@@ -40,20 +40,20 @@
     <!-- Main Content -->
     <div id="mainContent" class="transition-all duration-300 ml-64 min-h-screen bg-gray-100">
         <!-- Top Bar -->
-@include('admin.layout.header')
+        @include('admin.layout.header')
 
 
         <!-- Content -->
 
         <main class="p-6">
-      @yield('content')
+            @yield('content')
         </main>
 
     </div>
 
 
 
-<script src="{{ asset('assets/js/main.js') }}"></script>
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 
 </body>
 
