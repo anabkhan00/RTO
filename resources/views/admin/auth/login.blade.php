@@ -70,148 +70,54 @@
                 </div>
 
                 <div class="flex bg-gray-100 rounded-full mb-2 overflow-hidden p-1">
-                    <button id="loginTab"
-                        class="flex-1 py-2 font-semibold text-white bg-brand rounded-lg transition duration-300 hover:bg-[#D4B373]"
-                        onclick="showForm('login')">
+                    <button
+                        class="flex-1 py-2 font-semibold text-white bg-brand rounded-lg transition duration-300 hover:bg-[#D4B373]">
                         Sign In
                     </button>
-                    <button id="signupTab"
-                        class="flex-1 py-2 font-semibold text-gray-700 rounded-lg transition duration-300 hover:bg-[#D4B373] hover:text-white"
-                        onclick="showForm('signup')">
+                    <a href="{{ route('register') }}"
+                        class="flex-1 py-2 font-semibold text-gray-700 rounded-lg transition duration-300 hover:bg-[#D4B373] hover:text-white text-center">
                         Sign Up
-                    </button>
+                    </a>
                 </div>
 
                 <!-- LOGIN FORM -->
-                <form id="loginForm" class="space-y-3">
+                <form id="loginForm" class="space-y-3" method="POST" action="{{ route('login') }}">
+                    @csrf
+                    @if ($errors->any())
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                            @foreach ($errors->all() as $error)
+                                <p class="text-sm">{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+                    
                     <div class="text-left">
                         <label class="block text-sm font-semibold mb-1">Email</label>
-                        <input type="email" placeholder="Enter Email"
+                        <input type="email" name="email" placeholder="Enter Email" required
                             class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-
                     </div>
 
                     <div class="text-left">
                         <div class="flex justify-between">
                             <label class="block text-sm font-semibold ">Password</label>
-                            <a href="#"
-                                class="text-sm text-mycolr float-right mb-1 text-sm underline decoration-mycolr hover:decoration-gold transition-all">
-                                Forgot Password?
-                            </a>
-
                         </div>
-                        <input type="password" placeholder="Enter Password"
+                        <input type="password" name="password" placeholder="Enter Password" required
                             class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-
                     </div>
-                    <!-- Password Tips -->
-                    <ul class="text-xs text-start text-mycolr space-y-1">
-                        <li><i class="bi bi-check-lg"></i> Password Strength: Weak</li>
-                        <li><i class="bi bi-check-lg"></i> Cannot contain your name or email</li>
-                        <li><i class="bi bi-check-lg"></i> At least 8 characters</li>
-                        <li><i class="bi bi-check-lg"></i> Contains a number or symbol</li>
-                    </ul>
-                    <button type="button"
+                    
+                    <button type="submit"
                         class="w-full bg-brand text-white font-semibold py-3 text-sm rounded-md hover:bg-gold transition">
                         Sign In
                     </button>
-
-
-
-
                 </form>
 
-                <!-- SIGNUP FORM -->
-                <form id="signupForm" class="space-y-3 hidden">
-                    <p>Training Organization Information</p>
-                    <div class="text-left">
-                        <label class="block text-sm font-semibold mb-1"> Name</label>
-                        <input type="text" placeholder="Enter Name"
-                            class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-                    </div>
-<div class="w-full flex flex-wrap ">
-  <div class="w-full md:w-1/2 pe-2">
-    <div class="text-left">
-      <label class="block text-sm font-semibold mb-1">Phone Number</label>
-      <input type="email" placeholder="Enter Phone Number"
-        class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-    </div>
-  </div>
-  
-  <div class="w-full md:w-1/2 ps-2">
-    <div class="text-left">
-      <label class="block text-sm font-semibold mb-1">Email</label>
-      <input type="password" placeholder="Enter Email"
-        class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-    </div>
-  </div>
-</div>
-   <div class="w-full flex flex-wrap ">
-  <div class="w-full md:w-1/2 pe-2">
-    <div class="text-left">
-      <label class="block text-sm font-semibold mb-1">Password</label>
-      <input type="email" placeholder="Enter Password"
-        class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-    </div>
-  </div>
-  
-  <div class="w-full md:w-1/2 ps-2">
-    <div class="text-left">
-      <label class="block text-sm font-semibold mb-1">Confirm Password</label>
-      <input type="password" placeholder="Confirm Password"
-        class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-    </div>
-  </div>
-</div>
 
-               
-            
-                    <button type="button"
-                        class="w-full bg-brand text-white font-semibold py-3 text-sm rounded-md hover:bg-gold transition">
-                        Sign Up
-                    </button>
-
-
-
-
-                </form>
                 <p class="mt-5 text-xs text-center text-mycolr font-medium">By signing up to create an account I accept
                     Company’s <span class="text-brand">Terms of use & Privacy Policy.</span></p>
             </div>
         </div>
     </div>
-    <script>
-        function showForm(type) {
-            const loginForm = document.getElementById("loginForm");
-            const signupForm = document.getElementById("signupForm");
-            const loginTab = document.getElementById("loginTab");
-            const signupTab = document.getElementById("signupTab");
 
-            if (type === "signup") {
-                loginForm.classList.add("hidden");
-                signupForm.classList.remove("hidden");
-
-                // Active signup
-                signupTab.classList.add("bg-brand", "text-white");
-                signupTab.classList.remove("text-gray-700");
-
-                // Inactive login
-                loginTab.classList.remove("bg-brand", "text-white");
-                loginTab.classList.add("text-gray-700");
-            } else {
-                signupForm.classList.add("hidden");
-                loginForm.classList.remove("hidden");
-
-                // Active login
-                loginTab.classList.add("bg-brand", "text-white");
-                loginTab.classList.remove("text-gray-700");
-
-                // Inactive signup
-                signupTab.classList.remove("bg-brand", "text-white");
-                signupTab.classList.add("text-gray-700");
-            }
-        }
-    </script>
 </body>
 
 </html>
