@@ -37,13 +37,14 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
         return view('admin.pages.dashboard');
     })->name('dashboard');
 
-    Route::get('/rto', function () {
-        return view('admin.pages.add_rto');
-    })->name('add_rto');
+    Route::get('/rto', [App\Http\Controllers\Admin\RtoController::class, 'index'])->name('add_rto');
+    Route::post('/rto', [App\Http\Controllers\Admin\RtoController::class, 'store']);
+    Route::put('/rto/{id}', [App\Http\Controllers\Admin\RtoController::class, 'update']);
+    Route::delete('/rto/{id}', [App\Http\Controllers\Admin\RtoController::class, 'destroy']);
+    Route::patch('/rto/{id}/toggle-status', [App\Http\Controllers\Admin\RtoController::class, 'toggleStatus']);
 
-    Route::get('/students', function () {
-        return view('admin.pages.students');
-    })->name('students');
+    Route::get('/students', [App\Http\Controllers\Admin\StudentController::class, 'index'])->name('students');
+    Route::get('/students/download', [App\Http\Controllers\Admin\StudentController::class, 'download'])->name('students.download');
 
     Route::get('/courses', function () {
         return view('admin.pages.courses');
