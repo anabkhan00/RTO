@@ -7,7 +7,7 @@
     </div>
 
     <div class="bg-white rounded-lg shadow overflow-x-auto">
-        <table class="min-w-full border-collapse w-full">
+        <table id="studentsTable" class="min-w-full border-collapse w-full">
             <thead>
                 <tr class="text-left text-brand font-normal text-sm border-b">
                     <th class="p-3 whitespace-nowrap">Name</th>
@@ -36,9 +36,9 @@
                         </div>
                     </td>
                     <td class="p-3 whitespace-nowrap">
-                        <button class="text-blue-500 hover:text-blue-700 mr-2" title="View Details">
+                        {{-- <button class="text-blue-500 hover:text-blue-700 mr-2" title="View Details">
                             <i class="bi bi-eye-fill"></i>
-                        </button>
+                        </button> --}}
                         <button class="text-red-500 hover:text-red-700" title="Delete" onclick="return confirm('Are you sure?')">
                             <i class="bi bi-trash3-fill"></i>
                         </button>
@@ -52,4 +52,17 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#studentsTable').DataTable({
+                "pageLength": 10,
+                "searching": true,
+                "ordering": true,
+                "columnDefs": [
+                    { "orderable": false, "targets": [5] }
+                ]
+            });
+        });
+    </script>
 @endsection
