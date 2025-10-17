@@ -76,12 +76,12 @@
               <p class="flex items-center font-medium text-brand text-xs mt-2"><img src="{{ asset('assets/images/beeg.svg') }}"
                   class="w-3 me-3">Full Time and Part time Available</p>
             </div>
-            <div class="w-full mt-3">
+            {{-- <div class="w-full mt-3">
               <button type="button"
                 class="w-full bg-brand text-white font-semibold py-3 text-sm rounded-md hover:bg-gold transition">
                 Follow Industry
               </button>
-            </div>
+            </div> --}}
           </div>
         </div>
         <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-3">
@@ -103,12 +103,12 @@
               <p class="flex items-center font-medium text-brand text-xs mt-2"><img src="{{ asset('assets/images/beeg.svg') }}"
                   class="w-3 me-3">Only Full Time</p>
             </div>
-            <div class="w-full mt-3">
+            {{-- <div class="w-full mt-3">
               <button type="button"
                 class="w-full bg-brand text-white font-semibold py-3 text-sm rounded-md hover:bg-gold transition">
                 Follow Industry
               </button>
-            </div>
+            </div> --}}
           </div>
         </div>
         <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-3">
@@ -130,12 +130,12 @@
               <p class="flex items-center font-medium text-brand text-xs mt-2"><img src="{{ asset('assets/images/beeg.svg') }}"
                   class="w-3 me-3">Full Time and Part time Available</p>
             </div>
-            <div class="w-full mt-3">
+            {{-- <div class="w-full mt-3">
               <button type="button"
                 class="w-full bg-brand text-white font-semibold py-3 text-sm rounded-md hover:bg-gold transition">
                 Follow Industry
               </button>
-            </div>
+            </div> --}}
           </div>
         </div>
       </div>
@@ -145,104 +145,40 @@
           <table class="min-w-full border-collapse w-full">
             <thead>
               <tr class="text-left text-brand font-normal text-sm border-b">
-                <th class="p-3 whitespace-nowrap">RTO</th>
+                <th class="p-3 whitespace-nowrap">Student Name</th>
                 <th class="p-3 whitespace-nowrap">Email</th>
+                <th class="p-3 whitespace-nowrap">Phone</th>
                 <th class="p-3 whitespace-nowrap">Created Date</th>
-                <th class="p-3 whitespace-nowrap">Process</th>
                 <th class="p-3 whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody class="">
               <tr class="border-b font-medium text-xs hover:bg-gray-50">
-                <td class="p-3 whitespace-nowrap">Global Training</td>
-                <td class="p-3 whitespace-nowrap">info@globaltraining.com</td>
-                <td class="p-3 whitespace-nowrap">06 Oct 2022</td>
-                <td class="p-3 whitespace-nowrap">
-                  <div class="flex items-center space-x-2">
-                    <!-- Green Dot -->
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-
-                    <!-- Dropdown -->
-                    <select class="text-green-500 font-medium bg-transparent border-none focus:ring-0 cursor-pointer"
-                      onchange="this.classList.toggle('text-green-500', this.value === 'Approved');
-                 this.classList.toggle('text-red-500', this.value === 'Rejected');
-                 this.previousElementSibling.classList.toggle('bg-green-500', this.value === 'Approved');
-                 this.previousElementSibling.classList.toggle('bg-red-500', this.value === 'Rejected');">
-                      <option value="Approved" selected>Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                </td>
-
+                <td class="p-3 whitespace-nowrap"> Jonathan</td>
+                <td class="p-3 whitespace-nowrap">jonathan@gmail.com</td>
+                <td class="p-3 whitespace-nowrap">61800692273</td>
+             <td class="p-3 whitespace-nowrap">06, Oct 2022</td>
                 <td class="p-3 text-red-500 cursor-pointer whitespace-nowrap"><i class="bi bi-trash3-fill"></i></td>
               </tr>
-              <tr class="border-b font-medium text-xs hover:bg-gray-50">
-                <td class="p-3 whitespace-nowrap">Global Training</td>
-                <td class="p-3 whitespace-nowrap">info@globaltraining.com</td>
-                <td class="p-3 whitespace-nowrap">06 Oct 2022</td>
-                <td class="p-3 whitespace-nowrap">
-                  <div class="flex items-center space-x-2">
-                    <!-- Green Dot -->
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-
-                    <!-- Dropdown -->
-                    <select class="text-green-500 font-medium bg-transparent border-none focus:ring-0 cursor-pointer"
-                      onchange="this.classList.toggle('text-green-500', this.value === 'Approved');
-                 this.classList.toggle('text-red-500', this.value === 'Rejected');
-                 this.previousElementSibling.classList.toggle('bg-green-500', this.value === 'Approved');
-                 this.previousElementSibling.classList.toggle('bg-red-500', this.value === 'Rejected');">
-                      <option value="Approved" selected>Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                </td>
-
+                <tr class="border-b font-medium text-xs hover:bg-gray-50">
+                <td class="p-3 whitespace-nowrap"> Jonathan</td>
+                <td class="p-3 whitespace-nowrap">jonathan@gmail.com</td>
+                <td class="p-3 whitespace-nowrap">61800692273</td>
+             <td class="p-3 whitespace-nowrap">06, Oct 2022</td>
                 <td class="p-3 text-red-500 cursor-pointer whitespace-nowrap"><i class="bi bi-trash3-fill"></i></td>
               </tr>
-              <tr class="border-b font-medium text-xs hover:bg-gray-50">
-                <td class="p-3 whitespace-nowrap">Global Training</td>
-                <td class="p-3 whitespace-nowrap">info@globaltraining.com</td>
-                <td class="p-3 whitespace-nowrap">06 Oct 2022</td>
-                <td class="p-3 whitespace-nowrap">
-                  <div class="flex items-center space-x-2">
-                    <!-- Green Dot -->
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-
-                    <!-- Dropdown -->
-                    <select class="text-green-500 font-medium bg-transparent border-none focus:ring-0 cursor-pointer"
-                      onchange="this.classList.toggle('text-green-500', this.value === 'Approved');
-                 this.classList.toggle('text-red-500', this.value === 'Rejected');
-                 this.previousElementSibling.classList.toggle('bg-green-500', this.value === 'Approved');
-                 this.previousElementSibling.classList.toggle('bg-red-500', this.value === 'Rejected');">
-                      <option value="Approved" selected>Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                </td>
-
+                  <tr class="border-b font-medium text-xs hover:bg-gray-50">
+                <td class="p-3 whitespace-nowrap"> Jonathan</td>
+                <td class="p-3 whitespace-nowrap">jonathan@gmail.com</td>
+                <td class="p-3 whitespace-nowrap">61800692273</td>
+             <td class="p-3 whitespace-nowrap">06, Oct 2022</td>
                 <td class="p-3 text-red-500 cursor-pointer whitespace-nowrap"><i class="bi bi-trash3-fill"></i></td>
               </tr>
-              <tr class="border-b font-medium text-xs hover:bg-gray-50">
-                <td class="p-3 whitespace-nowrap">Global Training</td>
-                <td class="p-3 whitespace-nowrap">info@globaltraining.com</td>
-                <td class="p-3 whitespace-nowrap">06 Oct 2022</td>
-                <td class="p-3 whitespace-nowrap">
-                  <div class="flex items-center space-x-2">
-                    <!-- Green Dot -->
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-
-                    <!-- Dropdown -->
-                    <select class="text-green-500 font-medium bg-transparent border-none focus:ring-0 cursor-pointer"
-                      onchange="this.classList.toggle('text-green-500', this.value === 'Approved');
-                 this.classList.toggle('text-red-500', this.value === 'Rejected');
-                 this.previousElementSibling.classList.toggle('bg-green-500', this.value === 'Approved');
-                 this.previousElementSibling.classList.toggle('bg-red-500', this.value === 'Rejected');">
-                      <option value="Approved" selected>Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                </td>
-
+                  <tr class="border-b font-medium text-xs hover:bg-gray-50">
+                <td class="p-3 whitespace-nowrap"> Jonathan</td>
+                <td class="p-3 whitespace-nowrap">jonathan@gmail.com</td>
+                <td class="p-3 whitespace-nowrap">61800692273</td>
+             <td class="p-3 whitespace-nowrap">06, Oct 2022</td>
                 <td class="p-3 text-red-500 cursor-pointer whitespace-nowrap"><i class="bi bi-trash3-fill"></i></td>
               </tr>
             </tbody>
