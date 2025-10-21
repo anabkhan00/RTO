@@ -33,10 +33,10 @@
                 </a>
 
                 <!-- Create Users -->
-                <a href="{{ route('admin.create-users') }}"
+                {{-- <a href="{{ route('admin.create-users') }}"
                     class="flex items-center px-6 py-2 font-normal text-base transition {{ request()->routeIs('admin.create-users*') ? 'bg-brand rounded-lg' : '' }}">
                     Create Users
-                </a>
+                </a> --}}
 
                 <!-- Role & Permission Management -->
                 <a href="{{ route('admin.roles') }}"
@@ -50,6 +50,11 @@
                 <a href="{{ route('admin.assign-permissions') }}"
                     class="flex items-center px-6 py-2 font-normal text-base transition {{ request()->routeIs('admin.assign-permissions*') ? 'bg-brand rounded-lg' : '' }}">
                     Assign Permissions
+                </a>
+
+                <a href="/profile"
+                    class="flex items-center px-6 py-2 font-normal text-base transition {{ request()->is('profile') ? 'bg-brand rounded-lg' : '' }}">
+                    Profile
                 </a>
 
                 <a href="#"

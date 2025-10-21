@@ -1,5 +1,18 @@
-  @extends('admin.master_layout.index')
+@extends('rto.master_layout.index')
 @section('content')
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            @foreach ($errors->all() as $error)
+                <p class="text-sm">{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
     <div class="w-full flex justify-between mb-4">
         <div class="flex gap-3">
             <button class="bg-brand text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gold" id="openModalBtn">
@@ -9,9 +22,6 @@
                 <i class="bi bi-upload mr-2"></i> Upload CSV
             </button>
         </div>
-        <a href="{{ route('admin.students.download') }}" class="bg-gray-600 text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gray-700">
-            Download All <img src="{{ asset('assets/images/Login.svg') }}" class="ms-3 w-4">
-        </a>
     </div>
 
     <div class="bg-white rounded-lg shadow overflow-x-auto">
@@ -27,7 +37,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($students as $student)
+                @foreach($students as $student)
                 <tr class="border-b font-medium text-xs hover:bg-gray-50">
                     <td class="p-3 whitespace-nowrap">{{ $student->name }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $student->email }}</td>
@@ -38,7 +48,7 @@
                         <button onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ addslashes($student->address) }}')" class="text-blue-500 hover:text-blue-700 mr-2">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <form method="POST" action="/admin/students/{{ $student->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                        <form method="POST" action="/rto/students/{{ $student->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-500 hover:text-red-700">
@@ -47,11 +57,7 @@
                         </form>
                     </td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="p-3 text-center text-gray-500">No students found</td>
-                </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -65,7 +71,7 @@
 
             <h2 id="modalTitle" class="text-2xl font-semibold text-brand pb-3">Add Student</h2>
 
-            <form id="studentForm" method="POST" action="/admin/students" class="space-y-4">
+            <form id="studentForm" method="POST" action="/rto/students" class="space-y-4">
                 @csrf
                 <input type="hidden" id="studentId" name="_method" value="">
 
@@ -116,7 +122,7 @@
 
             <h2 class="text-2xl font-semibold text-brand pb-3">Upload Students CSV</h2>
 
-            <form method="POST" action="/admin/students/upload" enctype="multipart/form-data" class="space-y-4">
+            <form method="POST" action="/rto/students/upload" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div>
                     <label class="block text-sm font-medium text-brand mb-2">Select CSV File</label>
@@ -157,7 +163,7 @@
         openBtn.addEventListener('click', () => {
             resetForm();
             modalTitle.textContent = 'Add Student';
-            form.action = '/admin/students';
+            form.action = '/rto/students';
             document.getElementById('studentId').value = '';
             modal.classList.remove('hidden');
         });
@@ -170,7 +176,7 @@
 
         function editStudent(id, name, email, phone, address) {
             modalTitle.textContent = 'Edit Student';
-            form.action = `/admin/students/${id}`;
+            form.action = `/rto/students/${id}`;
             document.getElementById('studentId').value = 'PUT';
             document.getElementById('studentName').value = name;
             document.getElementById('studentEmail').value = email;
