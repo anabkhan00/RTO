@@ -44,7 +44,10 @@ class AuthController extends Controller
         if ($request->role === 'user') {
             $validationRules['address'] = 'required|string|max:255';
         } elseif ($request->role === 'rto') {
-            $validationRules['rto_number'] = 'required|string|max:255';
+            $validationRules['code'] = 'required|string|unique:users';
+            $validationRules['phone'] = 'required|string|max:20';
+            $validationRules['contact_person'] = 'required|string|max:255';
+            $validationRules['website'] = 'nullable|url';
         }
 
         $request->validate($validationRules);
@@ -59,8 +62,12 @@ class AuthController extends Controller
         // Add role-specific fields
         if ($request->role === 'user' && $request->address) {
             $userData['address'] = $request->address;
-        } elseif ($request->role === 'rto' && $request->rto_number) {
-            $userData['rto_number'] = $request->rto_number;
+        } elseif ($request->role === 'rto') {
+            $userData['code'] = $request->code;
+            $userData['phone'] = $request->phone;
+            $userData['contact_person'] = $request->contact_person;
+            $userData['website'] = $request->website;
+            $userData['status'] = true;
         }
 
         $user = User::create($userData);
