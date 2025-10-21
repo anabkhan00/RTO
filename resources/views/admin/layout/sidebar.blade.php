@@ -52,6 +52,11 @@
                     Assign Permissions
                 </a>
 
+                <a href="/profile"
+                    class="flex items-center px-6 py-2 font-normal text-base transition {{ request()->is('profile') ? 'bg-brand rounded-lg' : '' }}">
+                    Profile
+                </a>
+
                 <a href="#"
                     class="flex items-center px-6 py-2 font-normal text-base hover:bg-brand/20 transition">
                     Settings
