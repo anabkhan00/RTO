@@ -27,7 +27,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($students as $student)
+                @foreach($students as $student)
                 <tr class="border-b font-medium text-xs hover:bg-gray-50">
                     <td class="p-3 whitespace-nowrap">{{ $student->name }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $student->email }}</td>
@@ -38,20 +38,16 @@
                         <button onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ addslashes($student->address) }}')" class="text-blue-500 hover:text-blue-700 mr-2">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <form method="POST" action="/admin/students/{{ $student->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                        <button onclick="deleteStudent({{ $student->id }})" class="text-red-500 hover:text-red-700">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                        <form id="delete-form-{{ $student->id }}" method="POST" action="/admin/students/{{ $student->id }}" class="hidden">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700">
-                                <i class="bi bi-trash3-fill"></i>
-                            </button>
                         </form>
                     </td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="p-3 text-center text-gray-500">No students found</td>
-                </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -184,14 +180,43 @@
             document.getElementById('studentId').value = '';
         }
 
+        function deleteStudent(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('#studentsTable').DataTable({
-                "pageLength": 10,
+                "pageLength": 25,
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
                     { "orderable": false, "targets": [5] }
-                ]
+                ],
+                "dom": '<"top"lf><"dataTables_scroll overflow-x-auto"rt><"bottom"ip>',
+                "scrollX": true,
+                "language": {
+                    "search": "Search:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
             });
         });
     </script>

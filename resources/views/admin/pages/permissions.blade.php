@@ -8,11 +8,6 @@
         </div>
         
         <div class="p-6">
-            @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                    {{ session('success') }}
-                </div>
-            @endif
 
             <!-- Add Permission Form -->
             <form method="POST" action="{{ route('admin.permissions') }}" class="mb-6">
@@ -25,7 +20,7 @@
 
             <!-- Permissions Table -->
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-white border border-gray-200">
+                <table id="permissionsTable" class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
@@ -51,10 +46,10 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $permission->created_at->format('Y-m-d') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button onclick="editPermission({{ $permission->id }})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                                <form method="POST" action="/admin/permissions/{{ $permission->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                                <button onclick="deletePermission({{ $permission->id }})" class="text-red-600 hover:text-red-900">Delete</button>
+                                <form id="delete-form-{{ $permission->id }}" method="POST" action="/admin/permissions/{{ $permission->id }}" class="hidden">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -76,5 +71,45 @@ function cancelEdit(id) {
     document.getElementById('permission-name-' + id).classList.remove('hidden');
     document.getElementById('edit-form-' + id).classList.add('hidden');
 }
+
+function deletePermission(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+
+$(document).ready(function() {
+    $('#permissionsTable').DataTable({
+        "pageLength": 25,
+        "searching": true,
+        "ordering": true,
+        "columnDefs": [
+            { "orderable": false, "targets": [3] }
+        ],
+        "dom": '<"top"lf><"dataTables_scroll overflow-x-auto"rt><"bottom"ip>',
+        "scrollX": true,
+        "language": {
+            "search": "Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+});
 </script>
 @endsection

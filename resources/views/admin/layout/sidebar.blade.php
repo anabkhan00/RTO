@@ -57,14 +57,20 @@
                     Profile
                 </a>
 
-                <a href="#"
+                {{-- <a href="#"
                     class="flex items-center px-6 py-2 font-medium text-sm hover:bg-brand/20 transition">
                     Settings
-                </a>
+                </a> --}}
             </nav>
 
         </div>
-        <button class="m-6 py-2 border border-brand text-brand rounded-md hover:bg-brand hover:text-white transition">
+        <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">
+            @csrf
+        </form>
+
+        <button onclick="event.preventDefault(); document.getElementById('logoutForm').submit();"
+            class="m-6 py-2 border border-brand text-brand rounded-md hover:bg-brand hover:text-white transition">
             Logout
         </button>
+
     </aside>

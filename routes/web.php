@@ -40,6 +40,7 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show']);
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update']);
+    Route::post('/profile/documents', [App\Http\Controllers\ProfileController::class, 'uploadDocuments']);
 });
 
 // Admin Routes
@@ -66,18 +67,17 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::put('/courses/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update']);
     Route::delete('/courses/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy']);
 
+    Route::get('/industries', [App\Http\Controllers\Admin\IndustryController::class, 'index'])->name('Industries');
+    Route::post('/industries', [App\Http\Controllers\Admin\IndustryController::class, 'store']);
+    Route::put('/industries/{id}', [App\Http\Controllers\Admin\IndustryController::class, 'update']);
+    Route::delete('/industries/{id}', [App\Http\Controllers\Admin\IndustryController::class, 'destroy']);
+    Route::patch('/industries/{id}/toggle-status', [App\Http\Controllers\Admin\IndustryController::class, 'toggleStatus']);
 
-    Route::get('/Industries', [App\Http\Controllers\Admin\IndustryController::class, 'index'])->name('Industries');
-    Route::post('/Industries', [App\Http\Controllers\Admin\IndustryController::class, 'store']);
-    Route::put('/Industries/{id}', [App\Http\Controllers\Admin\IndustryController::class, 'update']);
-    Route::delete('/Industries/{id}', [App\Http\Controllers\Admin\IndustryController::class, 'destroy']);
-    Route::patch('/Industries/{id}/toggle-status', [App\Http\Controllers\Admin\IndustryController::class, 'toggleStatus']);
-
-    Route::get('/Coordinator', [App\Http\Controllers\Admin\CoordinatorController::class, 'index'])->name('Coordinator');
-    Route::post('/Coordinator', [App\Http\Controllers\Admin\CoordinatorController::class, 'store']);
-    Route::put('/Coordinator/{id}', [App\Http\Controllers\Admin\CoordinatorController::class, 'update']);
-    Route::delete('/Coordinator/{id}', [App\Http\Controllers\Admin\CoordinatorController::class, 'destroy']);
-    Route::patch('/Coordinator/{id}/reset-password', [App\Http\Controllers\Admin\CoordinatorController::class, 'resetPassword']);
+    Route::get('/coordinator', [App\Http\Controllers\Admin\CoordinatorController::class, 'index'])->name('Coordinator');
+    Route::post('/coordinator', [App\Http\Controllers\Admin\CoordinatorController::class, 'store']);
+    Route::put('/coordinator/{id}', [App\Http\Controllers\Admin\CoordinatorController::class, 'update']);
+    Route::delete('/coordinator/{id}', [App\Http\Controllers\Admin\CoordinatorController::class, 'destroy']);
+    Route::patch('/coordinator/{id}/reset-password', [App\Http\Controllers\Admin\CoordinatorController::class, 'resetPassword']);
 
     // Role & Permission Management
     Route::get('/roles', [RolePermissionController::class, 'roles'])->name('roles');
@@ -90,10 +90,6 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::delete('/permissions/{id}', [RolePermissionController::class, 'deletePermission']);
     Route::get('/assign-permissions', [RolePermissionController::class, 'assignPermissions'])->name('assign-permissions');
     Route::post('/assign-permissions', [RolePermissionController::class, 'updateRolePermissions']);
-
-    // User Management
-    // Route::get('/create-users', [App\Http\Controllers\Admin\UserManagementController::class, 'createUsers'])->name('create-users');
-    // Route::post('/create-users', [App\Http\Controllers\Admin\UserManagementController::class, 'storeUser']);
 });
 
 

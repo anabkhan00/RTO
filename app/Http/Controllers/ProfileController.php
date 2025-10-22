@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Models\RtoDocument;
 
 class ProfileController extends Controller
 {
@@ -62,5 +64,35 @@ class ProfileController extends Controller
 
         $user->update($updateData);
         return back()->with('success', 'Profile updated successfully');
+    }
+
+    public function uploadDocuments(Request $request)
+    {
+        $request->validate([
+            'labels' => 'required|array',
+            'labels.*' => 'required|string|max:255',
+            'documents' => 'required|array',
+            'documents.*' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240'
+        ]);
+
+        $user = Auth::user();
+        
+        foreach ($request->file('documents') as $index => $file) {
+            $label = $request->labels[$index];
+            
+            $fileName = time() . '_' . $index . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('rto_documents/' . $user->id, $fileName, 'public');
+            
+            RtoDocument::create([
+                'user_id' => $user->id,
+                'label' => $label,
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
+                'file_type' => $file->getClientOriginalExtension(),
+                'file_size' => $file->getSize()
+            ]);
+        }
+
+        return back()->with('success', 'Documents uploaded successfully');
     }
 }

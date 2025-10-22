@@ -8,16 +8,6 @@
         </div>
         
         <div class="p-6">
-            @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {{ session('error') }}
-                </div>
-            @endif
 
             <!-- Add Role Form -->
             <form method="POST" action="{{ route('admin.roles') }}" class="mb-6">
@@ -30,7 +20,7 @@
 
             <!-- Roles Table -->
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-white border border-gray-200">
+                <table id="rolesTable" class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
@@ -65,10 +55,10 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button onclick="editRole({{ $role->id }})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
                                 @if(!in_array($role->name, ['admin', 'user', 'rto']))
-                                <form method="POST" action="/admin/roles/{{ $role->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                                <button onclick="deleteRole({{ $role->id }})" class="text-red-600 hover:text-red-900">Delete</button>
+                                <form id="delete-form-{{ $role->id }}" method="POST" action="/admin/roles/{{ $role->id }}" class="hidden">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
                                 </form>
                                 @endif
                             </td>
@@ -91,5 +81,45 @@ function cancelEdit(id) {
     document.getElementById('role-name-' + id).classList.remove('hidden');
     document.getElementById('edit-form-' + id).classList.add('hidden');
 }
+
+function deleteRole(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+
+$(document).ready(function() {
+    $('#rolesTable').DataTable({
+        "pageLength": 25,
+        "searching": true,
+        "ordering": true,
+        "columnDefs": [
+            { "orderable": false, "targets": [4] }
+        ],
+        "dom": '<"top"lf><"dataTables_scroll overflow-x-auto"rt><"bottom"ip>',
+        "scrollX": true,
+        "language": {
+            "search": "Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+});
 </script>
 @endsection

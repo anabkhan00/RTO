@@ -1,18 +1,5 @@
 @extends('rto.master_layout.index')
 @section('content')
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            @foreach ($errors->all() as $error)
-                <p class="text-sm">{{ $error }}</p>
-            @endforeach
-        </div>
-    @endif
-
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-2xl font-semibold text-brand mb-6">Profile Settings</h2>
 
@@ -93,5 +80,95 @@
                 </button>
             </div>
         </form>
+
+        <!-- Document Upload Section -->
+        <div class="mt-8 border-t pt-6">
+            <h3 class="text-lg font-medium text-brand mb-4">Upload Documents</h3>
+            
+            <form method="POST" action="/profile/documents" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                
+                <div id="documentRows">
+                    <div class="document-row grid grid-cols-12 gap-4 items-end mb-4">
+                        <div class="col-span-5">
+                            <label class="block text-sm font-medium text-brand">Document Label</label>
+                            <input type="text" name="labels[]" placeholder="Enter document label" required
+                                class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                        </div>
+                        
+                        <div class="col-span-5">
+                            <label class="block text-sm font-medium text-brand">Document File</label>
+                            <input type="file" name="documents[]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required
+                                class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                        </div>
+                        
+                        <div class="col-span-2 flex justify-center">
+                            <button type="button" onclick="removeDocumentRow(this)" class="p-3 bg-red-500 text-white rounded-md hover:bg-red-600" style="display: none;">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <button type="button" onclick="addDocumentRow()" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm">
+                        + Add Another Document
+                    </button>
+                    
+                    <button type="submit" class="px-6 py-2 bg-brand text-white rounded-md hover:bg-gold">
+                        Upload Documents
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <script>
+        function addDocumentRow() {
+            const container = document.getElementById('documentRows');
+            const newRow = document.createElement('div');
+            newRow.className = 'document-row grid grid-cols-12 gap-4 items-end mb-4';
+            
+            newRow.innerHTML = `
+                <div class="col-span-5">
+                    <label class="block text-sm font-medium text-brand">Document Label</label>
+                    <input type="text" name="labels[]" placeholder="Enter document label" required
+                        class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                </div>
+                
+                <div class="col-span-5">
+                    <label class="block text-sm font-medium text-brand">Document File</label>
+                    <input type="file" name="documents[]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required
+                        class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                </div>
+                
+                <div class="col-span-2 flex justify-center">
+                    <button type="button" onclick="removeDocumentRow(this)" class="p-3 bg-red-500 text-white rounded-md hover:bg-red-600">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            updateRemoveButtons();
+        }
+        
+        function removeDocumentRow(button) {
+            const row = button.closest('.document-row');
+            row.remove();
+            updateRemoveButtons();
+        }
+        
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('.document-row');
+            rows.forEach((row, index) => {
+                const removeBtn = row.querySelector('button[onclick*="removeDocumentRow"]');
+                if (rows.length > 1) {
+                    removeBtn.style.display = 'block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            });
+        }
+    </script>
 @endsection
