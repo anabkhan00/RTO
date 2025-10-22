@@ -54,4 +54,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function rtoDocuments()
+    {
+        return $this->hasMany(RtoDocument::class);
+    }
 }

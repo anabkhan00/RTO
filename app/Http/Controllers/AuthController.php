@@ -18,7 +18,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
-            
+
             if ($user->hasRole('admin') || $user->hasRole('coordinator')) {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->hasRole('rto')) {
@@ -46,8 +46,8 @@ class AuthController extends Controller
         } elseif ($request->role === 'rto') {
             $validationRules['code'] = 'required|string|unique:users';
             $validationRules['phone'] = 'required|string|max:20';
-            $validationRules['contact_person'] = 'required|string|max:255';
-            $validationRules['website'] = 'nullable|url';
+            // $validationRules['contact_person'] = 'required|string|max:255';
+            // $validationRules['website'] = 'nullable|url';
         }
 
         $request->validate($validationRules);
@@ -65,8 +65,8 @@ class AuthController extends Controller
         } elseif ($request->role === 'rto') {
             $userData['code'] = $request->code;
             $userData['phone'] = $request->phone;
-            $userData['contact_person'] = $request->contact_person;
-            $userData['website'] = $request->website;
+            // $userData['contact_person'] = $request->contact_person;
+            // $userData['website'] = $request->website;
             $userData['status'] = true;
         }
 
@@ -77,7 +77,7 @@ class AuthController extends Controller
         if ($user->hasRole('rto')) {
             return redirect()->route('rto.dashboard');
         }
-        
+
         return redirect()->route('user.dashboard');
     }
 

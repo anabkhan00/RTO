@@ -1,18 +1,5 @@
 @extends('rto.master_layout.index')
 @section('content')
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            @foreach ($errors->all() as $error)
-                <p class="text-sm">{{ $error }}</p>
-            @endforeach
-        </div>
-    @endif
-
     <div class="w-full flex justify-between mb-4">
         <div class="flex gap-3">
             <button class="bg-brand text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gold" id="openModalBtn">
@@ -48,12 +35,12 @@
                         <button onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ addslashes($student->address) }}')" class="text-blue-500 hover:text-blue-700 mr-2">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <form method="POST" action="/rto/students/{{ $student->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                        <button onclick="deleteStudent({{ $student->id }})" class="text-red-500 hover:text-red-700">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                        <form id="delete-form-{{ $student->id }}" method="POST" action="/rto/students/{{ $student->id }}" class="hidden">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700">
-                                <i class="bi bi-trash3-fill"></i>
-                            </button>
                         </form>
                     </td>
                 </tr>
@@ -190,14 +177,43 @@
             document.getElementById('studentId').value = '';
         }
 
+        function deleteStudent(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('#studentsTable').DataTable({
-                "pageLength": 10,
+                "pageLength": 25,
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
                     { "orderable": false, "targets": [5] }
-                ]
+                ],
+                "dom": '<"top"lf><"dataTables_scroll overflow-x-auto"rt><"bottom"ip>',
+                "scrollX": true,
+                "language": {
+                    "search": "Search:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
             });
         });
     </script>

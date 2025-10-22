@@ -1,18 +1,5 @@
-  @extends('admin.master_layout.index')
+@extends('admin.master_layout.index')
 @section('content')
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            @foreach ($errors->all() as $error)
-                <p class="text-sm">{{ $error }}</p>
-            @endforeach
-        </div>
-    @endif
-
     <div class="w-full flex justify-end mb-4">
         <button class="bg-brand text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gold" id="openModalBtn">
             + Add Industry
@@ -33,7 +20,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($industries as $industry)
+                @foreach($industries as $industry)
                 <tr class="border-b font-medium text-xs hover:bg-gray-50">
                     <td class="p-3 whitespace-nowrap">{{ $industry->name }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $industry->email }}</td>
@@ -57,20 +44,16 @@
                         <button onclick="editIndustry({{ $industry->id }}, '{{ $industry->name }}', '{{ addslashes($industry->description) }}', '{{ $industry->contact_person }}', '{{ $industry->email }}', '{{ $industry->phone }}', '{{ addslashes($industry->address) }}', '{{ $industry->website }}')" class="text-blue-500 hover:text-blue-700 mr-2">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <form method="POST" action="/admin/Industries/{{ $industry->id }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                        <button onclick="deleteIndustry({{ $industry->id }})" class="text-red-500 hover:text-red-700">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                        <form id="delete-form-{{ $industry->id }}" method="POST" action="/admin/Industries/{{ $industry->id }}" class="hidden">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700">
-                                <i class="bi bi-trash3-fill"></i>
-                            </button>
                         </form>
                     </td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="p-3 text-center text-gray-500">No industries found</td>
-                </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -181,14 +164,43 @@ function resetForm() {
     document.getElementById('industryId').value = '';
 }
 
+function deleteIndustry(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+
 $(document).ready(function() {
     $('#industriesTable').DataTable({
-        "pageLength": 10,
+        "pageLength": 25,
         "searching": true,
         "ordering": true,
         "columnDefs": [
             { "orderable": false, "targets": [6] }
-        ]
+        ],
+        "dom": '<"top"lf><"dataTables_scroll overflow-x-auto"rt><"bottom"ip>',
+        "scrollX": true,
+        "language": {
+            "search": "Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
     });
 });
 </script>

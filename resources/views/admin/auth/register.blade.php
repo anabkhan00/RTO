@@ -127,24 +127,24 @@
                             <input type="text" name="code" placeholder="Enter RTO Code"
                                 class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
                         </div>
-                        
+
                         <div class="text-left">
                             <label class="block text-sm font-semibold mb-1">Phone Number</label>
                             <input type="text" name="phone" placeholder="Enter Phone Number"
                                 class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
                         </div>
-                        
-                        <div class="text-left">
+
+                        {{-- <div class="text-left">
                             <label class="block text-sm font-semibold mb-1">Contact Person Name</label>
                             <input type="text" name="contact_person" placeholder="Enter Contact Person Name"
                                 class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
                         </div>
-                        
+
                         <div class="text-left">
                             <label class="block text-sm font-semibold mb-1">Website (Optional)</label>
                             <input type="url" name="website" placeholder="Enter Website URL"
                                 class="w-full border border-gold bg-white rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-                        </div>
+                        </div> --}}
                     </div>
 
                     <div class="w-full flex flex-wrap">
@@ -181,11 +181,11 @@ function toggleFields() {
     const roleSelect = document.getElementById('roleSelect');
     const studentField = document.getElementById('studentField');
     const rtoFields = document.getElementById('rtoFields');
-    
+
     // Hide all fields first
     studentField.classList.add('hidden');
     rtoFields.classList.add('hidden');
-    
+
     // Show relevant field based on selection
     if (roleSelect.value === 'user') {
         studentField.classList.remove('hidden');
