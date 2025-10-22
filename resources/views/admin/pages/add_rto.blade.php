@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelBtn" class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                    <button type="button" id="cancelBtn" class="px-6 py-2 bg-gold text-white rounded-md hover:bg-brand">
                         Cancel
                     </button>
                     <button type="submit" class="px-6 py-2 bg-brand text-white rounded-md hover:bg-gold">

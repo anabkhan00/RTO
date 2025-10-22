@@ -123,40 +123,41 @@
   <div class=" rounded-xl p-2 flex flex-col md:flex-row gap-6 w-full max-w-6xl">
 
     <!-- 📊 LEFT: Line Chart -->
-    <div class="bg-white rounded-lg p-5 flex-1 shadow-sm">
+    <div class="bg-white rounded-lg p-3 flex-1 shadow-sm">
       <div class="flex justify-between items-center mb-3">
-        <h2 class="text-lg font-semibold text-gray-800">Students Referral Outcome</h2>
-        <button class="border border-yellow-700 text-yellow-700 text-sm px-3 py-1 rounded-md">
+        <h2 class="font-semibold text-sm text-brand">Students Referral Outcome</h2>
+        <button class="border border-gold text-dark text-xs px-3 py-1 rounded-md">
           This Month
         </button>
       </div>
 
-      <canvas id="lineChart" height="150"></canvas>
+      <canvas id="lineChart" height="100"></canvas>
 
       <div class="flex justify-center gap-6 mt-4 text-sm">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center font-semibold text-brand text-xs gap-2">
           <span class="w-3 h-3 bg-green-500 rounded-full"></span> Hired
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center font-semibold text-brand text-xs gap-2">
           <span class="w-3 h-3 bg-blue-500 rounded-full"></span> Pending
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center font-semibold text-brand text-xs gap-2">
           <span class="w-3 h-3 bg-red-500 rounded-full"></span> Rejected
         </div>
       </div>
     </div>
 
-    <!-- 🎯 RIGHT: Gauge Chart -->
-    <div class="bg-[#d4b373] rounded-lg flex flex-col justify-center items-center p-6 w-full md:w-1/3">
-      <h3 class="text-gray-900 font-semibold mb-3">Target vs Achieved</h3>
-      <div class="relative w-40 h-20">
-        <canvas id="gaugeChart"></canvas>
-        <div class="absolute inset-0 flex flex-col items-center justify-center translate-y-6">
-          <p class="text-xl font-bold text-gray-900">80%</p>
-          <p class="text-gray-800 text-sm">achieved</p>
-        </div>
-      </div>
+<div class="bg-[#d4b373] rounded-lg flex flex-col items-center justify-center p-6 w-full md:w-1/3">
+  <h3 class="font-semibold text-sm text-brand  mb-3">Target vs Achieved</h3>
+  <div class="relative w-52 h-52 flex items-center justify-center">
+    <canvas id="gaugeChart"></canvas>
+    <div class="absolute inset-0 flex flex-col items-center justify-center translate-y-6">
+      <p id="gaugeValue" class="text-xl font-bold text-brand">0%</p>
+      <p class="font-semibold text-sm text-brand">achieved</p>
     </div>
+  </div>
+</div>
+
+
   </div>
        
         
@@ -319,25 +320,45 @@
         }
       }
     });
+ const gaugeCtx = document.getElementById('gaugeChart');
+  const valueEl = document.getElementById('gaugeValue');
 
-    // 🕹️ Gauge Chart (Half-donut)
-    const gaugeCtx = document.getElementById('gaugeChart');
-    new Chart(gaugeCtx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [80, 20],
-          backgroundColor: ['#111827', '#e5e7eb'],
-          borderWidth: 0,
-          cutout: '75%',
-          circumference: 180,
-          rotation: 270
-        }]
+  // 🕹️ Gauge Chart (No white circles)
+  const gaugeChart = new Chart(gaugeCtx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [0, 100], // start from 0%
+        backgroundColor: ['#ffffff', '#000000'], // white fill, black base
+        borderWidth: 0,
+        cutout: '70%', // thickness
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
       },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+      animation: {
+        duration: 2000,
+        easing: 'easeOutQuart',
+        onProgress(animation) {
+          const progress = Math.round((animation.currentStep / animation.numSteps) * 80);
+          valueEl.textContent = progress + '%';
+          gaugeChart.data.datasets[0].data = [progress, 100 - progress];
+          gaugeChart.update('none');
+        }
       }
-    });
+    }
+  });
+
+  // 🔥 Trigger smooth fill to 80%
+  setTimeout(() => {
+    gaugeChart.data.datasets[0].data = [80, 20];
+    gaugeChart.update();
+  }, 100);
   </script>
       @endsection
