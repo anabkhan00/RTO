@@ -12,24 +12,12 @@ class Course extends Model
     protected $fillable = [
         'name',
         'code',
+        'credit_hours',
         'description',
-        'duration', 
-        'price',
-        'rto_id',
         'status',
-        'placement_hours',
-        'no_of_students'
     ];
 
     protected $casts = [
         'status' => 'boolean',
-        'price' => 'decimal:2',
-        'placement_hours' => 'integer',
-        'no_of_students' => 'integer'
     ];
-
-    public function rto()
-    {
-        return $this->belongsTo(User::class, 'rto_id');
-    }
 }

@@ -40,8 +40,9 @@ class RtoController extends Controller
     {
         $rtoId = Auth::id();
         $studentIds = RtoStudent::where('rto_id', $rtoId)->pluck('student_id');
-        $students = User::whereIn('id', $studentIds)->latest()->get();
-        return view('rto.pages.students', compact('students'));
+        $students = User::with('course')->whereIn('id', $studentIds)->latest()->get();
+        $courses = Course::where('status', true)->get();
+        return view('rto.pages.students', compact('students', 'courses'));
     }
 
     public function storeStudent(Request $request)
@@ -51,6 +52,7 @@ class RtoController extends Controller
             'email' => 'required|email|unique:users',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'course_id' => 'nullable|exists:courses,id',
         ]);
 
         $student = User::create([
@@ -58,6 +60,7 @@ class RtoController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'course_id' => $request->course_id,
             'password' => Hash::make('password'),
             'role' => 'user',
         ]);
@@ -80,6 +83,7 @@ class RtoController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'course_id' => 'nullable|exists:courses,id',
         ]);
 
         $student = User::findOrFail($id);
@@ -88,6 +92,7 @@ class RtoController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'course_id' => $request->course_id,
         ]);
 
         return back()->with('success', 'Student updated successfully');
@@ -126,11 +131,18 @@ class RtoController extends Controller
             if (count($row) >= 2 && !empty($row[0]) && !empty($row[1])) {
                 $existingUser = User::where('email', $row[1])->first();
                 if (!$existingUser) {
+                    $courseId = null;
+                    if (!empty($row[4])) {
+                        $course = Course::where('code', $row[4])->first();
+                        $courseId = $course ? $course->id : null;
+                    }
+                    
                     $student = User::create([
                         'name' => $row[0],
                         'email' => $row[1],
                         'phone' => $row[2] ?? null,
                         'address' => $row[3] ?? null,
+                        'course_id' => $courseId,
                         'password' => Hash::make('password'),
                         'role' => 'user',
                     ]);
@@ -197,5 +209,17 @@ class RtoController extends Controller
 
         $user->update($updateData);
         return back()->with('success', 'Profile updated successfully');
+    }
+
+    public function csvFormat()
+    {
+        $csvData = "name,email,phone,address,course_code\n";
+        $csvData .= "John Doe,john@example.com,1234567890,123 Main St,CS101\n";
+        $csvData .= "Jane Smith,jane@example.com,0987654321,456 Oak Ave,IT201\n";
+        
+        return \Illuminate\Support\Facades\Response::make($csvData, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="student_import_format.csv"',
+        ]);
     }
 }

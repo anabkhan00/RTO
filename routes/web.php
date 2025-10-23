@@ -34,6 +34,7 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::put('/rto/students/{id}', [RtoController::class, 'updateStudent']);
     Route::delete('/rto/students/{id}', [RtoController::class, 'destroyStudent']);
     Route::post('/rto/students/upload', [RtoController::class, 'uploadStudents']);
+    Route::get('/rto/students/csv-format', [RtoController::class, 'csvFormat']);
 });
 
 // Universal Profile Routes
@@ -54,6 +55,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::put('/rto/{id}', [App\Http\Controllers\Admin\RtoController::class, 'update']);
     Route::delete('/rto/{id}', [App\Http\Controllers\Admin\RtoController::class, 'destroy']);
     Route::patch('/rto/{id}/toggle-status', [App\Http\Controllers\Admin\RtoController::class, 'toggleStatus']);
+    Route::get('/rto/{id}/details', [App\Http\Controllers\Admin\RtoController::class, 'details']);
 
     Route::get('/students', [App\Http\Controllers\Admin\StudentController::class, 'index'])->name('students');
     Route::post('/students', [App\Http\Controllers\Admin\StudentController::class, 'store']);
@@ -61,6 +63,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::delete('/students/{id}', [App\Http\Controllers\Admin\StudentController::class, 'destroy']);
     Route::post('/students/upload', [App\Http\Controllers\Admin\StudentController::class, 'upload']);
     Route::get('/students/download', [App\Http\Controllers\Admin\StudentController::class, 'download'])->name('students.download');
+    Route::get('/students/csv-format', [App\Http\Controllers\Admin\StudentController::class, 'csvFormat']);
 
     Route::get('/courses', [App\Http\Controllers\Admin\CourseController::class, 'index'])->name('courses');
     Route::post('/courses', [App\Http\Controllers\Admin\CourseController::class, 'store']);
