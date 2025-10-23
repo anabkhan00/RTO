@@ -19,8 +19,9 @@ class CourseController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|unique:courses',
-            'placement_hours' => 'required|integer|min:0',
-            'no_of_students' => 'required|integer|min:0',
+            'credit_hours' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|boolean',
         ]);
 
         Course::create($request->all());
@@ -32,8 +33,9 @@ class CourseController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|unique:courses,code,' . $id,
-            'placement_hours' => 'required|integer|min:0',
-            'no_of_students' => 'required|integer|min:0',
+            'credit_hours' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|boolean',
         ]);
 
         $course = Course::findOrFail($id);

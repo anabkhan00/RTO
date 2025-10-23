@@ -31,6 +31,9 @@
                         <td class="p-3 whitespace-nowrap">{{ $rto->website ?? 'N/A' }}</td>
                         <td class="p-3 whitespace-nowrap">{{ $rto->created_at->format('d M Y') }}</td>
                         <td class="p-3 whitespace-nowrap">
+                            <a href="/admin/rto/{{ $rto->id }}/details" class="text-green-500 hover:text-green-700 mr-2">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
                             <button
                                 onclick="editRto({{ $rto->id }}, '{{ $rto->code }}', '{{ $rto->name }}', '{{ $rto->email }}', '{{ $rto->phone }}', '{{ $rto->contact_person }}', '{{ $rto->website }}')"
                                 class="text-blue-500 hover:text-blue-700 mr-2">

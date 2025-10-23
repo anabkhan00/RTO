@@ -78,4 +78,10 @@ class RtoController extends Controller
         $rto->update(['status' => !$rto->status]);
         return back()->with('success', 'RTO status updated successfully');
     }
+
+    public function details($id)
+    {
+        $rto = User::with('rtoDocuments')->findOrFail($id);
+        return view('admin.pages.rto_details', compact('rto'));
+    }
 }

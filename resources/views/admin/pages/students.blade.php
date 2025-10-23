@@ -8,6 +8,9 @@
             <button class="bg-green-600 text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-green-700" id="openUploadBtn">
                 <i class="bi bi-upload mr-2"></i> Upload CSV
             </button>
+            <a href="/admin/students/csv-format" class="bg-gray-600 text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gray-700">
+                <i class="bi bi-download mr-2"></i> CSV Format
+            </a>
         </div>
         <a href="{{ route('admin.students.download') }}" class="bg-gray-600 text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gray-700">
             Download All <img src="{{ asset('assets/images/Login.svg') }}" class="ms-3 w-4">
@@ -21,6 +24,7 @@
                     <th class="p-3 whitespace-nowrap">Name</th>
                     <th class="p-3 whitespace-nowrap">Email</th>
                     <th class="p-3 whitespace-nowrap">Phone</th>
+                    <th class="p-3 whitespace-nowrap">Course</th>
                     <th class="p-3 whitespace-nowrap">Address</th>
                     <th class="p-3 whitespace-nowrap">Joined Date</th>
                     <th class="p-3 whitespace-nowrap">Actions</th>
@@ -32,10 +36,11 @@
                     <td class="p-3 whitespace-nowrap">{{ $student->name }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $student->email }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $student->phone ?? 'N/A' }}</td>
+                    <td class="p-3 whitespace-nowrap">{{ $student->course ? $student->course->code : 'N/A' }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $student->address ?? 'N/A' }}</td>
                     <td class="p-3 whitespace-nowrap">{{ $student->created_at->format('d M Y') }}</td>
                     <td class="p-3 whitespace-nowrap">
-                        <button onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ addslashes($student->address) }}')" class="text-blue-500 hover:text-blue-700 mr-2">
+                        <button onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ addslashes($student->address) }}', {{ $student->course_id ?? 'null' }})" class="text-blue-500 hover:text-blue-700 mr-2">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                         <button onclick="deleteStudent({{ $student->id }})" class="text-red-500 hover:text-red-700">
@@ -83,6 +88,17 @@
                         <input type="text" name="phone" id="studentPhone" placeholder="Enter Phone Number"
                             class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-brand">Course</label>
+                        <select name="course_id" id="studentCourse"
+                            class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200">
+                            <option value="">Select Course</option>
+                            @foreach($courses as $course)
+                                <option value="{{ $course->id }}">{{ $course->code }} - {{ $course->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <div>
@@ -122,7 +138,7 @@
 
                 <div class="bg-gray-50 p-3 rounded text-sm">
                     <p class="font-medium text-brand mb-2">CSV Format:</p>
-                    <p class="text-gray-600">name,email,phone,address</p>
+                    <p class="text-gray-600">name,email,phone,address,course_code</p>
                     <p class="text-gray-600 text-xs mt-1">First row should contain headers</p>
                 </div>
 
@@ -164,7 +180,7 @@
         cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
         cancelUploadBtn.addEventListener('click', () => uploadModal.classList.add('hidden'));
 
-        function editStudent(id, name, email, phone, address) {
+        function editStudent(id, name, email, phone, address, courseId) {
             modalTitle.textContent = 'Edit Student';
             form.action = `/admin/students/${id}`;
             document.getElementById('studentId').value = 'PUT';
@@ -172,6 +188,7 @@
             document.getElementById('studentEmail').value = email;
             document.getElementById('studentPhone').value = phone || '';
             document.getElementById('studentAddress').value = address || '';
+            document.getElementById('studentCourse').value = courseId || '';
             modal.classList.remove('hidden');
         }
 

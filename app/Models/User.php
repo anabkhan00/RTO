@@ -30,6 +30,7 @@ class User extends Authenticatable
         'website',
         'contact_person',
         'status',
+        'course_id',
     ];
 
     /**
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function rtoDocuments()
     {
         return $this->hasMany(RtoDocument::class);
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
     }
 }

@@ -12,7 +12,7 @@ class ProfileController extends Controller
 {
     public function show()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('rtoDocuments');
         
         if ($user->role === 'admin' || $user->role === 'coordinator') {
             return view('admin.pages.profile', compact('user'));
