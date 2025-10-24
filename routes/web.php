@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RtoController;
 use App\Http\Controllers\Admin\RolePermissionController;
+use App\Http\Controllers\StudentDocumentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +36,9 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::delete('/rto/students/{id}', [RtoController::class, 'destroyStudent']);
     Route::post('/rto/students/upload', [RtoController::class, 'uploadStudents']);
     Route::get('/rto/students/csv-format', [RtoController::class, 'csvFormat']);
+    Route::get('/rto/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('rto.student-documents.index');
+    Route::post('/rto/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('rto.student-documents.store');
+    Route::delete('/rto/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
 });
 
 // Universal Profile Routes
@@ -93,6 +97,10 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::delete('/permissions/{id}', [RolePermissionController::class, 'deletePermission']);
     Route::get('/assign-permissions', [RolePermissionController::class, 'assignPermissions'])->name('assign-permissions');
     Route::post('/assign-permissions', [RolePermissionController::class, 'updateRolePermissions']);
+
+    Route::get('/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('student-documents.index');
+    Route::post('/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('student-documents.store');
+    Route::delete('/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
 });
 
 

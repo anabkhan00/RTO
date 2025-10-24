@@ -43,6 +43,9 @@
                         <button onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ addslashes($student->address) }}', {{ $student->course_id ?? 'null' }})" class="text-blue-500 hover:text-blue-700 mr-2">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
+                        <a href="{{ route('admin.student-documents.index', $student->id) }}" class="text-green-500 hover:text-green-700 mr-2">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </a>
                         <button onclick="deleteStudent({{ $student->id }})" class="text-red-500 hover:text-red-700">
                             <i class="bi bi-trash3-fill"></i>
                         </button>

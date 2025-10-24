@@ -16,7 +16,9 @@
                 </a>
 
                 <a href="{{ route('admin.students') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*')
+            ? 'bg-brand rounded-lg text-white'
+            : '' }}">
                     Students
                 </a>
                 <a href="{{ route('admin.courses') }}"
