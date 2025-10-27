@@ -54,6 +54,11 @@
                     Assign Permissions
                 </a>
 
+                <a href="{{ route('admin.document-checklist') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.document-checklist*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    Document Checklist
+                </a>
+
                 <a href="/profile"
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->is('profile') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Profile
