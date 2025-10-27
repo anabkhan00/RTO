@@ -12,6 +12,7 @@ class StudentDocument extends Model
         'label',
         'file_path',
         'original_name',
+        'checklist_id',
     ];
 
     public function student()
@@ -22,5 +23,10 @@ class StudentDocument extends Model
     public function uploader()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function checklist()
+    {
+        return $this->belongsTo(DocumentChecklist::class, 'checklist_id');
     }
 }

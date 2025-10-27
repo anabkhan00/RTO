@@ -15,10 +15,13 @@ Route::get('/', function () {
 Route::get('/login', function () {
     return view('admin.auth.login');
 })->name('login');
+
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::get('/register', function () {
     return view('admin.auth.register');
 })->name('register');
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -38,14 +41,18 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::get('/rto/students/csv-format', [RtoController::class, 'csvFormat']);
     Route::get('/rto/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('rto.student-documents.index');
     Route::post('/rto/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('rto.student-documents.store');
+    Route::post('/rto/student-documents/assign-types/{student}', [StudentDocumentController::class, 'assignTypes']);
     Route::delete('/rto/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
+    Route::get('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'index'])->name('rto.my-documents');
+    Route::post('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'store']);
+    Route::delete('/rto/my-documents/{document}', [App\Http\Controllers\RtoPersonalDocumentController::class, 'destroy']);
+
 });
 
 // Universal Profile Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show']);
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update']);
-    Route::post('/profile/documents', [App\Http\Controllers\ProfileController::class, 'uploadDocuments']);
 });
 
 // Admin Routes
@@ -100,7 +107,14 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
 
     Route::get('/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('student-documents.index');
     Route::post('/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('student-documents.store');
+    Route::post('/student-documents/assign-types/{student}', [StudentDocumentController::class, 'assignTypes']);
     Route::delete('/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
+    
+    Route::get('/document-checklist', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'index'])->name('document-checklist');
+    Route::post('/document-checklist', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'store']);
+    Route::put('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'update']);
+    Route::delete('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'destroy']);
+    Route::patch('/document-checklist/{id}/toggle-status', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'toggleStatus']);
 });
 
 

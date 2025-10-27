@@ -21,6 +21,9 @@
                                         <p class="text-xs text-gray-500">
                                             {{ $document->original_name }} — Uploaded by {{ $document->uploader->name }}
                                         </p>
+                                        @if($document->checklist)
+                                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mt-1">{{ $document->checklist->name }}</span>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -60,37 +63,21 @@
                 enctype="multipart/form-data" class="space-y-4">
                 @csrf
 
-                <div id="documentRows">
-                    <div class="document-row grid grid-cols-12 gap-3 items-center mb-4">
-                        <div class="col-span-5">
-                            <label class="block text-sm font-medium text-brand mb-1">Document Label</label>
-                            <input type="text" name="documents[0][label]" placeholder="Enter document label" required
-                                class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-brand mb-1">Document Label</label>
+                        <input type="text" name="label" placeholder="Enter document label" required
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    </div>
 
-                        <div class="col-span-5">
-                            <label class="block text-sm font-medium text-brand mb-1">Document File</label>
-                            <input type="file" name="documents[0][file]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                required
-                                class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-                        </div>
-
-                        <div class="col-span-2 flex justify-center">
-                            <button type="button" onclick="removeDocumentRow(this)"
-                                class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
-                                style="display: none;">
-                                <i class="bi bi-trash text-sm"></i>
-                            </button>
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium text-brand mb-1">Select Files (Max 50MB each)</label>
+                        <input type="file" name="files[]" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip" required
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
                     </div>
                 </div>
 
-                <div class="flex justify-between items-center">
-                    <button type="button" onclick="addDocumentRow()"
-                        class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm">
-                        + Add Another Document
-                    </button>
-
+                <div class="flex justify-end">
                     <button type="submit" id="uploadBtn" class="px-6 py-2 bg-brand text-white rounded-md hover:bg-gold">
                         <span id="uploadText">Upload Documents</span>
                         <span id="uploadLoader" class="hidden">
@@ -102,57 +89,48 @@
         </div>
     </div>
 
+<!-- Checklist Modal -->
+<div id="checklistModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
+    <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 relative">
+        <button id="closeChecklistModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
+            &times;
+        </button>
+
+        <h3 class="text-xl font-semibold text-brand mb-4">Select Document Types</h3>
+        
+        <form id="checklistForm" method="POST">
+            @csrf
+            <input type="hidden" id="uploadedDocuments" name="document_ids" value="">
+            
+            <div class="space-y-3 mb-6">
+                @foreach($checklists as $checklist)
+                    <label class="flex items-center">
+                        <input type="checkbox" name="checklist_ids[]" value="{{ $checklist->id }}" class="mr-3">
+                        <span class="text-sm">{{ $checklist->name }}</span>
+                    </label>
+                @endforeach
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <button type="button" id="skipChecklist" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                    Skip
+                </button>
+                <button type="submit" class="px-4 py-2 bg-brand text-white rounded-md hover:bg-gold">
+                    Save Types
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
     <script>
-        function addDocumentRow() {
-            const container = document.getElementById('documentRows');
-            const rowCount = container.children.length;
-            const newRow = document.createElement('div');
-            newRow.className = 'document-row grid grid-cols-12 gap-3 items-center mb-4';
-
-            newRow.innerHTML = `
-        <div class="col-span-5">
-            <label class="block text-sm font-medium text-brand mb-1">Document Label</label>
-            <input type="text" name="documents[${rowCount}][label]" placeholder="Enter document label" required
-                class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-        </div>
-
-        <div class="col-span-5">
-            <label class="block text-sm font-medium text-brand mb-1">Document File</label>
-            <input type="file" name="documents[${rowCount}][file]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required
-                class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-        </div>
-
-        <div class="col-span-2 flex justify-center">
-            <button type="button" onclick="removeDocumentRow(this)"
-                class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">
-                <i class="bi bi-trash text-sm"></i>
-            </button>
-        </div>
-    `;
-
-            container.appendChild(newRow);
-            updateRemoveButtons();
-        }
-
-        function removeDocumentRow(button) {
-            const row = button.closest('.document-row');
-            row.remove();
-            updateRemoveButtons();
-        }
-
-        function updateRemoveButtons() {
-            const rows = document.querySelectorAll('.document-row');
-            rows.forEach((row, index) => {
-                const removeBtn = row.querySelector('button[onclick*="removeDocumentRow"]');
-                removeBtn.style.display = index === 0 ? 'none' : 'block';
-            });
-        }
-
         $(document).ready(function() {
-            updateRemoveButtons();
 
             // Handle form submission with loader
-            $('form').on('submit', function() {
+            $('form[enctype="multipart/form-data"]').on('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submitted');
+                
                 const uploadBtn = $('#uploadBtn');
                 const uploadText = $('#uploadText');
                 const uploadLoader = $('#uploadLoader');
@@ -160,6 +138,62 @@
                 uploadBtn.prop('disabled', true);
                 uploadText.addClass('hidden');
                 uploadLoader.removeClass('hidden');
+                
+                const formData = new FormData(this);
+                
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(response) {
+                        console.log('Response:', response);
+                        if (response.success && response.document_ids) {
+                            $('#uploadedDocuments').val(response.document_ids.join(','));
+                            $('#checklistModal').removeClass('hidden');
+                        } else {
+                            location.reload();
+                        }
+                        uploadBtn.prop('disabled', false);
+                        uploadText.removeClass('hidden');
+                        uploadLoader.addClass('hidden');
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', xhr.responseText);
+                        toastr.error('Error uploading documents!');
+                        uploadBtn.prop('disabled', false);
+                        uploadText.removeClass('hidden');
+                        uploadLoader.addClass('hidden');
+                    }
+                });
+            });
+            
+            // Handle checklist form submission
+            $('#checklistForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                $.ajax({
+                    url: '/rto/student-documents/assign-types/{{ $student->id }}',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#checklistModal').addClass('hidden');
+                        location.reload();
+                    },
+                    error: function() {
+                        toastr.error('Error assigning document types!');
+                    }
+                });
+            });
+            
+            // Handle skip button
+            $('#skipChecklist, #closeChecklistModal').on('click', function() {
+                $('#checklistModal').addClass('hidden');
+                location.reload();
             });
 
             $(document).on('click', '.delete-document', function() {
