@@ -21,8 +21,10 @@
                                         <p class="text-xs text-gray-500">
                                             {{ $document->original_name }} — Uploaded by {{ $document->uploader->name }}
                                         </p>
-                                        @if($document->checklist)
-                                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mt-1">{{ $document->checklist->name }}</span>
+                                        @if($document->checklist_ids)
+                                            @foreach($document->checklists() as $checklist)
+                                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mt-1 mr-1">{{ $checklist->name }}</span>
+                                            @endforeach
                                         @endif
                                     </div>
                                 </div>
@@ -54,6 +56,40 @@
             </div>
         @endif
 
+        <!-- Document Checklist Status -->
+        <div class="mb-8 border-t pt-6">
+            <h3 class="text-lg font-medium text-brand mb-4">Document Checklist Status</h3>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <div class="grid gap-3">
+                    @foreach($checklists as $checklist)
+                        @php
+                            $hasDocument = $student->studentDocuments->filter(function($doc) use ($checklist) {
+                                return $doc->checklist_ids && in_array($checklist->id, $doc->checklist_ids);
+                            })->count() > 0;
+                        @endphp
+                        <div class="flex items-center justify-between bg-white p-3 rounded border">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" {{ $hasDocument ? 'checked' : '' }} disabled class="mr-2">
+                                <span class="text-sm {{ $hasDocument ? 'text-green-600 font-medium' : 'text-gray-600' }}">
+                                    {{ $checklist->name }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if($hasDocument)
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                                        {{ $student->studentDocuments->filter(function($doc) use ($checklist) { return $doc->checklist_ids && in_array($checklist->id, $doc->checklist_ids); })->count() }} document(s)
+                                    </span>
+                                    <i class="bi bi-check-circle text-green-500"></i>
+                                @else
+                                    <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Missing</span>
+                                    <i class="bi bi-x-circle text-red-500"></i>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
 
         <!-- Document Upload Section -->
         <div class="border-t pt-6">
@@ -97,11 +133,11 @@
         </button>
 
         <h3 class="text-xl font-semibold text-brand mb-4">Select Document Types</h3>
-        
+
         <form id="checklistForm" method="POST">
             @csrf
             <input type="hidden" id="uploadedDocuments" name="document_ids" value="">
-            
+
             <div class="space-y-3 mb-6">
                 @foreach($checklists as $checklist)
                     <label class="flex items-center">
@@ -110,7 +146,7 @@
                     </label>
                 @endforeach
             </div>
-            
+
             <div class="flex justify-end gap-3">
                 <button type="button" id="skipChecklist" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
                     Skip
@@ -130,7 +166,7 @@
             $('form[enctype="multipart/form-data"]').on('submit', function(e) {
                 e.preventDefault();
                 console.log('Form submitted');
-                
+
                 const uploadBtn = $('#uploadBtn');
                 const uploadText = $('#uploadText');
                 const uploadLoader = $('#uploadLoader');
@@ -138,9 +174,9 @@
                 uploadBtn.prop('disabled', true);
                 uploadText.addClass('hidden');
                 uploadLoader.removeClass('hidden');
-                
+
                 const formData = new FormData(this);
-                
+
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
@@ -171,11 +207,11 @@
                     }
                 });
             });
-            
+
             // Handle checklist form submission
             $('#checklistForm').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 $.ajax({
                     url: '/rto/student-documents/assign-types/{{ $student->id }}',
                     type: 'POST',
@@ -189,7 +225,7 @@
                     }
                 });
             });
-            
+
             // Handle skip button
             $('#skipChecklist, #closeChecklistModal').on('click', function() {
                 $('#checklistModal').addClass('hidden');
