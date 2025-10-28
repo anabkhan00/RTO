@@ -39,7 +39,7 @@ class StudentDocumentController extends Controller
         ]);
 
         $documentIds = [];
-        
+
         foreach ($request->file('files') as $file) {
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('student_documents', $fileName, 'public');
@@ -51,7 +51,7 @@ class StudentDocumentController extends Controller
                 'file_path' => $filePath,
                 'original_name' => $file->getClientOriginalName(),
             ]);
-            
+
             $documentIds[] = $document->id;
         }
 
@@ -64,7 +64,7 @@ class StudentDocumentController extends Controller
 
         return redirect()->back()->with('success', 'Documents uploaded successfully!');
     }
-    
+
     public function assignTypes(Request $request, $studentId)
     {
         $request->validate([
@@ -72,19 +72,16 @@ class StudentDocumentController extends Controller
             'checklist_ids' => 'nullable|array',
             'checklist_ids.*' => 'exists:document_checklists,id',
         ]);
-        
+
         $documentIds = explode(',', $request->document_ids);
-        
+
         if ($request->checklist_ids) {
             foreach ($documentIds as $documentId) {
-                foreach ($request->checklist_ids as $checklistId) {
-                    StudentDocument::where('id', $documentId)
-                        ->update(['checklist_id' => $checklistId]);
-                    break; // Only assign first selected checklist to each document
-                }
+                StudentDocument::where('id', $documentId)
+                    ->update(['checklist_ids' => $request->checklist_ids]);
             }
         }
-        
+
         return response()->json(['success' => true]);
     }
 

@@ -12,7 +12,11 @@ class StudentDocument extends Model
         'label',
         'file_path',
         'original_name',
-        'checklist_id',
+        'checklist_ids',
+    ];
+
+    protected $casts = [
+        'checklist_ids' => 'array',
     ];
 
     public function student()
@@ -25,8 +29,8 @@ class StudentDocument extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    public function checklist()
+    public function checklists()
     {
-        return $this->belongsTo(DocumentChecklist::class, 'checklist_id');
+        return DocumentChecklist::whereIn('id', $this->checklist_ids ?? [])->get();
     }
 }
