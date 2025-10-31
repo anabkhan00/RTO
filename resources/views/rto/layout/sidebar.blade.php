@@ -30,7 +30,7 @@
             </nav>
 
         </div>
-        <button class="m-6 py-2 border border-brand text-brand rounded-md hover:bg-brand hover:text-white transition">
+        {{-- <button class="m-6 py-2 border border-brand text-brand rounded-md hover:bg-brand hover:text-white transition">
             Logout
-        </button>
+        </button> --}}
     </aside>

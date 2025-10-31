@@ -1,36 +1,73 @@
       @extends('rto.master_layout.index')
       @section('content')
-          <div class="w-full p-3">
-            <a href="/rto/students" class="block">
-              <div class="w-full  bg-white rounded-lg shadow p-4 flex items-center justify-between">
-                  <!-- LEFT: Icon + Text -->
-                  <div class="flex items-center gap-3">
-                      <div class="  rounded-md flex items-center justify-center">
-                          <!-- 🎓 Graduation cap icon -->
+          <div class="w-full p-3 flex gap-6">
+              <!-- Total Students Card -->
+              <a href="/rto/students" class="block flex-1">
+                  <div class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center">
+                      <div class="flex items-center justify-center">
                           <img src="{{ asset('assets/images/stucomp.svg') }}" class="w-10">
                       </div>
-                      <div>
-                          <p class="font-semibold text-brand text-sm">43234</p>
-                          <p class="text-xs text-gray-500">Total Students</p>
+                      <div class="flex flex-col items-center mt-3">
+                          <p class="font-semibold text-brand text-xs">Total Students</p>
+                      </div>
+                      <div class="w-full max-w-xs mt-3">
+                          <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                              <span class="font-medium text-brand text-xs">43,234</span>
+                              <span class="font-medium text-brand text-xs">80%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
+                              <div class="bg-[#0014AB] h-1 rounded-full" style="width: 80%;"></div>
+                          </div>
                       </div>
                   </div>
 
-                  <!-- RIGHT: Progress Bar + Percentage -->
-                  <div class="flex-1 ml-6">
-                      <div class="flex justify-between text-sm text-gray-700 mb-1">
-                          <span></span>
-                          <span class="font-medium text-brand text-xs">80%</span>
+                  <!-- Completed Placements Card -->
+                  <div class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center mt-2">
+                      <div class="flex items-center justify-center">
+                          <img src="{{ asset('assets/images/Placement.svg') }}" class="w-10">
                       </div>
-                      <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
-                          <div class="bg-[#0014AB] h-1 rounded-full" style="width: 80%;"></div>
+                      <div class="flex flex-col items-center mt-3">
+                          <p class="font-semibold text-brand text-xs">Completed Placements</p>
+                      </div>
+                      <div class="w-full max-w-xs mt-3">
+                          <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                              <span class="font-medium text-brand text-xs">2,156</span>
+                              <span class="font-medium text-brand text-xs">85%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
+                              <div class="bg-[#00AB03] h-1 rounded-full" style="width: 85%;"></div>
+                          </div>
+                      </div>
+                  </div>
+              </a>
+
+              <!-- Overall Employee Performance Card -->
+              <div class="bg-white rounded-lg shadow p-4 flex-1">
+                  <div class="flex items-center justify-between mb-3">
+                      <h2 class="font-semibold text-sm text-brand">Overall Employee Performance</h2>
+                      <i class="bi bi-info-circle text-gray-400"></i>
+                  </div>
+                  <div class="text-right">
+                      <p class="text-green-600 text-xs font-semibold">+13.38%</p>
+                      <p class="text-gray-500 text-xs">past month</p>
+                  </div>
+                  <div class="flex justify-center items-center">
+                      <!-- Chart Container -->
+                      <div class="relative w-64 h-64">
+                          <canvas id="radialChart"></canvas>
+                          <div class="absolute inset-0 flex flex-col items-center justify-center">
+                              <p class="text-2xl font-bold text-brand">32%</p>
+                              <p class="text-sm text-gray-600">Avg</p>
+                          </div>
                       </div>
                   </div>
               </div>
-            </a>
-
           </div>
+
+
           <div class="w-full flex flex-wrap">
-              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/5 p-2">
+              <!-- Active Placements -->
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
                   <a href="/rto/students?status=active" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
@@ -51,7 +88,9 @@
                       </div>
                   </a>
               </div>
-              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/5 p-2">
+
+              <!-- Booked Placements -->
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
                   <a href="/rto/students?status=booked" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
@@ -72,28 +111,9 @@
                       </div>
                   </a>
               </div>
-              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/5 p-2">
-                  <a href="/rto/students?status=completed" class="block">
-                      <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
-                          <div class="flex items-center justify-center w-full">
-                              <img src="{{ asset('assets/images/Placement.svg') }}" class="w-10">
-                          </div>
-                          <div class="flex items-center mt-3 justify-center w-full">
-                              <p class="font-semibold text-brand text-xs">Completed Placements</p>
-                          </div>
-                          <div class="w-full max-w-md mt-2">
-                              <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
-                                  <span class="font-medium text-brand text-xs">2,156</span>
-                                  <span class="font-medium text-brand text-xs">85%</span>
-                              </div>
-                              <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
-                                  <div class="bg-[#00AB03] h-1 rounded-full" style="width: 85%;"></div>
-                              </div>
-                          </div>
-                      </div>
-                  </a>
-              </div>
-              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/5 p-2">
+
+              <!-- Flagged Placements -->
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
                   <a href="/rto/students?status=flagged" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
@@ -114,7 +134,9 @@
                       </div>
                   </a>
               </div>
-              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/5 p-2">
+
+              <!-- Awaiting Placements -->
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
                   <a href="/rto/students?status=awaiting" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
@@ -138,6 +160,74 @@
           </div>
 
 
+          <div class="w-full p-3 flex gap-6">
+              <!-- Overall Employee Performance Card -->
+              <div class="bg-white rounded-lg shadow p-4 flex-1">
+                  <div class="flex items-center justify-between mb-3">
+                      <h2 class="font-semibold text-sm text-brand">Overall Employee Performance</h2>
+                      <i class="bi bi-info-circle text-gray-400"></i>
+                  </div>
+
+                  <div class="text-right mb-4">
+                      <p class="text-green-600 text-xs font-semibold">+8.24%</p>
+                      <p class="text-gray-500 text-xs">past month</p>
+                  </div>
+
+                  <!-- Added spacing between all performance lines -->
+                  <div class="space-y-4"> <!-- was space-y-3 -->
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Performance A</span>
+                              <span class="font-medium text-brand">70%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden"> <!-- slightly thicker -->
+                              <div class="bg-[#D60404] h-1.5 rounded-full" style="width: 70%;"></div>
+                          </div>
+                      </div>
+
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Performance B</span>
+                              <span class="font-medium text-brand">40%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div class="bg-[#FF8C00] h-1.5 rounded-full" style="width: 40%;"></div>
+                          </div>
+                      </div>
+
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Performance C</span>
+                              <span class="font-medium text-brand">25%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div class="bg-[#FFD700] h-1.5 rounded-full" style="width: 25%;"></div>
+                          </div>
+                      </div>
+
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Performance D</span>
+                              <span class="font-medium text-brand">15%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div class="bg-[#00A8AB] h-1.5 rounded-full" style="width: 15%;"></div>
+                          </div>
+                      </div>
+
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Performance E</span>
+                              <span class="font-medium text-brand">90%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div class="bg-[#00AB03] h-1.5 rounded-full" style="width: 90%;"></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
 
           <div class="rounded-xl p-2 flex flex-col md:flex-row gap-6 w-full max-w-6xl">
               <!-- 📈 LEFT: Line Chart -->
@@ -151,23 +241,114 @@
 
                   <canvas id="lineChart" height="100"></canvas>
 
-                  <div class="flex justify-center gap-6 mt-4 text-sm">
-                      <div class="flex items-center font-semibold text-brand text-xs gap-2">
-                          <span class="w-3 h-3 bg-[#00A8AB] rounded-full"></span> Active
+                  <div class="flex justify-center gap-4 mt-4 text-xs flex-wrap">
+                      <div class="flex items-center font-semibold text-brand gap-2">
+                          <span class="w-3 h-3 bg-[#0014AB] rounded-full"></span> In Progress
                       </div>
-                      <div class="flex items-center font-semibold text-brand text-xs gap-2">
-                          <span class="w-3 h-3 bg-[#00AB03] rounded-full"></span> Completed
+                      <div class="flex items-center font-semibold text-brand gap-2">
+                          <span class="w-3 h-3 bg-[#D60404] rounded-full"></span> Agreement Pending
+                      </div>
+                      <div class="flex items-center font-semibold text-brand gap-2">
+                          <span class="w-3 h-3 bg-[#00AB03] rounded-full"></span> Workplace Started
+                      </div>
+                      <div class="flex items-center font-semibold text-brand gap-2">
+                          <span class="w-3 h-3 bg-[#000000] rounded-full"></span> Don't Have Workplace
+                      </div>
+                      <div class="flex items-center font-semibold text-brand gap-2">
+                          <span class="w-3 h-3 bg-[#00A8AB] rounded-full"></span> Appointment
                       </div>
                   </div>
               </div>
 
-              <div class="bg-[#d4b373] rounded-lg flex flex-col items-center justify-center p-6 w-full md:w-1/3">
-                  <h3 class="font-semibold text-sm text-brand mb-3">Target vs Achieved</h3>
-                  <div class="relative w-52 h-52 flex items-center justify-center">
-                      <canvas id="gaugeChart"></canvas>
-                      <div class="absolute inset-0 flex flex-col items-center justify-center translate-y-6">
-                          <p id="gaugeValue" class="text-xl font-bold text-brand">0%</p>
-                          <p class="font-semibold text-sm text-brand">achieved</p>
+
+          </div>
+
+
+
+          <!-- Students Table Section -->
+          <div class="w-full mt-6">
+              <div class="bg-white rounded-lg shadow-sm p-6">
+                  <h2 class="text-lg font-semibold text-brand mb-4">Students Overview</h2>
+
+                  <!-- Filters -->
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                      <div>
+                          <input type="text" id="dashSearchFilter" placeholder="Search by name or email..."
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                      </div>
+                      <div>
+                          <select id="dashProgressFilter"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                              <option value="">All Progress</option>
+                              <option value="Assigned">Assigned</option>
+                              <option value="Interview">Interview</option>
+                              <option value="Placed">Placed</option>
+                          </select>
+                      </div>
+                      <div>
+                          <select id="dashIndustryFilter"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                              <option value="">All Industries</option>
+                              <option value="Healthcare">Healthcare</option>
+                              <option value="Tech">Tech</option>
+                              <option value="Marketing">Marketing</option>
+                          </select>
+                      </div>
+                      <div>
+                          <button id="dashResetFilters"
+                              class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                              Reset Filters
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- Table -->
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full">
+                          <thead class="bg-gray-50">
+                              <tr>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Name</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Industry</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Email</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Phone</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Progress</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Coordinator</th>
+                              </tr>
+                          </thead>
+                          <tbody id="dashStudentsTable" class="bg-white divide-y divide-gray-200">
+                              <!-- Sample data will be populated by JavaScript -->
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <!-- Pagination -->
+                  <div class="flex items-center justify-between mt-4">
+                      <div class="text-sm text-gray-700">
+                          Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span
+                              id="totalRecords">25</span> results
+                      </div>
+                      <div class="flex gap-2">
+                          <button id="prevPage"
+                              class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+                              disabled>
+                              Previous
+                          </button>
+                          <span id="pageNumbers" class="flex gap-1"></span>
+                          <button id="nextPage" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                              Next
+                          </button>
                       </div>
                   </div>
               </div>
@@ -197,16 +378,37 @@
                   data: {
                       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                       datasets: [{
-                              label: 'Active',
-                              data: [15, 18, 13, 20, 17, 23, 19],
-                              borderColor: '#00A8AB',
+                              label: 'In Progress',
+                              data: [25, 28, 23, 30, 27, 33, 29],
+                              borderColor: '#0014AB',
                               tension: 0.4,
                               fill: false
                           },
                           {
-                              label: 'Completed',
-                              data: [12, 15, 10, 18, 14, 20, 16],
+                              label: 'Agreement Pending',
+                              data: [5, 7, 4, 8, 6, 9, 7],
+                              borderColor: '#D60404',
+                              tension: 0.4,
+                              fill: false
+                          },
+                          {
+                              label: 'Workplace Started',
+                              data: [2, 3, 1, 4, 2, 5, 3],
                               borderColor: '#00AB03',
+                              tension: 0.4,
+                              fill: false
+                          },
+                          {
+                              label: 'Don\'t Have Workplace',
+                              data: [1, 1, 0, 2, 1, 2, 1],
+                              borderColor: '#000000',
+                              tension: 0.4,
+                              fill: false
+                          },
+                          {
+                              label: 'Appointment',
+                              data: [3, 4, 2, 5, 3, 6, 4],
+                              borderColor: '#00A8AB',
                               tension: 0.4,
                               fill: false
                           }
@@ -237,88 +439,337 @@
                       }
                   }
               });
-              const gaugeCtx = document.getElementById('gaugeChart');
-              const valueEl = document.getElementById('gaugeValue');
-
-              // 🕹️ Gauge Chart (No white circles)
-              const gaugeChart = new Chart(gaugeCtx, {
-                  type: 'doughnut',
-                  data: {
-                      datasets: [{
-                          data: [0, 100], // start from 0%
-                          backgroundColor: ['#ffffff', '#000000'], // white fill, black base
-                          borderWidth: 0,
-                          cutout: '70%', // thickness
-                          circumference: 180,
-                          rotation: 270
-                      }]
+              // Dashboard Students Table
+              const dashStudentsData = [{
+                      name: 'Nicole Wegmann',
+                      industry: 'Healthcare Solutions',
+                      email: 'nicole.wegmann@email.com',
+                      phone: '+92-300-1234567',
+                      progress: 'Assigned',
+                      coordinator: 'Zain'
                   },
-                  options: {
-                      responsive: true,
-                      plugins: {
-                          legend: {
-                              display: false
-                          },
-                          tooltip: {
-                              enabled: false
-                          }
-                      },
-                      animation: {
-                          duration: 2000,
-                          easing: 'easeOutQuart',
-                          onProgress(animation) {
-                              const progress = Math.round((animation.currentStep / animation.numSteps) * 80);
-                              valueEl.textContent = progress + '%';
-                              gaugeChart.data.datasets[0].data = [progress, 100 - progress];
-                              gaugeChart.update('none');
-                          }
-                      }
+                  {
+                      name: 'Chenoa Dick',
+                      industry: 'Tech Innovations',
+                      email: 'chenoa.dick@email.com',
+                      phone: '+92-301-2345678',
+                      progress: 'Interview',
+                      coordinator: 'Bilal'
+                  },
+                  {
+                      name: 'Amanda Hinds',
+                      industry: 'Digital Marketing',
+                      email: 'amanda.hinds@email.com',
+                      phone: '+92-302-3456789',
+                      progress: 'Placed',
+                      coordinator: 'Nico'
+                  },
+                  {
+                      name: 'Emma Nightwork',
+                      industry: 'Healthcare Solutions',
+                      email: 'emma.nightwork@email.com',
+                      phone: '+92-303-4567890',
+                      progress: 'Interview',
+                      coordinator: 'Melanie'
+                  },
+                  {
+                      name: 'Sarah Johnson',
+                      industry: 'Tech Innovations',
+                      email: 'sarah.johnson@email.com',
+                      phone: '+92-304-5678901',
+                      progress: 'Assigned',
+                      coordinator: 'Ahmed'
+                  },
+                  {
+                      name: 'Michael Brown',
+                      industry: 'Creative Studios',
+                      email: 'michael.brown@email.com',
+                      phone: '+92-305-6789012',
+                      progress: 'Interview',
+                      coordinator: 'Fatima'
+                  },
+                  {
+                      name: 'Lisa Wilson',
+                      industry: 'Healthcare Solutions',
+                      email: 'lisa.wilson@email.com',
+                      phone: '+92-306-7890123',
+                      progress: 'Placed',
+                      coordinator: 'Hassan'
+                  },
+                  {
+                      name: 'David Miller',
+                      industry: 'Digital Marketing',
+                      email: 'david.miller@email.com',
+                      phone: '+92-307-8901234',
+                      progress: 'Interview',
+                      coordinator: 'Ayesha'
+                  },
+                  {
+                      name: 'Jennifer Davis',
+                      industry: 'Tech Innovations',
+                      email: 'jennifer.davis@email.com',
+                      phone: '+92-308-9012345',
+                      progress: 'Assigned',
+                      coordinator: 'Omar'
+                  },
+                  {
+                      name: 'Robert Garcia',
+                      industry: 'Creative Studios',
+                      email: 'robert.garcia@email.com',
+                      phone: '+92-309-0123456',
+                      progress: 'Interview',
+                      coordinator: 'Zara'
+                  },
+                  {
+                      name: 'Maria Rodriguez',
+                      industry: 'Healthcare Solutions',
+                      email: 'maria.rodriguez@email.com',
+                      phone: '+92-310-1234567',
+                      progress: 'Placed',
+                      coordinator: 'Usman'
+                  },
+                  {
+                      name: 'James Wilson',
+                      industry: 'Tech Innovations',
+                      email: 'james.wilson@email.com',
+                      phone: '+92-311-2345678',
+                      progress: 'Assigned',
+                      coordinator: 'Hina'
+                  },
+                  {
+                      name: 'Anna Thompson',
+                      industry: 'Digital Marketing',
+                      email: 'anna.thompson@email.com',
+                      phone: '+92-312-3456789',
+                      progress: 'Interview',
+                      coordinator: 'Tariq'
+                  },
+                  {
+                      name: 'Mark Anderson',
+                      industry: 'Creative Studios',
+                      email: 'mark.anderson@email.com',
+                      phone: '+92-313-4567890',
+                      progress: 'Placed',
+                      coordinator: 'Nadia'
+                  },
+                  {
+                      name: 'Sophie Martin',
+                      industry: 'Healthcare Solutions',
+                      email: 'sophie.martin@email.com',
+                      phone: '+92-314-5678901',
+                      progress: 'Assigned',
+                      coordinator: 'Kamran'
+                  }
+              ];
+
+              let currentPage = 1;
+              const itemsPerPage = 10;
+              let filteredData = [...dashStudentsData];
+
+              function renderTable() {
+                  const startIndex = (currentPage - 1) * itemsPerPage;
+                  const endIndex = startIndex + itemsPerPage;
+                  const pageData = filteredData.slice(startIndex, endIndex);
+
+                  const tbody = document.getElementById('dashStudentsTable');
+                  tbody.innerHTML = pageData.map(student => `
+                      <tr class="hover:bg-gray-50 transition-colors">
+                          <td class="px-4 py-3 whitespace-nowrap">
+                              <div class="flex items-center">
+                                  <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
+                                      ${student.name.charAt(0)}
+                                  </div>
+                                  <span class="text-sm font-medium text-gray-900">${student.name}</span>
+                              </div>
+                          </td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.industry}</td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.email}</td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.phone}</td>
+                          <td class="px-4 py-3 whitespace-nowrap">
+                              <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                                  student.progress === 'Assigned' ? 'bg-gray-100 text-gray-800' :
+                                  student.progress === 'Interview' ? 'bg-orange-100 text-orange-800' :
+                                  'bg-green-100 text-green-800'
+                              }">
+                                  ${student.progress}
+                              </span>
+                          </td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.coordinator}</td>
+                      </tr>
+                  `).join('');
+
+                  updatePagination();
+              }
+
+              function updatePagination() {
+                  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+                  const startRecord = (currentPage - 1) * itemsPerPage + 1;
+                  const endRecord = Math.min(currentPage * itemsPerPage, filteredData.length);
+
+                  document.getElementById('showingStart').textContent = startRecord;
+                  document.getElementById('showingEnd').textContent = endRecord;
+                  document.getElementById('totalRecords').textContent = filteredData.length;
+
+                  document.getElementById('prevPage').disabled = currentPage === 1;
+                  document.getElementById('nextPage').disabled = currentPage === totalPages;
+
+                  const pageNumbers = document.getElementById('pageNumbers');
+                  pageNumbers.innerHTML = '';
+                  for (let i = 1; i <= totalPages; i++) {
+                      const btn = document.createElement('button');
+                      btn.textContent = i;
+                      btn.className =
+                          `px-3 py-1 rounded ${i === currentPage ? 'bg-brand text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
+                      btn.onclick = () => {
+                          currentPage = i;
+                          renderTable();
+                      };
+                      pageNumbers.appendChild(btn);
+                  }
+              }
+
+              function filterTable() {
+                  const searchTerm = document.getElementById('dashSearchFilter').value.toLowerCase();
+                  const progressFilter = document.getElementById('dashProgressFilter').value;
+                  const industryFilter = document.getElementById('dashIndustryFilter').value;
+
+                  filteredData = dashStudentsData.filter(student => {
+                      const matchesSearch = student.name.toLowerCase().includes(searchTerm) || student.email.toLowerCase()
+                          .includes(searchTerm);
+                      const matchesProgress = !progressFilter || student.progress === progressFilter;
+                      const matchesIndustry = !industryFilter || student.industry.includes(industryFilter);
+
+                      return matchesSearch && matchesProgress && matchesIndustry;
+                  });
+
+                  currentPage = 1;
+                  renderTable();
+              }
+
+              document.getElementById('dashSearchFilter').addEventListener('input', filterTable);
+              document.getElementById('dashProgressFilter').addEventListener('change', filterTable);
+              document.getElementById('dashIndustryFilter').addEventListener('change', filterTable);
+              document.getElementById('dashResetFilters').addEventListener('click', () => {
+                  document.getElementById('dashSearchFilter').value = '';
+                  document.getElementById('dashProgressFilter').value = '';
+                  document.getElementById('dashIndustryFilter').value = '';
+                  filteredData = [...dashStudentsData];
+                  currentPage = 1;
+                  renderTable();
+              });
+
+              document.getElementById('prevPage').addEventListener('click', () => {
+                  if (currentPage > 1) {
+                      currentPage--;
+                      renderTable();
                   }
               });
 
-              // 🔥 Trigger smooth fill to 80%
-              setTimeout(() => {
-                  gaugeChart.data.datasets[0].data = [80, 20];
-                  gaugeChart.update();
-              }, 100);
+              document.getElementById('nextPage').addEventListener('click', () => {
+                  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+                  if (currentPage < totalPages) {
+                      currentPage++;
+                      renderTable();
+                  }
+              });
+
+              renderTable();
 
               // 🗺️ Initialize Google Map
               function initMap() {
                   const map = new google.maps.Map(document.getElementById('map'), {
                       zoom: 6,
-                      center: { lat: -25.274398, lng: 133.775136 }, // Australia center
-                      styles: [
-                          {
+                      center: {
+                          lat: -25.274398,
+                          lng: 133.775136
+                      }, // Australia center
+                      styles: [{
                               featureType: 'all',
                               elementType: 'geometry.fill',
-                              stylers: [{ color: '#f5f5f5' }]
+                              stylers: [{
+                                  color: '#f5f5f5'
+                              }]
                           },
                           {
                               featureType: 'water',
                               elementType: 'geometry',
-                              stylers: [{ color: '#e9e9e9' }]
+                              stylers: [{
+                                  color: '#e9e9e9'
+                              }]
                           }
                       ]
                   });
 
                   // Student locations (dummy data)
-                  const students = [
-                      { lat: -33.8688, lng: 151.2093, type: 'active', name: 'John Smith' }, // Sydney
-                      { lat: -37.8136, lng: 144.9631, type: 'completed', name: 'Sarah Johnson' }, // Melbourne
-                      { lat: -27.4698, lng: 153.0251, type: 'active', name: 'Mike Wilson' }, // Brisbane
-                      { lat: -31.9505, lng: 115.8605, type: 'completed', name: 'Emma Davis' }, // Perth
-                      { lat: -34.9285, lng: 138.6007, type: 'active', name: 'Chris Brown' }, // Adelaide
-                      { lat: -42.8821, lng: 147.3272, type: 'completed', name: 'Lisa Garcia' }, // Hobart
-                      { lat: -12.4634, lng: 130.8456, type: 'active', name: 'David Miller' }, // Darwin
-                      { lat: -35.2809, lng: 149.1300, type: 'completed', name: 'Anna Wilson' }, // Canberra
-                      { lat: -23.6980, lng: 133.8807, type: 'active', name: 'Tom Anderson' }, // Alice Springs
-                      { lat: -19.2590, lng: 146.8169, type: 'completed', name: 'Maria Rodriguez' } // Townsville
+                  const students = [{
+                          lat: -33.8688,
+                          lng: 151.2093,
+                          type: 'active',
+                          name: 'John Smith'
+                      }, // Sydney
+                      {
+                          lat: -37.8136,
+                          lng: 144.9631,
+                          type: 'completed',
+                          name: 'Sarah Johnson'
+                      }, // Melbourne
+                      {
+                          lat: -27.4698,
+                          lng: 153.0251,
+                          type: 'active',
+                          name: 'Mike Wilson'
+                      }, // Brisbane
+                      {
+                          lat: -31.9505,
+                          lng: 115.8605,
+                          type: 'completed',
+                          name: 'Emma Davis'
+                      }, // Perth
+                      {
+                          lat: -34.9285,
+                          lng: 138.6007,
+                          type: 'active',
+                          name: 'Chris Brown'
+                      }, // Adelaide
+                      {
+                          lat: -42.8821,
+                          lng: 147.3272,
+                          type: 'completed',
+                          name: 'Lisa Garcia'
+                      }, // Hobart
+                      {
+                          lat: -12.4634,
+                          lng: 130.8456,
+                          type: 'active',
+                          name: 'David Miller'
+                      }, // Darwin
+                      {
+                          lat: -35.2809,
+                          lng: 149.1300,
+                          type: 'completed',
+                          name: 'Anna Wilson'
+                      }, // Canberra
+                      {
+                          lat: -23.6980,
+                          lng: 133.8807,
+                          type: 'active',
+                          name: 'Tom Anderson'
+                      }, // Alice Springs
+                      {
+                          lat: -19.2590,
+                          lng: 146.8169,
+                          type: 'completed',
+                          name: 'Maria Rodriguez'
+                      } // Townsville
                   ];
 
                   // Add markers for each student
                   students.forEach(student => {
                       const marker = new google.maps.Marker({
-                          position: { lat: student.lat, lng: student.lng },
+                          position: {
+                              lat: student.lat,
+                              lng: student.lng
+                          },
                           map: map,
                           title: `${student.name} - ${student.type}`,
                           icon: {
@@ -359,5 +810,62 @@
 
               // Initialize map when page loads
               setTimeout(loadGoogleMaps, 500);
+
+
+              // Radial Progress Chart (Multi-layered)
+              const radialCtx = document.getElementById('radialChart');
+              new Chart(radialCtx, {
+                  type: 'doughnut',
+                  data: {
+                      datasets: [{
+                              data: [70, 30],
+                              backgroundColor: ['#D60404', '#f5f5f5'],
+                              cutout: '85%',
+                              borderWidth: 0
+                          },
+                          {
+                              data: [40, 60],
+                              backgroundColor: ['#FBBF24', '#f5f5f5'],
+                              cutout: '75%',
+                              borderWidth: 0
+                          },
+                          {
+                              data: [25, 75],
+                              backgroundColor: ['#FCD34D', '#f5f5f5'],
+                              cutout: '65%',
+                              borderWidth: 0
+                          },
+                          {
+                              data: [15, 85],
+                              backgroundColor: ['#00A8AB', '#f5f5f5'],
+                              cutout: '55%',
+                              borderWidth: 0
+                          },
+                          {
+                              data: [90, 10],
+                              backgroundColor: ['#00AB03', '#f5f5f5'],
+                              cutout: '45%',
+                              borderWidth: 0
+                          }
+                      ]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false, // ⚠️ allow flexible resizing
+                      plugins: {
+                          legend: {
+                              display: false
+                          },
+                          tooltip: {
+                              enabled: false
+                          }
+                      },
+                      rotation: -90,
+                      animation: {
+                          duration: 2000,
+                          easing: 'easeOutQuart'
+                      }
+                  }
+              });
           </script>
       @endsection

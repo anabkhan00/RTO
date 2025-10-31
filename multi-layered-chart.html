@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Layered Performance Chart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+        <h2 class="text-xl font-semibold text-gray-800 text-center mb-6">Performance Overview</h2>
+        
+        <!-- Chart Container -->
+        <div class="relative w-80 h-80 mx-auto">
+            <canvas id="performanceChart"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <p class="text-4xl font-bold text-gray-800">32%</p>
+                <p class="text-sm text-gray-600 mt-1">Average</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Multi-layered Performance Chart
+        const ctx = document.getElementById('performanceChart');
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [
+                    // Outer ring - Red
+                    {
+                        data: [35, 65],
+                        backgroundColor: ['#D60404', '#f5f5f5'],
+                        cutout: '85%',
+                        borderWidth: 0,
+                        borderRadius: 0
+                    },
+                    // Second ring - Orange
+                    {
+                        data: [60, 40],
+                        backgroundColor: ['#FBBF24', '#f5f5f5'],
+                        cutout: '72%',
+                        borderWidth: 0,
+                        borderRadius: 0
+                    },
+                    // Third ring - Yellow
+                    {
+                        data: [45, 55],
+                        backgroundColor: ['#FCD34D', '#f5f5f5'],
+                        cutout: '59%',
+                        borderWidth: 0,
+                        borderRadius: 0
+                    },
+                    // Fourth ring - Blue
+                    {
+                        data: [75, 25],
+                        backgroundColor: ['#00A8AB', '#f5f5f5'],
+                        cutout: '46%',
+                        borderWidth: 0,
+                        borderRadius: 0
+                    },
+                    // Inner ring - Green
+                    {
+                        data: [80, 20],
+                        backgroundColor: ['#00AB03', '#f5f5f5'],
+                        cutout: '33%',
+                        borderWidth: 0,
+                        borderRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                },
+                rotation: -90,
+                circumference: 360,
+                animation: {
+                    duration: 2500,
+                    easing: 'easeOutQuart',
+                    animateRotate: true,
+                    animateScale: false
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 0
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
