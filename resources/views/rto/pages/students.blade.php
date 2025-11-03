@@ -123,9 +123,9 @@
             <table id="studentsTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Name</th>
+                            Name</th> --}}
                         {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             RTO</th> --}}
@@ -135,12 +135,12 @@
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Sectors</th>
-                        <th
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Email</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Phone</th>
+                            Phone</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Course</th>
@@ -153,9 +153,9 @@
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Address</th>
-                        <th
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Assign Coordinator</th>
+                            Assign Coordinator</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
@@ -169,7 +169,7 @@
                         <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
                             onclick="window.location.href='{{ route('rto.student-documents.index', $student->id) }}'">
                             <!-- Name with Priority Badge -->
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <span
                                         class="inline-flex px-2 py-1 text-xs font-medium rounded-full mr-2
@@ -188,7 +188,7 @@
                                         <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
                                     </div>
                                 </div>
-                            </td>
+                            </td> --}}
                             <!-- RTO -->
                             {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->rto_number ?? '-----' }}</td> --}}
                             <!-- Industry -->
@@ -202,10 +202,10 @@
                                 </a>
                             </td>
                             <!-- Email -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
+                            {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
                             <!-- Phone -->
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->phone ?? '-----' }}
-                            </td>
+                            </td> --}}
                             <!-- Course -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span
@@ -236,12 +236,12 @@
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                                 {{ $student->address ?? '-----' }}</td>
                             <!-- Assign Coordinator -->
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <span class="text-sm text-gray-900 mr-2">Admin</span>
                                     <a href="#" class="text-brand hover:text-gold text-xs font-medium">change</a>
                                 </div>
-                            </td>
+                            </td> --}}
                             <!-- Created At -->
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                                 {{ $student->created_at->format('j M Y') }}</td>
