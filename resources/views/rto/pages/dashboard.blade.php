@@ -317,14 +317,38 @@
                               <tr>
                                   <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Name</th>
                                   <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Industry</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Email</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Phone</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Course</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Days Left</th>
                                   <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Progress</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Coordinator</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Created at</th>
                               </tr>
                           </thead>
                           <tbody class="bg-white divide-y divide-gray-200">
-                              <!-- Data will be populated by DataTables -->
+                              @foreach($students as $student)
+                              <tr class="hover:bg-gray-50 transition-colors">
+                                  <td class="px-4 py-3 whitespace-nowrap">
+                                      <div class="flex items-center">
+                                          <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
+                                              {{ substr($student->name, 0, 1) }}
+                                          </div>
+                                          <span class="text-sm font-medium text-gray-900">{{ $student->name }}</span>
+                                      </div>
+                                  </td>
+                                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->industry ?? 'Healthcare' }}</td>
+                                  <td class="px-4 py-3 whitespace-nowrap">
+                                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                          {{ $student->course->name ?? 'No Course' }}
+                                      </span>
+                                  </td>
+                                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ rand(10, 300) }} Days</td>
+                                  <td class="px-4 py-3 whitespace-nowrap">
+                                      <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                                          Assigned
+                                      </span>
+                                  </td>
+                                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->created_at->format('j M Y') }}</td>
+                              </tr>
+                              @endforeach
                           </tbody>
                       </table>
                   </div>
@@ -437,52 +461,10 @@
                       }
                   }
               });
-              // Dashboard Students DataTable
-              const dashStudentsData = [
-                  ['Nicole Wegmann', 'Healthcare Solutions', 'nicole.wegmann@email.com', '+92-300-1234567', 'Assigned', 'Zain'],
-                  ['Chenoa Dick', 'Tech Innovations', 'chenoa.dick@email.com', '+92-301-2345678', 'Interview', 'Bilal'],
-                  ['Amanda Hinds', 'Digital Marketing', 'amanda.hinds@email.com', '+92-302-3456789', 'Placed', 'Nico'],
-                  ['Emma Nightwork', 'Healthcare Solutions', 'emma.nightwork@email.com', '+92-303-4567890', 'Interview', 'Melanie'],
-                  ['Sarah Johnson', 'Tech Innovations', 'sarah.johnson@email.com', '+92-304-5678901', 'Assigned', 'Ahmed'],
-                  ['Michael Brown', 'Creative Studios', 'michael.brown@email.com', '+92-305-6789012', 'Interview', 'Fatima'],
-                  ['Lisa Wilson', 'Healthcare Solutions', 'lisa.wilson@email.com', '+92-306-7890123', 'Placed', 'Hassan'],
-                  ['David Miller', 'Digital Marketing', 'david.miller@email.com', '+92-307-8901234', 'Interview', 'Ayesha'],
-                  ['Jennifer Davis', 'Tech Innovations', 'jennifer.davis@email.com', '+92-308-9012345', 'Assigned', 'Omar'],
-                  ['Robert Garcia', 'Creative Studios', 'robert.garcia@email.com', '+92-309-0123456', 'Interview', 'Zara'],
-                  ['Maria Rodriguez', 'Healthcare Solutions', 'maria.rodriguez@email.com', '+92-310-1234567', 'Placed', 'Usman'],
-                  ['James Wilson', 'Tech Innovations', 'james.wilson@email.com', '+92-311-2345678', 'Assigned', 'Hina'],
-                  ['Anna Thompson', 'Digital Marketing', 'anna.thompson@email.com', '+92-312-3456789', 'Interview', 'Tariq'],
-                  ['Mark Anderson', 'Creative Studios', 'mark.anderson@email.com', '+92-313-4567890', 'Placed', 'Nadia'],
-                  ['Sophie Martin', 'Healthcare Solutions', 'sophie.martin@email.com', '+92-314-5678901', 'Assigned', 'Kamran']
-              ];
-
               // Initialize DataTable
               const table = $('#dashStudentsDataTable').DataTable({
-                  data: dashStudentsData,
-                  pageLength: 10,
+                  pageLength: 25,
                   scrollX: true,
-                  columnDefs: [
-                      {
-                          targets: 0,
-                          render: function(data, type, row) {
-                              return `<div class="flex items-center">
-                                  <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
-                                      ${data.charAt(0)}
-                                  </div>
-                                  <span class="text-sm font-medium text-gray-900">${data}</span>
-                              </div>`;
-                          }
-                      },
-                      {
-                          targets: 4,
-                          render: function(data, type, row) {
-                              const colorClass = data === 'Assigned' ? 'bg-gray-100 text-gray-800' :
-                                               data === 'Interview' ? 'bg-orange-100 text-orange-800' :
-                                               'bg-green-100 text-green-800';
-                              return `<span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${colorClass}">${data}</span>`;
-                          }
-                      }
-                  ],
                   dom: 'rt<"flex items-center justify-between mt-4"<"text-sm text-gray-700"i><"flex gap-2"p>>',
                   language: {
                       info: 'Showing _START_ to _END_ of _TOTAL_ results',

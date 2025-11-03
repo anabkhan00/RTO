@@ -26,13 +26,15 @@ class RtoController extends Controller
             ->latest()
             ->take(5)
             ->get();
+        $students = User::with('course')->whereIn('id', $studentIds)->latest()->get();
 
         return view('rto.pages.dashboard', compact(
             'totalStudents',
             'activeCourses', 
             'thisMonthStudents',
             'completedStudents',
-            'recentStudents'
+            'recentStudents',
+            'students'
         ));
     }
 
