@@ -27,9 +27,15 @@
     </div>
 
     <!-- Filter Section -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-4 border-b border-gray-200">
+            <button id="toggleFilters" class="flex items-center justify-between w-full text-left">
+                <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+                <i id="filterIcon" class="bi bi-chevron-down text-gray-500 transition-transform"></i>
+            </button>
+        </div>
+        <div id="filterContent" class="hidden p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/Email</label>
                 <input type="text" id="searchFilter" placeholder="Search students..."
@@ -38,7 +44,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">RTO</label>
                 <select id="rtoFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                     <option value="">All RTOs</option>
                     <option value="Alfie Training">Alfie Training</option>
                     <option value="Open Colleges">Open Colleges</option>
@@ -47,7 +53,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                 <select id="priorityFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                     <option value="">All Priorities</option>
                     <option value="High Priority">High Priority</option>
                     <option value="Medium Priority">Medium Priority</option>
@@ -57,7 +63,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
                 <select id="courseFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                     <option value="">All Courses</option>
                     <option value="Web Development">Web Development</option>
                     <option value="Graphic Design">Graphic Design</option>
@@ -68,7 +74,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Progress Status</label>
                 <select id="progressFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                     <option value="">All Status</option>
                     <option value="Assigned">Assigned</option>
                     <option value="Interview">Interview</option>
@@ -94,6 +100,7 @@
                     class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
                     Reset
                 </button>
+            </div>
             </div>
         </div>
     </div>
@@ -147,7 +154,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach ($students as $index => $student)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{{ route('rto.student-documents.index', $student->id) }}'">
                             <!-- Name with Priority Badge -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -226,27 +233,18 @@
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                                 {{ $student->created_at->format('j M Y') }}</td>
                             <!-- Actions -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium" onclick="event.stopPropagation()">
                                 <div class="relative">
                                     <button onclick="toggleDropdown({{ $index }})"
-                                        class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-                                        MORE <i class="bi bi-chevron-down ml-1"></i>
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <div id="dropdown-{{ $index }}"
-                                        class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
-                                        {{-- <a href="#"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">View Details</a> --}}
-                                        <a href="#"
-                                            onclick="editStudent({{ $student->id }}, '{{ $student->name }}', '{{ $student->email }}', '{{ $student->phone }}', '{{ $student->address }}', {{ $student->course_id ?? 1 }})"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Edit Student</a>
-                                        <a href="{{ route('rto.student-documents.index', $student->id) }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">View
-                                            Documents</a>
-                                        {{-- <a href="#"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Assign
-                                            Coordinator</a> --}}
+                                        class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
                                         <a href="#" onclick="deleteStudent({{ $student->id }})"
-                                            class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Delete Student</a>
+                                            class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
+                                            <i class="bi bi-trash mr-2"></i>Delete
+                                        </a>
                                     </div>
                                 </div>
                             </td>
@@ -300,7 +298,7 @@
                                 <i class="bi bi-building mr-1"></i> RTO
                             </label>
                             <select name="rto" id="studentRto"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select RTO</option>
                                 <option value="Alfie Training">Alfie Training</option>
                                 <option value="Open Colleges">Open Colleges</option>
@@ -312,7 +310,7 @@
                                 <i class="bi bi-flag mr-1"></i> Priority
                             </label>
                             <select name="priority" id="studentPriority"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select Priority</option>
                                 <option value="High Priority">High Priority</option>
                                 <option value="Medium Priority">Medium Priority</option>
@@ -333,7 +331,7 @@
                                 <i class="bi bi-book mr-1"></i> Course
                             </label>
                             <select name="course_id" id="studentCourse"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select Course</option>
                                 <option value="1">Web Development</option>
                                 <option value="2">Graphic Design</option>
@@ -355,7 +353,7 @@
                                 <i class="bi bi-person-check mr-1"></i> Coordinator
                             </label>
                             <select name="coordinator" id="studentCoordinator"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select Coordinator</option>
                                 <option value="Zain">Zain</option>
                                 <option value="Bilal">Bilal</option>
@@ -602,12 +600,49 @@
             studentModal.classList.remove('hidden');
         }
 
+        // Filter toggle functionality
+        document.getElementById('toggleFilters').addEventListener('click', function() {
+            const filterContent = document.getElementById('filterContent');
+            const filterIcon = document.getElementById('filterIcon');
+
+            filterContent.classList.toggle('hidden');
+            filterIcon.classList.toggle('rotate-180');
+        });
+
+        // Student details function
+        function showStudentDetails(id, name, email, phone, address) {
+            Swal.fire({
+                title: 'Student Details',
+                html: `
+                    <div class="text-left space-y-3">
+                        <div><strong>Name:</strong> ${name}</div>
+                        <div><strong>Email:</strong> ${email}</div>
+                        <div><strong>Phone:</strong> ${phone || 'Not provided'}</div>
+                        <div><strong>Address:</strong> ${address || 'Not provided'}</div>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Close',
+                confirmButtonColor: '#1E293B'
+            });
+        }
+
         // Delete student function
         function deleteStudent(id) {
-            if (confirm('Are you sure you want to delete this student?')) {
-                // Handle delete logic here
-                console.log('Delete student with ID:', id);
-            }
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('Delete student with ID:', id);
+                    Swal.fire('Deleted!', 'Student has been deleted.', 'success');
+                }
+            });
         }
     </script>
 @endsection

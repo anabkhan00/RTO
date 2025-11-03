@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\RtoPersonalDocument;
+use App\Models\DocumentChecklist;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +14,10 @@ class RtoPersonalDocumentController extends Controller
     public function index()
     {
         $documents = RtoPersonalDocument::where('rto_id', Auth::id())->latest()->get();
-        return view('rto.pages.my_documents', compact('documents'));
+        $checklists = DocumentChecklist::where('status', 1)->get();
+        $students = User::role('user')->with(['studentDocuments', 'course'])->get();
+
+        return view('rto.pages.my_documents', compact('documents', 'checklists', 'students'));
     }
 
     public function store(Request $request)
@@ -42,13 +47,13 @@ class RtoPersonalDocumentController extends Controller
     public function destroy($id)
     {
         $document = RtoPersonalDocument::where('rto_id', Auth::id())->findOrFail($id);
-        
+
         if (Storage::disk('public')->exists($document->file_path)) {
             Storage::disk('public')->delete($document->file_path);
         }
-        
+
         $document->delete();
-        
+
         return response()->json(['success' => true]);
     }
 }
