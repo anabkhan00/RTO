@@ -36,71 +36,83 @@
         </div>
         <div id="filterContent" class="hidden p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/Email</label>
-                <input type="text" id="searchFilter" placeholder="Search students..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">RTO</label>
-                <select id="rtoFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                    <option value="">All RTOs</option>
-                    <option value="Alfie Training">Alfie Training</option>
-                    <option value="Open Colleges">Open Colleges</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                <select id="priorityFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                    <option value="">All Priorities</option>
-                    <option value="High Priority">High Priority</option>
-                    <option value="Medium Priority">Medium Priority</option>
-                    <option value="Low Priority">Low Priority</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
-                <select id="courseFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                    <option value="">All Courses</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="Graphic Design">Graphic Design</option>
-                    <option value="Mobile Apps">Mobile Apps</option>
-                    <option value="Data Science">Data Science</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Progress Status</label>
-                <select id="progressFilter"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                    <option value="">All Status</option>
-                    <option value="Assigned">Assigned</option>
-                    <option value="Interview">Interview</option>
-                    <option value="Placed">Placed</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
-                <input type="date" id="fromDate"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
-                <input type="date" id="toDate"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-            </div>
-            <div class="flex items-end gap-2">
-                <button id="applyFilters"
-                    class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors text-sm font-medium">
-                    Apply Filters
-                </button>
-                <button id="resetFilters"
-                    class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
-                    Reset
-                </button>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/Email</label>
+                    <input type="text" id="searchFilter" placeholder="Search students..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <select id="locationFilter"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">Select Province</option>
+                        <option value="Alberta">Alberta</option>
+                        <option value="British Columbia">British Columbia</option>
+                        <option value="Manitoba">Manitoba</option>
+                        <option value="New Brunswick">New Brunswick</option>
+                        <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+                        <option value="Nova Scotia">Nova Scotia</option>
+                        <option value="Ontario">Ontario</option>
+                        <option value="Prince Edward Island">Prince Edward Island</option>
+                        <option value="Quebec">Quebec</option>
+                        <option value="Saskatchewan">Saskatchewan</option>
+                        <option value="Northwest Territories">Northwest Territories</option>
+                        <option value="Nunavut">Nunavut</option>
+                        <option value="Yukon">Yukon</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select id="priorityFilter"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">All Priorities</option>
+                        <option value="High Priority">High Priority</option>
+                        <option value="Medium Priority">Medium Priority</option>
+                        <option value="Low Priority">Low Priority</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+                    <select id="courseFilter"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">All Courses</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Graphic Design">Graphic Design</option>
+                        <option value="Mobile Apps">Mobile Apps</option>
+                        <option value="Data Science">Data Science</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Progress Status</label>
+                    <select id="progressFilter"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">All Status</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Placed">Placed</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                    <input type="date" id="fromDate"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                    <input type="date" id="toDate"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div class="flex items-end gap-2">
+                    <button id="applyFilters"
+                        class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors text-sm font-medium">
+                        Apply Filters
+                    </button>
+                    <button id="resetFilters"
+                        class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
+                        Reset
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -154,7 +166,8 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach ($students as $index => $student)
-                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{{ route('rto.student-documents.index', $student->id) }}'">
+                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                            onclick="window.location.href='{{ route('rto.student-documents.index', $student->id) }}'">
                             <!-- Name with Priority Badge -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -422,9 +435,9 @@
                         <p class="font-medium text-blue-800 mb-2 flex items-center">
                             <i class="bi bi-info-circle mr-1"></i> CSV Format:
                         </p>
-                        <p class="text-blue-700 font-mono text-sm">
+                        {{-- <p class="text-blue-700 font-mono text-sm">
                             name,email,phone,address,course_code,rto,priority,industry</p>
-                        <p class="text-blue-600 text-xs mt-2">First row should contain headers</p>
+                        <p class="text-blue-600 text-xs mt-2">First row should contain headers</p> --}}
                     </div>
 
                     <div class="flex justify-end gap-3 pt-4 border-t">
