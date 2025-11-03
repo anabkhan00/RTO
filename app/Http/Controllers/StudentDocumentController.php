@@ -85,6 +85,20 @@ class StudentDocumentController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function getExistingChecklists($studentId)
+    {
+        $existingChecklistIds = StudentDocument::where('student_id', $studentId)
+            ->whereNotNull('checklist_ids')
+            ->get()
+            ->pluck('checklist_ids')
+            ->flatten()
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return response()->json(['existing_checklist_ids' => $existingChecklistIds]);
+    }
+
     public function destroy($id)
     {
         $document = StudentDocument::findOrFail($id);

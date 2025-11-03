@@ -113,12 +113,60 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex justify-end pb-3">
                     <button type="submit" id="uploadBtn" class="px-6 py-2 bg-brand text-white rounded-md hover:bg-gold">
                         <span id="uploadText">Upload Documents</span>
                         <span id="uploadLoader" class="hidden">
                             <i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Uploading...
                         </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Student Update Section -->
+        <div class="border-t pt-6 mb-6">
+            <h3 class="text-lg font-medium text-brand mb-4">Update Student Information</h3>
+
+            <form action="/rto/students/{{ $student->id }}" method="POST" class="bg-gray-50 rounded-lg p-6">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-brand mb-1">Name</label>
+                        <input type="text" name="name" value="{{ $student->name }}" required
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-brand mb-1">Email</label>
+                        <input type="email" name="email" value="{{ $student->email }}" required
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-brand mb-1">Phone</label>
+                        <input type="text" name="phone" value="{{ $student->phone }}"
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-brand mb-1">Industry</label>
+                        <input type="text" name="industry" value="{{ $student->industry }}"
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-brand mb-1">Address</label>
+                        <textarea name="address" rows="3"
+                            class="w-full border border-gold bg-white text-sm rounded-md p-3 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200">{{ $student->address }}</textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="px-6 py-2 bg-brand text-white rounded-md hover:bg-gold transition-colors">
+                        <i class="bi bi-check-circle mr-2"></i>Update Student
                     </button>
                 </div>
             </form>

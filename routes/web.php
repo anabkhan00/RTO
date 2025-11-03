@@ -41,6 +41,7 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::get('/rto/students/csv-format', [RtoController::class, 'csvFormat']);
     Route::get('/rto/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('rto.student-documents.index');
     Route::post('/rto/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('rto.student-documents.store');
+    Route::get('/rto/student-documents/{student}/existing-checklists', [StudentDocumentController::class, 'getExistingChecklists']);
     Route::post('/rto/student-documents/assign-types/{student}', [StudentDocumentController::class, 'assignTypes']);
     Route::delete('/rto/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
     Route::get('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'index'])->name('rto.my-documents');

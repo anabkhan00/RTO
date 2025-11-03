@@ -278,7 +278,7 @@
                       </div>
                       <div>
                           <select id="dashProgressFilter"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                               <option value="">All Progress</option>
                               <option value="Assigned">Assigned</option>
                               <option value="Interview">Interview</option>
@@ -287,7 +287,7 @@
                       </div>
                       <div>
                           <select id="dashIndustryFilter"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                               <option value="">All Industries</option>
                               <option value="Healthcare">Healthcare</option>
                               <option value="Tech">Tech</option>
@@ -304,52 +304,29 @@
 
                   <!-- Table -->
                   <div class="overflow-x-auto">
-                      <table class="min-w-full">
+                      <table id="dashStudentsDataTable" class="min-w-full" style="table-layout: fixed;">
+                          <colgroup>
+                              <col style="width: 20%;">
+                              <col style="width: 18%;">
+                              <col style="width: 22%;">
+                              <col style="width: 15%;">
+                              <col style="width: 12%;">
+                              <col style="width: 13%;">
+                          </colgroup>
                           <thead class="bg-gray-50">
                               <tr>
-                                  <th
-                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Name</th>
-                                  <th
-                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Industry</th>
-                                  <th
-                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Email</th>
-                                  <th
-                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Phone</th>
-                                  <th
-                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Progress</th>
-                                  <th
-                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Coordinator</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Name</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Industry</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Email</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Phone</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Progress</th>
+                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Coordinator</th>
                               </tr>
                           </thead>
-                          <tbody id="dashStudentsTable" class="bg-white divide-y divide-gray-200">
-                              <!-- Sample data will be populated by JavaScript -->
+                          <tbody class="bg-white divide-y divide-gray-200">
+                              <!-- Data will be populated by DataTables -->
                           </tbody>
                       </table>
-                  </div>
-
-                  <!-- Pagination -->
-                  <div class="flex items-center justify-between mt-4">
-                      <div class="text-sm text-gray-700">
-                          Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span
-                              id="totalRecords">25</span> results
-                      </div>
-                      <div class="flex gap-2">
-                          <button id="prevPage"
-                              class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
-                              disabled>
-                              Previous
-                          </button>
-                          <span id="pageNumbers" class="flex gap-1"></span>
-                          <button id="nextPage" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-                              Next
-                          </button>
-                      </div>
                   </div>
               </div>
           </div>
@@ -370,6 +347,27 @@
               </div>
           </div>
 
+          <style>
+              /* DataTables styling */
+              #dashStudentsDataTable_wrapper .dataTables_paginate .paginate_button {
+                  padding: 0.25rem 0.75rem;
+                  margin: 0 0.125rem;
+                  border-radius: 0.375rem;
+                  background-color: #e5e7eb;
+                  color: #374151;
+                  border: none;
+              }
+              #dashStudentsDataTable_wrapper .dataTables_paginate .paginate_button:hover {
+                  background-color: #d1d5db;
+              }
+              #dashStudentsDataTable_wrapper .dataTables_paginate .paginate_button.current {
+                  background-color: var(--brand);
+                  color: white;
+              }
+              #dashStudentsDataTable tbody tr:hover {
+                  background-color: #f9fafb;
+              }
+          </style>
           <script>
               // 📈 Line Chart
               const ctx = document.getElementById('lineChart');
@@ -439,241 +437,81 @@
                       }
                   }
               });
-              // Dashboard Students Table
-              const dashStudentsData = [{
-                      name: 'Nicole Wegmann',
-                      industry: 'Healthcare Solutions',
-                      email: 'nicole.wegmann@email.com',
-                      phone: '+92-300-1234567',
-                      progress: 'Assigned',
-                      coordinator: 'Zain'
-                  },
-                  {
-                      name: 'Chenoa Dick',
-                      industry: 'Tech Innovations',
-                      email: 'chenoa.dick@email.com',
-                      phone: '+92-301-2345678',
-                      progress: 'Interview',
-                      coordinator: 'Bilal'
-                  },
-                  {
-                      name: 'Amanda Hinds',
-                      industry: 'Digital Marketing',
-                      email: 'amanda.hinds@email.com',
-                      phone: '+92-302-3456789',
-                      progress: 'Placed',
-                      coordinator: 'Nico'
-                  },
-                  {
-                      name: 'Emma Nightwork',
-                      industry: 'Healthcare Solutions',
-                      email: 'emma.nightwork@email.com',
-                      phone: '+92-303-4567890',
-                      progress: 'Interview',
-                      coordinator: 'Melanie'
-                  },
-                  {
-                      name: 'Sarah Johnson',
-                      industry: 'Tech Innovations',
-                      email: 'sarah.johnson@email.com',
-                      phone: '+92-304-5678901',
-                      progress: 'Assigned',
-                      coordinator: 'Ahmed'
-                  },
-                  {
-                      name: 'Michael Brown',
-                      industry: 'Creative Studios',
-                      email: 'michael.brown@email.com',
-                      phone: '+92-305-6789012',
-                      progress: 'Interview',
-                      coordinator: 'Fatima'
-                  },
-                  {
-                      name: 'Lisa Wilson',
-                      industry: 'Healthcare Solutions',
-                      email: 'lisa.wilson@email.com',
-                      phone: '+92-306-7890123',
-                      progress: 'Placed',
-                      coordinator: 'Hassan'
-                  },
-                  {
-                      name: 'David Miller',
-                      industry: 'Digital Marketing',
-                      email: 'david.miller@email.com',
-                      phone: '+92-307-8901234',
-                      progress: 'Interview',
-                      coordinator: 'Ayesha'
-                  },
-                  {
-                      name: 'Jennifer Davis',
-                      industry: 'Tech Innovations',
-                      email: 'jennifer.davis@email.com',
-                      phone: '+92-308-9012345',
-                      progress: 'Assigned',
-                      coordinator: 'Omar'
-                  },
-                  {
-                      name: 'Robert Garcia',
-                      industry: 'Creative Studios',
-                      email: 'robert.garcia@email.com',
-                      phone: '+92-309-0123456',
-                      progress: 'Interview',
-                      coordinator: 'Zara'
-                  },
-                  {
-                      name: 'Maria Rodriguez',
-                      industry: 'Healthcare Solutions',
-                      email: 'maria.rodriguez@email.com',
-                      phone: '+92-310-1234567',
-                      progress: 'Placed',
-                      coordinator: 'Usman'
-                  },
-                  {
-                      name: 'James Wilson',
-                      industry: 'Tech Innovations',
-                      email: 'james.wilson@email.com',
-                      phone: '+92-311-2345678',
-                      progress: 'Assigned',
-                      coordinator: 'Hina'
-                  },
-                  {
-                      name: 'Anna Thompson',
-                      industry: 'Digital Marketing',
-                      email: 'anna.thompson@email.com',
-                      phone: '+92-312-3456789',
-                      progress: 'Interview',
-                      coordinator: 'Tariq'
-                  },
-                  {
-                      name: 'Mark Anderson',
-                      industry: 'Creative Studios',
-                      email: 'mark.anderson@email.com',
-                      phone: '+92-313-4567890',
-                      progress: 'Placed',
-                      coordinator: 'Nadia'
-                  },
-                  {
-                      name: 'Sophie Martin',
-                      industry: 'Healthcare Solutions',
-                      email: 'sophie.martin@email.com',
-                      phone: '+92-314-5678901',
-                      progress: 'Assigned',
-                      coordinator: 'Kamran'
-                  }
+              // Dashboard Students DataTable
+              const dashStudentsData = [
+                  ['Nicole Wegmann', 'Healthcare Solutions', 'nicole.wegmann@email.com', '+92-300-1234567', 'Assigned', 'Zain'],
+                  ['Chenoa Dick', 'Tech Innovations', 'chenoa.dick@email.com', '+92-301-2345678', 'Interview', 'Bilal'],
+                  ['Amanda Hinds', 'Digital Marketing', 'amanda.hinds@email.com', '+92-302-3456789', 'Placed', 'Nico'],
+                  ['Emma Nightwork', 'Healthcare Solutions', 'emma.nightwork@email.com', '+92-303-4567890', 'Interview', 'Melanie'],
+                  ['Sarah Johnson', 'Tech Innovations', 'sarah.johnson@email.com', '+92-304-5678901', 'Assigned', 'Ahmed'],
+                  ['Michael Brown', 'Creative Studios', 'michael.brown@email.com', '+92-305-6789012', 'Interview', 'Fatima'],
+                  ['Lisa Wilson', 'Healthcare Solutions', 'lisa.wilson@email.com', '+92-306-7890123', 'Placed', 'Hassan'],
+                  ['David Miller', 'Digital Marketing', 'david.miller@email.com', '+92-307-8901234', 'Interview', 'Ayesha'],
+                  ['Jennifer Davis', 'Tech Innovations', 'jennifer.davis@email.com', '+92-308-9012345', 'Assigned', 'Omar'],
+                  ['Robert Garcia', 'Creative Studios', 'robert.garcia@email.com', '+92-309-0123456', 'Interview', 'Zara'],
+                  ['Maria Rodriguez', 'Healthcare Solutions', 'maria.rodriguez@email.com', '+92-310-1234567', 'Placed', 'Usman'],
+                  ['James Wilson', 'Tech Innovations', 'james.wilson@email.com', '+92-311-2345678', 'Assigned', 'Hina'],
+                  ['Anna Thompson', 'Digital Marketing', 'anna.thompson@email.com', '+92-312-3456789', 'Interview', 'Tariq'],
+                  ['Mark Anderson', 'Creative Studios', 'mark.anderson@email.com', '+92-313-4567890', 'Placed', 'Nadia'],
+                  ['Sophie Martin', 'Healthcare Solutions', 'sophie.martin@email.com', '+92-314-5678901', 'Assigned', 'Kamran']
               ];
 
-              let currentPage = 1;
-              const itemsPerPage = 10;
-              let filteredData = [...dashStudentsData];
-
-              function renderTable() {
-                  const startIndex = (currentPage - 1) * itemsPerPage;
-                  const endIndex = startIndex + itemsPerPage;
-                  const pageData = filteredData.slice(startIndex, endIndex);
-
-                  const tbody = document.getElementById('dashStudentsTable');
-                  tbody.innerHTML = pageData.map(student => `
-                      <tr class="hover:bg-gray-50 transition-colors">
-                          <td class="px-4 py-3 whitespace-nowrap">
-                              <div class="flex items-center">
+              // Initialize DataTable
+              const table = $('#dashStudentsDataTable').DataTable({
+                  data: dashStudentsData,
+                  pageLength: 10,
+                  scrollX: true,
+                  columnDefs: [
+                      {
+                          targets: 0,
+                          render: function(data, type, row) {
+                              return `<div class="flex items-center">
                                   <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
-                                      ${student.name.charAt(0)}
+                                      ${data.charAt(0)}
                                   </div>
-                                  <span class="text-sm font-medium text-gray-900">${student.name}</span>
-                              </div>
-                          </td>
-                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.industry}</td>
-                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.email}</td>
-                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.phone}</td>
-                          <td class="px-4 py-3 whitespace-nowrap">
-                              <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                                  student.progress === 'Assigned' ? 'bg-gray-100 text-gray-800' :
-                                  student.progress === 'Interview' ? 'bg-orange-100 text-orange-800' :
-                                  'bg-green-100 text-green-800'
-                              }">
-                                  ${student.progress}
-                              </span>
-                          </td>
-                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${student.coordinator}</td>
-                      </tr>
-                  `).join('');
-
-                  updatePagination();
-              }
-
-              function updatePagination() {
-                  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-                  const startRecord = (currentPage - 1) * itemsPerPage + 1;
-                  const endRecord = Math.min(currentPage * itemsPerPage, filteredData.length);
-
-                  document.getElementById('showingStart').textContent = startRecord;
-                  document.getElementById('showingEnd').textContent = endRecord;
-                  document.getElementById('totalRecords').textContent = filteredData.length;
-
-                  document.getElementById('prevPage').disabled = currentPage === 1;
-                  document.getElementById('nextPage').disabled = currentPage === totalPages;
-
-                  const pageNumbers = document.getElementById('pageNumbers');
-                  pageNumbers.innerHTML = '';
-                  for (let i = 1; i <= totalPages; i++) {
-                      const btn = document.createElement('button');
-                      btn.textContent = i;
-                      btn.className =
-                          `px-3 py-1 rounded ${i === currentPage ? 'bg-brand text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
-                      btn.onclick = () => {
-                          currentPage = i;
-                          renderTable();
-                      };
-                      pageNumbers.appendChild(btn);
-                  }
-              }
-
-              function filterTable() {
-                  const searchTerm = document.getElementById('dashSearchFilter').value.toLowerCase();
-                  const progressFilter = document.getElementById('dashProgressFilter').value;
-                  const industryFilter = document.getElementById('dashIndustryFilter').value;
-
-                  filteredData = dashStudentsData.filter(student => {
-                      const matchesSearch = student.name.toLowerCase().includes(searchTerm) || student.email.toLowerCase()
-                          .includes(searchTerm);
-                      const matchesProgress = !progressFilter || student.progress === progressFilter;
-                      const matchesIndustry = !industryFilter || student.industry.includes(industryFilter);
-
-                      return matchesSearch && matchesProgress && matchesIndustry;
-                  });
-
-                  currentPage = 1;
-                  renderTable();
-              }
-
-              document.getElementById('dashSearchFilter').addEventListener('input', filterTable);
-              document.getElementById('dashProgressFilter').addEventListener('change', filterTable);
-              document.getElementById('dashIndustryFilter').addEventListener('change', filterTable);
-              document.getElementById('dashResetFilters').addEventListener('click', () => {
-                  document.getElementById('dashSearchFilter').value = '';
-                  document.getElementById('dashProgressFilter').value = '';
-                  document.getElementById('dashIndustryFilter').value = '';
-                  filteredData = [...dashStudentsData];
-                  currentPage = 1;
-                  renderTable();
-              });
-
-              document.getElementById('prevPage').addEventListener('click', () => {
-                  if (currentPage > 1) {
-                      currentPage--;
-                      renderTable();
+                                  <span class="text-sm font-medium text-gray-900">${data}</span>
+                              </div>`;
+                          }
+                      },
+                      {
+                          targets: 4,
+                          render: function(data, type, row) {
+                              const colorClass = data === 'Assigned' ? 'bg-gray-100 text-gray-800' :
+                                               data === 'Interview' ? 'bg-orange-100 text-orange-800' :
+                                               'bg-green-100 text-green-800';
+                              return `<span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${colorClass}">${data}</span>`;
+                          }
+                      }
+                  ],
+                  dom: 'rt<"flex items-center justify-between mt-4"<"text-sm text-gray-700"i><"flex gap-2"p>>',
+                  language: {
+                      info: 'Showing _START_ to _END_ of _TOTAL_ results',
+                      paginate: {
+                          previous: 'Previous',
+                          next: 'Next'
+                      }
                   }
               });
 
-              document.getElementById('nextPage').addEventListener('click', () => {
-                  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-                  if (currentPage < totalPages) {
-                      currentPage++;
-                      renderTable();
-                  }
+              // Custom filtering
+              $('#dashSearchFilter').on('keyup', function() {
+                  table.search(this.value).draw();
               });
 
-              renderTable();
+              $('#dashProgressFilter').on('change', function() {
+                  table.column(4).search(this.value).draw();
+              });
+
+              $('#dashIndustryFilter').on('change', function() {
+                  table.column(1).search(this.value).draw();
+              });
+
+              $('#dashResetFilters').on('click', function() {
+                  $('#dashSearchFilter').val('');
+                  $('#dashProgressFilter').val('');
+                  $('#dashIndustryFilter').val('');
+                  table.search('').columns().search('').draw();
+              });
 
               // 🗺️ Initialize Google Map
               function initMap() {
