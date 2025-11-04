@@ -47,6 +47,12 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::get('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'index'])->name('rto.my-documents');
     Route::post('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'store']);
     Route::delete('/rto/my-documents/{document}', [App\Http\Controllers\RtoPersonalDocumentController::class, 'destroy']);
+    
+    // E-Signature Routes
+    Route::get('/rto/esignature', [App\Http\Controllers\EsignatureController::class, 'index'])->name('rto.esignature');
+    Route::post('/rto/esignature', [App\Http\Controllers\EsignatureController::class, 'store']);
+    Route::put('/rto/esignature/{esignature}', [App\Http\Controllers\EsignatureController::class, 'update']);
+    Route::delete('/rto/esignature/{esignature}', [App\Http\Controllers\EsignatureController::class, 'destroy']);
 
 });
 

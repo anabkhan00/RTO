@@ -70,4 +70,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(StudentDocument::class, 'student_id');
     }
+
+    public function esignature()
+    {
+        return $this->hasOne(Esignature::class);
+    }
 }

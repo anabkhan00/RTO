@@ -1,4 +1,17 @@
 @extends('rto.master_layout.index')
+<style>
+    .bg-blue-100,
+    .bg-purple-100,
+    .bg-green-100,
+    .bg-orange-100,
+    .bg-pink-100,
+    .bg-indigo-100,
+    .bg-teal-100,
+    .bg-rose-100 {
+        background-color: rgba(0, 0, 0, 0.03) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+</style>
 @section('content')
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -123,24 +136,24 @@
             <table id="studentsTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Name</th>
+                            Name</th> --}}
                         {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             RTO</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Industry</th>
-                        <th
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Sectors</th>
-                        <th
+                            Sectors</th> --}}
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Email</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Phone</th>
+                            Phone</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Course</th>
@@ -153,9 +166,9 @@
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Address</th>
-                        <th
+                        {{-- <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Assign Coordinator</th>
+                            Assign Coordinator</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
@@ -169,7 +182,7 @@
                         <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
                             onclick="window.location.href='{{ route('rto.student-documents.index', $student->id) }}'">
                             <!-- Name with Priority Badge -->
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <span
                                         class="inline-flex px-2 py-1 text-xs font-medium rounded-full mr-2
@@ -188,60 +201,100 @@
                                         <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
                                     </div>
                                 </div>
-                            </td>
+                            </td> --}}
                             <!-- RTO -->
                             {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->rto_number ?? '-----' }}</td> --}}
                             <!-- Industry -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                                {{ $student->industry ?? '-----' }}</td>
-                            <!-- Sectors -->
+
+                            @php
+                                // Pastel color palette
+                                $palette = [
+                                    ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-100'],
+                                    ['bg' => 'bg-purple-50', 'text' => 'text-purple-700', 'border' => 'border-purple-100'],
+                                    ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
+                                    ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
+                                    ['bg' => 'bg-pink-50', 'text' => 'text-pink-700', 'border' => 'border-pink-100'],
+                                    ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
+                                    ['bg' => 'bg-teal-50', 'text' => 'text-teal-700', 'border' => 'border-teal-100'],
+                                    ['bg' => 'bg-cyan-50', 'text' => 'text-cyan-700', 'border' => 'border-cyan-100'],
+                                ];
+
+                                // Progress status mapping
+                                $progressColors = [
+                                    'Assigned' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-100'],
+                                    'Interview' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
+                                    'Placed' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
+                                    'Completed' => ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
+                                ];
+
+                                // Days left color logic
+                                $daysLeft = rand(10, 300);
+                                $daysColor = $daysLeft > 150 ?
+                                    ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'] :
+                                    ($daysLeft >= 30 ?
+                                        ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'] :
+                                        ['bg' => 'bg-red-50', 'text' => 'text-red-700', 'border' => 'border-red-100']);
+
+                                // Dynamic assignments
+                                $industry = $student->industry ?? 'Healthcare';
+                                $courseName = $student->course->name ?? 'No Course';
+                                $progress = 'Completed';
+
+                                $industryColor = $palette[abs(crc32($industry)) % count($palette)];
+                                $courseColor = $palette[abs(crc32($courseName)) % count($palette)];
+                                $progressColor = $progressColors[$progress] ?? $palette[6];
+                            @endphp
+
                             <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
+                                    {{ $industry }}
+                                </span>
+                            </td>
+                            <!-- Sectors -->
+                            {{-- <td class="px-4 py-3 whitespace-nowrap">
                                 <a href="#" class="text-brand hover:text-gold text-sm font-medium">
                                     VIEW / EDIT
                                     <i class="bi bi-layers ml-1"></i>
                                 </a>
-                            </td>
+                            </td> --}}
                             <!-- Email -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
+                            {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
                             <!-- Phone -->
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->phone ?? '-----' }}
-                            </td>
+                            </td> --}}
                             <!-- Course -->
+
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span
-                                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                @if ($student->course && $student->course->name == 'Web Development') bg-blue-100 text-blue-800
-                                @elseif($student->course && $student->course->name == 'Graphic Design') bg-purple-100 text-purple-800
-                                @elseif($student->course && $student->course->name == 'Mobile Apps') bg-green-100 text-green-800
-                                @else bg-orange-100 text-orange-800 @endif">
-                                    {{ $student->course->name ?? 'No Course' }}
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
+                                    {{ $courseName }}
                                 </span>
                             </td>
+
                             <!-- Days Left -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                                {{ rand(10, 300) }} Days left
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
+                                    @if($daysLeft > 150) @elseif($daysLeft >= 30) @else @endif
+                                    {{ $daysLeft }} Days left
+                                </span>
                             </td>
+
                             <!-- Progress -->
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex flex-col">
-                                    <span
-                                        class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full mb-1 bg-gray-100 text-gray-800">
-                                        <i class="bi bi-person mr-1"></i>
-                                        Assigned
-                                    </span>
-                                    <div class="text-xs text-gray-600">Co- Admin</div>
-                                </div>
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
+                                    <i class="bi bi-person mr-1"></i>
+                                    {{ $progress }}
+                                </span>
                             </td>
                             <!-- Address -->
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                                 {{ $student->address ?? '-----' }}</td>
                             <!-- Assign Coordinator -->
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <span class="text-sm text-gray-900 mr-2">Admin</span>
                                     <a href="#" class="text-brand hover:text-gold text-xs font-medium">change</a>
                                 </div>
-                            </td>
+                            </td> --}}
                             <!-- Created At -->
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                                 {{ $student->created_at->format('j M Y') }}</td>
@@ -306,7 +359,7 @@
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
                         </div>
 
-                        <div>
+                        {{-- <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="bi bi-building mr-1"></i> RTO
                             </label>
@@ -316,7 +369,7 @@
                                 <option value="Alfie Training">Alfie Training</option>
                                 <option value="Open Colleges">Open Colleges</option>
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -355,6 +408,15 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-person mr-1"></i> Address <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="address" id="studentAddress" placeholder="Enter Student Address"
+                                required
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
+                        </div>
+
+                        {{-- <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="bi bi-briefcase mr-1"></i> Industry
                             </label>
                             <input type="text" name="industry" id="studentIndustry" placeholder="Enter Industry"
@@ -380,16 +442,16 @@
                                 <option value="Zara">Zara</option>
                                 <option value="Usman">Usman</option>
                             </select>
-                        </div>
+                        </div> --}}
                     </div>
 
-                    <div>
+                    {{-- <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             <i class="bi bi-geo-alt mr-1"></i> Address
                         </label>
                         <textarea name="address" id="studentAddress" placeholder="Enter Address" rows="3"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all"></textarea>
-                    </div>
+                    </div> --}}
 
                     <div class="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" id="cancelBtn"
@@ -456,6 +518,21 @@
     </div>
 
     <script>
+        // Initialize DataTables for students table
+        $('#studentsTable').DataTable({
+            "pageLength": 25,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "lengthChange": false,
+            "columnDefs": [{
+                "orderable": false,
+                "targets": [6]
+            }],
+            "dom": 'rt<"flex justify-end mt-4"p>',
+            "scrollX": true
+        });
+
         // Modal functionality
         const studentModal = document.getElementById('studentModal');
         const uploadModal = document.getElementById('uploadModal');
@@ -658,4 +735,29 @@
             });
         }
     </script>
+
+    <style>
+        /* DataTables pagination styling */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.25rem 0.75rem;
+            margin: 0 0.125rem;
+            border-radius: 0.375rem;
+            background-color: #e5e7eb;
+            color: #374151;
+            border: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #d1d5db;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: var(--brand);
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: right;
+        }
+    </style>
 @endsection

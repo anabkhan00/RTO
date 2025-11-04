@@ -2,7 +2,7 @@
         class="fixed top-0 left-0 h-full w-64 bg-gold text-brand flex flex-col justify-between transition-all duration-300 z-50">
         <div>
             <div class="p-6 text-2xl font-bold flex justify-center  border-white/20">
-                <img src="{{ asset('public/assets/images/whitelogo-1.svg') }}" class="w-32">
+                <img src="{{ asset('assets/images/whitelogo-1.svg') }}" class="w-32">
             </div>
             <nav class="mt-2 space-y-1 px-6">
                 <a href="{{ route('rto.dashboard') }}"

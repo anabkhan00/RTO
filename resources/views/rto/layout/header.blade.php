@@ -4,7 +4,7 @@
         <button id="menuBtn" class="text-2xl text-gray-700 focus:outline-none">
             <img src="{{ asset('assets/images/todle.svg') }}" class="w-8" />
         </button>
-        <h2 class="font-semibold text-lg">RTO Dashboard</h2>
+        <h2 class="font-semibold text-lg">Dashboard</h2>
     </div>
 
     <!-- CENTER: Search -->
