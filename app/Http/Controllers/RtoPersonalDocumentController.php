@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RtoPersonalDocument;
 use App\Models\DocumentChecklist;
 use App\Models\User;
+use App\Models\Esignature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,8 +17,9 @@ class RtoPersonalDocumentController extends Controller
         $documents = RtoPersonalDocument::where('rto_id', Auth::id())->latest()->get();
         $checklists = DocumentChecklist::where('status', 1)->get();
         $students = User::role('user')->with(['studentDocuments', 'course'])->get();
+        $signature = Esignature::where('user_id', Auth::id())->first();
 
-        return view('rto.pages.my_documents', compact('documents', 'checklists', 'students'));
+        return view('rto.pages.my_documents', compact('documents', 'checklists', 'students', 'signature'));
     }
 
     public function store(Request $request)

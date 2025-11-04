@@ -1,46 +1,51 @@
       @extends('rto.master_layout.index')
       @section('content')
-          <div class="w-full p-3 flex gap-6">
+          <div class="w-full p-3 flex flex-nowrap gap-6">
               <!-- Total Students Card -->
-              <a href="/rto/students" class="block flex-1">
-                  <div class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center">
-                      <div class="flex items-center justify-center">
-                          <img src="{{ asset('assets/images/stucomp.svg') }}" class="w-10">
-                      </div>
-                      <div class="flex flex-col items-center mt-3">
-                          <p class="font-semibold text-brand text-xs">Total Students</p>
-                      </div>
-                      <div class="w-full max-w-xs mt-3">
-                          <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
-                              <span class="font-medium text-brand text-xs">43,234</span>
-                              <span class="font-medium text-brand text-xs">80%</span>
+              <div class="flex-1">
+                  <a href="/rto/students" class="block flex-1">
+                      <div class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center">
+                          <div class="flex items-center justify-center">
+                              <img src="{{ asset('assets/images/stucomp.svg') }}" class="w-10">
                           </div>
-                          <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
-                              <div class="bg-[#0014AB] h-1 rounded-full" style="width: 80%;"></div>
+                          <div class="flex flex-col items-center mt-3">
+                              <p class="font-semibold text-brand text-xs">Total Students</p>
+                          </div>
+                          <div class="w-full max-w-xs mt-3">
+                              <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                                  <span class="font-medium text-brand text-xs">43,234</span>
+                                  <span class="font-medium text-brand text-xs">80%</span>
+                              </div>
+                              <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
+                                  <div class="bg-[#0014AB] h-1 rounded-full" style="width: 80%;"></div>
+                              </div>
                           </div>
                       </div>
-                  </div>
+                  </a>
 
-                  <!-- Completed Placements Card -->
-                  <div class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center mt-2">
-                      <div class="flex items-center justify-center">
-                          <img src="{{ asset('assets/images/Placement.svg') }}" class="w-10">
-                      </div>
-                      <div class="flex flex-col items-center mt-3">
-                          <p class="font-semibold text-brand text-xs">Completed Placements</p>
-                      </div>
-                      <div class="w-full max-w-xs mt-3">
-                          <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
-                              <span class="font-medium text-brand text-xs">2,156</span>
-                              <span class="font-medium text-brand text-xs">85%</span>
+                  {{-- <a href="/rto/students?status=completed" class="block flex-1"> --}}
+                  <a href="#" class="block flex-1">
+                      <!-- Completed Placements Card -->
+                      <div
+                          class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center mt-2">
+                          <div class="flex items-center justify-center">
+                              <img src="{{ asset('assets/images/Placement.svg') }}" class="w-10">
                           </div>
-                          <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
-                              <div class="bg-[#00AB03] h-1 rounded-full" style="width: 85%;"></div>
+                          <div class="flex flex-col items-center mt-3">
+                              <p class="font-semibold text-brand text-xs">Completed Placements</p>
+                          </div>
+                          <div class="w-full max-w-xs mt-3">
+                              <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                                  <span class="font-medium text-brand text-xs">2,156</span>
+                                  <span class="font-medium text-brand text-xs">85%</span>
+                              </div>
+                              <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
+                                  <div class="bg-[#00AB03] h-1 rounded-full" style="width: 85%;"></div>
+                              </div>
                           </div>
                       </div>
-                  </div>
-              </a>
-
+                  </a>
+              </div>
               <!-- Overall Employee Performance Card -->
               <div class="bg-white rounded-lg shadow p-4 flex-1">
                   <div class="flex items-center justify-between mb-3">
@@ -68,7 +73,8 @@
           <div class="w-full flex flex-wrap">
               <!-- Active Placements -->
               <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-                  <a href="/rto/students?status=active" class="block">
+                  {{-- <a href="/rto/students?status=active" class="block"> --}}
+                  <a href="#" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
                               <img src="{{ asset('assets/images/Started.svg') }}" class="w-10">
@@ -91,7 +97,8 @@
 
               <!-- Booked Placements -->
               <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-                  <a href="/rto/students?status=booked" class="block">
+                  {{-- <a href="/rto/students?status=booked" class="block"> --}}
+                  <a href="#" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
                               <img src="{{ asset('assets/images/booked.svg') }}" class="w-10">
@@ -114,7 +121,8 @@
 
               <!-- Flagged Placements -->
               <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-                  <a href="/rto/students?status=flagged" class="block">
+                  {{-- <a href="/rto/students?status=flagged" class="block"> --}}
+                  <a href="#" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
                               <img src="{{ asset('assets/images/flagged.svg') }}" class="w-10">
@@ -137,7 +145,8 @@
 
               <!-- Awaiting Placements -->
               <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-                  <a href="/rto/students?status=awaiting" class="block">
+                  {{-- <a href="/rto/students?status=awaiting" class="block"> --}}
+                  <a href="#" class="block">
                       <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                           <div class="flex items-center justify-center w-full">
                               <img src="{{ asset('assets/images/dashclock.svg') }}" class="w-10">
@@ -173,55 +182,55 @@
                       <p class="text-gray-500 text-xs">past month</p>
                   </div>
 
-                  <!-- Added spacing between all performance lines -->
-                  <div class="space-y-4"> <!-- was space-y-3 -->
+                  <!-- Placement Performance Lines -->
+                  <div class="space-y-4">
                       <div>
                           <div class="flex justify-between text-xs mb-2">
-                              <span class="text-gray-700">Performance A</span>
-                              <span class="font-medium text-brand">70%</span>
-                          </div>
-                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden"> <!-- slightly thicker -->
-                              <div class="bg-[#D60404] h-1.5 rounded-full" style="width: 70%;"></div>
-                          </div>
-                      </div>
-
-                      <div>
-                          <div class="flex justify-between text-xs mb-2">
-                              <span class="text-gray-700">Performance B</span>
-                              <span class="font-medium text-brand">40%</span>
+                              <span class="text-gray-700">Completed Placements</span>
+                              <span class="font-medium text-brand">85%</span>
                           </div>
                           <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                              <div class="bg-[#FF8C00] h-1.5 rounded-full" style="width: 40%;"></div>
+                              <div class="bg-[#00AB03] h-1.5 rounded-full" style="width: 85%;"></div>
                           </div>
                       </div>
 
                       <div>
                           <div class="flex justify-between text-xs mb-2">
-                              <span class="text-gray-700">Performance C</span>
+                              <span class="text-gray-700">Active Placements</span>
+                              <span class="font-medium text-brand">65%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div class="bg-[#00A8AB] h-1.5 rounded-full" style="width: 65%;"></div>
+                          </div>
+                      </div>
+
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Booked Placements</span>
+                              <span class="font-medium text-brand">45%</span>
+                          </div>
+                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div class="bg-[#FBBF24] h-1.5 rounded-full" style="width: 45%;"></div>
+                          </div>
+                      </div>
+
+                      <div>
+                          <div class="flex justify-between text-xs mb-2">
+                              <span class="text-gray-700">Awaiting Placements</span>
                               <span class="font-medium text-brand">25%</span>
                           </div>
                           <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                              <div class="bg-[#FFD700] h-1.5 rounded-full" style="width: 25%;"></div>
+                              <div class="bg-[#AB6C00] h-1.5 rounded-full" style="width: 25%;"></div>
                           </div>
                       </div>
 
                       <div>
                           <div class="flex justify-between text-xs mb-2">
-                              <span class="text-gray-700">Performance D</span>
-                              <span class="font-medium text-brand">15%</span>
+                              <span class="text-gray-700">Flagged Placements</span>
+                              <span class="font-medium text-brand">3%</span>
                           </div>
                           <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                              <div class="bg-[#00A8AB] h-1.5 rounded-full" style="width: 15%;"></div>
-                          </div>
-                      </div>
-
-                      <div>
-                          <div class="flex justify-between text-xs mb-2">
-                              <span class="text-gray-700">Performance E</span>
-                              <span class="font-medium text-brand">90%</span>
-                          </div>
-                          <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                              <div class="bg-[#00AB03] h-1.5 rounded-full" style="width: 90%;"></div>
+                              <div class="bg-[#D60404] h-1.5 rounded-full" style="width: 3%;"></div>
                           </div>
                       </div>
                   </div>
@@ -267,8 +276,11 @@
 
           <!-- Students Table Section -->
           <div class="w-full mt-6">
-              <div class="bg-white rounded-lg shadow-sm p-6">
-                  <h2 class="text-lg font-semibold text-brand mb-4">Students Overview</h2>
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <div class="p-4 border-b border-gray-200">
+                      <h2 class="text-lg font-semibold text-brand">Students Overview</h2>
+                  </div>
+                  <div class="p-6">
 
                   <!-- Filters -->
                   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -302,52 +314,128 @@
                       </div>
                   </div>
 
+                  </div>
                   <!-- Table -->
                   <div class="overflow-x-auto">
                       <table id="dashStudentsDataTable" class="min-w-full" style="table-layout: fixed;">
                           <colgroup>
-                              <col style="width: 20%;">
                               <col style="width: 18%;">
-                              <col style="width: 22%;">
-                              <col style="width: 15%;">
+                              <col style="width: 16%;">
+                              <col style="width: 20%;">
+                              <col style="width: 14%;">
                               <col style="width: 12%;">
-                              <col style="width: 13%;">
+                              <col style="width: 12%;">
+                              <col style="width: 8%;">
                           </colgroup>
                           <thead class="bg-gray-50">
                               <tr>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Name</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Industry</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Course</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Days Left</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Progress</th>
-                                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Created at</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Name</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Industry</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Course</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Days Left</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Progress</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Created at</th>
+                                  <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Actions</th>
                               </tr>
                           </thead>
                           <tbody class="bg-white divide-y divide-gray-200">
-                              @foreach($students as $student)
-                              <tr class="hover:bg-gray-50 transition-colors">
-                                  <td class="px-4 py-3 whitespace-nowrap">
-                                      <div class="flex items-center">
-                                          <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
-                                              {{ substr($student->name, 0, 1) }}
+                              @foreach ($students as $student)
+                                  @php
+                                      $palette = [
+                                          ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-100'],
+                                          ['bg' => 'bg-purple-50', 'text' => 'text-purple-700', 'border' => 'border-purple-100'],
+                                          ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
+                                          ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
+                                          ['bg' => 'bg-pink-50', 'text' => 'text-pink-700', 'border' => 'border-pink-100'],
+                                          ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
+                                          ['bg' => 'bg-teal-50', 'text' => 'text-teal-700', 'border' => 'border-teal-100'],
+                                          ['bg' => 'bg-cyan-50', 'text' => 'text-cyan-700', 'border' => 'border-cyan-100'],
+                                      ];
+
+                                      $progressColors = [
+                                          'Assigned' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-100'],
+                                          'Interview' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
+                                          'Placed' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
+                                          'Completed' => ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
+                                      ];
+
+                                      $daysLeft = rand(10, 300);
+                                      $daysColor = $daysLeft > 150 ?
+                                          ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'] :
+                                          ($daysLeft >= 30 ?
+                                              ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'] :
+                                              ['bg' => 'bg-red-50', 'text' => 'text-red-700', 'border' => 'border-red-100']);
+
+                                      $industry = $student->industry ?? 'Healthcare';
+                                      $courseName = $student->course->name ?? 'No Course';
+                                      $progress = 'Interview';
+
+                                      $industryColor = $palette[abs(crc32($industry)) % count($palette)];
+                                      $courseColor = $palette[abs(crc32($courseName)) % count($palette)];
+                                      $progressColor = $progressColors[$progress] ?? $palette[6];
+                                  @endphp
+                                  <tr class="hover:bg-gray-50 transition-colors">
+                                      <td class="px-4 py-3 whitespace-nowrap">
+                                          <div class="flex items-center">
+                                              <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
+                                                  {{ substr($student->name, 0, 1) }}
+                                              </div>
+                                              <span class="text-sm font-medium text-gray-900">{{ $student->name }}</span>
                                           </div>
-                                          <span class="text-sm font-medium text-gray-900">{{ $student->name }}</span>
-                                      </div>
-                                  </td>
-                                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->industry ?? 'Healthcare' }}</td>
-                                  <td class="px-4 py-3 whitespace-nowrap">
-                                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                          {{ $student->course->name ?? 'No Course' }}
-                                      </span>
-                                  </td>
-                                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ rand(10, 300) }} Days</td>
-                                  <td class="px-4 py-3 whitespace-nowrap">
-                                      <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                                          Assigned
-                                      </span>
-                                  </td>
-                                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->created_at->format('j M Y') }}</td>
-                              </tr>
+                                      </td>
+                                      <td class="px-4 py-3 whitespace-nowrap">
+                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
+                                              {{ $industry }}
+                                          </span>
+                                      </td>
+                                      <td class="px-4 py-3 whitespace-nowrap">
+                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
+                                              {{ $courseName }}
+                                          </span>
+                                      </td>
+                                      <td class="px-4 py-3 whitespace-nowrap">
+                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
+                                              @if($daysLeft > 150) @elseif($daysLeft >= 30) @else @endif
+                                              {{ $daysLeft }} Days left
+                                          </span>
+                                      </td>
+                                      <td class="px-4 py-3 whitespace-nowrap">
+                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
+                                              <i class="bi bi-person mr-1"></i>
+                                              {{ $progress }}
+                                          </span>
+                                      </td>
+                                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->created_at->format('j M Y') }}</td>
+                                      <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                          <div class="relative">
+                                              <button onclick="toggleDashDropdown({{ $loop->index }})"
+                                                  class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                                                  <i class="bi bi-three-dots-vertical"></i>
+                                              </button>
+                                              <div id="dash-dropdown-{{ $loop->index }}"
+                                                  class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
+                                                  <a href="{{ route('rto.student-documents.index', $student->id) }}"
+                                                      class="block px-4 py-2 text-sm text-brand hover:bg-gray-50 rounded-md">
+                                                      <i class="bi bi-eye mr-2"></i>View
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </td>
+                                  </tr>
                               @endforeach
                           </tbody>
                       </table>
@@ -373,7 +461,7 @@
 
           <style>
               /* DataTables styling */
-              #dashStudentsDataTable_wrapper .dataTables_paginate .paginate_button {
+              .dataTables_wrapper .dataTables_paginate .paginate_button {
                   padding: 0.25rem 0.75rem;
                   margin: 0 0.125rem;
                   border-radius: 0.375rem;
@@ -381,15 +469,18 @@
                   color: #374151;
                   border: none;
               }
-              #dashStudentsDataTable_wrapper .dataTables_paginate .paginate_button:hover {
+
+              .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
                   background-color: #d1d5db;
               }
-              #dashStudentsDataTable_wrapper .dataTables_paginate .paginate_button.current {
+
+              .dataTables_wrapper .dataTables_paginate .paginate_button.current {
                   background-color: var(--brand);
                   color: white;
               }
-              #dashStudentsDataTable tbody tr:hover {
-                  background-color: #f9fafb;
+
+              .dataTables_wrapper .dataTables_paginate {
+                  text-align: right;
               }
           </style>
           <script>
@@ -463,16 +554,13 @@
               });
               // Initialize DataTable
               const table = $('#dashStudentsDataTable').DataTable({
-                  pageLength: 25,
-                  scrollX: true,
-                  dom: 'rt<"flex items-center justify-between mt-4"<"text-sm text-gray-700"i><"flex gap-2"p>>',
-                  language: {
-                      info: 'Showing _START_ to _END_ of _TOTAL_ results',
-                      paginate: {
-                          previous: 'Previous',
-                          next: 'Next'
-                      }
-                  }
+                  "pageLength": 25,
+                  "searching": false,
+                  "ordering": false,
+                  "info": false,
+                  "lengthChange": false,
+                  "dom": 'rt<"bottom"p>',
+                  "scrollX": true
               });
 
               // Custom filtering
@@ -493,6 +581,27 @@
                   $('#dashProgressFilter').val('');
                   $('#dashIndustryFilter').val('');
                   table.search('').columns().search('').draw();
+              });
+
+              // Dashboard dropdown toggle
+              function toggleDashDropdown(index) {
+                  const dropdown = document.getElementById(`dash-dropdown-${index}`);
+                  const allDropdowns = document.querySelectorAll('[id^="dash-dropdown-"]');
+                  
+                  allDropdowns.forEach(dd => {
+                      if (dd !== dropdown) {
+                          dd.classList.add('hidden');
+                      }
+                  });
+                  
+                  dropdown.classList.toggle('hidden');
+              }
+
+              document.addEventListener('click', (e) => {
+                  if (!e.target.closest('[onclick^="toggleDashDropdown"]')) {
+                      const allDropdowns = document.querySelectorAll('[id^="dash-dropdown-"]');
+                      allDropdowns.forEach(dd => dd.classList.add('hidden'));
+                  }
               });
 
               // 🗺️ Initialize Google Map
@@ -638,32 +747,32 @@
                   type: 'doughnut',
                   data: {
                       datasets: [{
-                              data: [70, 30],
-                              backgroundColor: ['#D60404', '#f5f5f5'],
+                              data: [85, 15],
+                              backgroundColor: ['#00AB03', '#f5f5f5'],
                               cutout: '85%',
                               borderWidth: 0
                           },
                           {
-                              data: [40, 60],
-                              backgroundColor: ['#FBBF24', '#f5f5f5'],
+                              data: [65, 35],
+                              backgroundColor: ['#00A8AB', '#f5f5f5'],
                               cutout: '75%',
                               borderWidth: 0
                           },
                           {
-                              data: [25, 75],
-                              backgroundColor: ['#FCD34D', '#f5f5f5'],
+                              data: [45, 55],
+                              backgroundColor: ['#FBBF24', '#f5f5f5'],
                               cutout: '65%',
                               borderWidth: 0
                           },
                           {
-                              data: [15, 85],
-                              backgroundColor: ['#00A8AB', '#f5f5f5'],
+                              data: [25, 75],
+                              backgroundColor: ['#AB6C00', '#f5f5f5'],
                               cutout: '55%',
                               borderWidth: 0
                           },
                           {
-                              data: [90, 10],
-                              backgroundColor: ['#00AB03', '#f5f5f5'],
+                              data: [3, 97],
+                              backgroundColor: ['#D60404', '#f5f5f5'],
                               cutout: '45%',
                               borderWidth: 0
                           }
