@@ -1,9 +1,10 @@
       @extends('rto.master_layout.index')
+@section('page-title', 'Dashboard')
       @section('content')
           <div class="w-full p-3 flex flex-nowrap gap-6">
               <!-- Total Students Card -->
               <div class="flex-1">
-                  <a href="/rto/students" class="block flex-1">
+                  <a href="/rto/students" class="block flex-1 hover:shadow-lg transition-shadow cursor-pointer">
                       <div class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center">
                           <div class="flex items-center justify-center">
                               <img src="{{ asset('assets/images/stucomp.svg') }}" class="w-10">
@@ -24,7 +25,7 @@
                   </a>
 
                   {{-- <a href="/rto/students?status=completed" class="block flex-1"> --}}
-                  <a href="#" class="block flex-1">
+                  <a href="#" class="block flex-1 hover:shadow-lg transition-shadow cursor-pointer">
                       <!-- Completed Placements Card -->
                       <div
                           class="w-full bg-white rounded-lg h-48 shadow p-4 flex flex-col items-center justify-center mt-2">
@@ -382,7 +383,7 @@
 
                                       $industry = $student->industry ?? 'Healthcare';
                                       $courseName = $student->course->name ?? 'No Course';
-                                      $progress = 'Interview';
+                                      $progress = 'Placed';
 
                                       $industryColor = $palette[abs(crc32($industry)) % count($palette)];
                                       $courseColor = $palette[abs(crc32($courseName)) % count($palette)];
@@ -391,9 +392,9 @@
                                   <tr class="hover:bg-gray-50 transition-colors">
                                       <td class="px-4 py-3 whitespace-nowrap">
                                           <div class="flex items-center">
-                                              <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
+                                              {{-- <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
                                                   {{ substr($student->name, 0, 1) }}
-                                              </div>
+                                              </div> --}}
                                               <span class="text-sm font-medium text-gray-900">{{ $student->name }}</span>
                                           </div>
                                       </td>
@@ -587,13 +588,13 @@
               function toggleDashDropdown(index) {
                   const dropdown = document.getElementById(`dash-dropdown-${index}`);
                   const allDropdowns = document.querySelectorAll('[id^="dash-dropdown-"]');
-                  
+
                   allDropdowns.forEach(dd => {
                       if (dd !== dropdown) {
                           dd.classList.add('hidden');
                       }
                   });
-                  
+
                   dropdown.classList.toggle('hidden');
               }
 

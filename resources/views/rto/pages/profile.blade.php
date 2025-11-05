@@ -1,4 +1,5 @@
 @extends('rto.master_layout.index')
+@section('page-title', 'Settings')
 @section('content')
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-2xl font-semibold text-brand mb-6">Profile Settings</h2>

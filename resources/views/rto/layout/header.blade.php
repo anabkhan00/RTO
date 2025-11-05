@@ -2,9 +2,9 @@
     <!-- LEFT: Toggle + Title -->
     <div class="flex items-center gap-3">
         <button id="menuBtn" class="text-2xl text-gray-700 focus:outline-none">
-            <img src="{{ asset('assets/images/todle.svg') }}" class="w-8" />
+            <img src="{{ asset('public/assets/images/todle.svg') }}" class="w-8" />
         </button>
-        <h2 class="font-semibold text-lg">Dashboard</h2>
+        <h2 class="font-semibold text-lg">@yield('page-title', 'Dashboard')</h2>
     </div>
 
     <!-- CENTER: Search -->

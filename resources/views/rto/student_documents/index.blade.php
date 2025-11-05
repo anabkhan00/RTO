@@ -1,4 +1,5 @@
 @extends('rto.master_layout.index')
+@section('page-title', 'Student Documents')
 
 @section('title', 'Student Documents - ' . $student->name)
 
@@ -58,7 +59,7 @@
 
                 <div class="flex justify-end mt-4">
                     <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-gold transition-colors text-sm">
-                        <i class="bi bi-check-circle mr-1"></i>Update
+                        Update
                     </button>
                 </div>
             </form>
@@ -83,7 +84,7 @@
                                 });
                                 $hasDocument = $documents->count() > 0;
                             @endphp
-                            <div class="p-2 rounded hover:bg-gray-50">
+                            <div class=" rounded hover:bg-gray-50">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         @if ($hasDocument)
@@ -152,8 +153,8 @@
                             <p class="text-xs text-gray-500 mt-1">Supported: PDF, DOC, DOCX, JPG, PNG, ZIP</p>
                         </div>
 
-                        <div class="pt-2">
-                            <button type="submit" id="uploadBtn" class="w-full bg-brand text-white py-2 px-4 rounded-lg hover:bg-gold transition-colors text-sm font-medium">
+                        <div class="pt-2 flex justify-end">
+                            <button type="submit" id="uploadBtn" class="bg-brand text-white py-2 px-4 rounded-lg hover:bg-gold transition-colors text-sm font-medium ">
                                 <span id="uploadText"><i class="bi bi-upload mr-2"></i>Upload Documents</span>
                                 <span id="uploadLoader" class="hidden">
                                     <i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Uploading...
