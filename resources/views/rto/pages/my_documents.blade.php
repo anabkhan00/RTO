@@ -1,4 +1,5 @@
 @extends('rto.master_layout.index')
+@section('page-title', 'Documents')
 <style>
     .bg-blue-100,
     .bg-purple-100,
@@ -160,10 +161,10 @@
                     <table id="studentsTable" class="min-w-full table-fixed w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-student" style="width: 20%; min-width: 140px;">Student</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-contact" style="width: 20%; min-width: 140px;">Contact</th>
-                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-status" style="width: 52%; min-width: 200px;">Document Status</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-actions" style="width: 8%; min-width: 80px;">Actions</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-student" style="width: 25%;">Student</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-contact" style="width: 25%;">Contact</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-status" style="width: 40%;">Document Status</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-actions" style="width: 25%;">Actions</th>
                             </tr>
                         </thead>
 
@@ -250,10 +251,10 @@
                                     <!-- Student -->
                                     <td class="px-4 py-3 whitespace-nowrap col-student">
                                         <div class="flex items-center">
-                                            <div
+                                            {{-- <div
                                                 class="h-10 w-10 rounded-full bg-gradient-to-br from-brand to-gold flex items-center justify-center text-white font-semibold text-sm mr-3">
                                                 {{ substr($student->name, 0, 1) }}
-                                            </div>
+                                            </div> --}}
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
                                                 <div class="text-xs text-gray-500">
@@ -519,7 +520,7 @@
                 columnDefs: [
                     { targets: 0, width: '20%', className: 'col-student' },
                     { targets: 1, width: '20%', className: 'col-contact' },
-                    { targets: 2, width: '52%', className: 'col-status text-center' },
+                    // { targets: 2, width: '52%', className: 'col-status text-center' },
                     { targets: 3, width: '8%', className: 'col-actions text-right' }
                 ]
             });
@@ -1053,7 +1054,7 @@
 
         .status-icons-grid {
             display: grid;
-            grid-template-columns: repeat(5, 20px);
+            grid-template-columns: repeat(10, 20px);
             gap: 6px;
             justify-content: center;
             align-items: center;
@@ -1063,8 +1064,8 @@
            Example: <div class="grid gap-1 justify-center" style="grid-template-columns:repeat(5,20px)"> */
 
         .status-icon {
-            width: 20px;
-            height: 20px;
+            width: 15px;
+            height: 15px;
             border-radius: 9999px;
             display: flex;
             align-items: center;

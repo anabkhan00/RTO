@@ -1,4 +1,5 @@
 @extends('rto.master_layout.index')
+@section('page-title', 'Students')
 <style>
     .bg-blue-100,
     .bg-purple-100,
