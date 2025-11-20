@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RtoController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\StudentDocumentController;
+use App\Http\Controllers\StudentNoteController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::get('/rto/students', [RtoController::class, 'students'])->name('rto.students');
     Route::post('/rto/students', [RtoController::class, 'storeStudent']);
     Route::put('/rto/students/{id}', [RtoController::class, 'updateStudent']);
+    Route::post('/rto/students/{id}/notes', [RtoController::class, 'saveStudentNotes']);
     Route::delete('/rto/students/{id}', [RtoController::class, 'destroyStudent']);
     Route::post('/rto/students/upload', [RtoController::class, 'uploadStudents']);
     Route::get('/rto/students/csv-format', [RtoController::class, 'csvFormat']);
@@ -47,12 +49,16 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     Route::get('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'index'])->name('rto.my-documents');
     Route::post('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'store']);
     Route::delete('/rto/my-documents/{document}', [App\Http\Controllers\RtoPersonalDocumentController::class, 'destroy']);
-    
+
     // E-Signature Routes
     Route::get('/rto/esignature', [App\Http\Controllers\EsignatureController::class, 'index'])->name('rto.esignature');
     Route::post('/rto/esignature', [App\Http\Controllers\EsignatureController::class, 'store']);
     Route::put('/rto/esignature/{esignature}', [App\Http\Controllers\EsignatureController::class, 'update']);
     Route::delete('/rto/esignature/{esignature}', [App\Http\Controllers\EsignatureController::class, 'destroy']);
+
+    // Student Notes Routes
+    Route::post('/rto/students/{student}/notes', [StudentNoteController::class, 'store']);
+    Route::get('/rto/students/{student}/notes', [StudentNoteController::class, 'index']);
 
 });
 
@@ -116,7 +122,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::post('/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('student-documents.store');
     Route::post('/student-documents/assign-types/{student}', [StudentDocumentController::class, 'assignTypes']);
     Route::delete('/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
-    
+
     Route::get('/document-checklist', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'index'])->name('document-checklist');
     Route::post('/document-checklist', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'store']);
     Route::put('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'update']);

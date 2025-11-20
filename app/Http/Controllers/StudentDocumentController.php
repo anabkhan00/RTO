@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\StudentDocument;
 use App\Models\RtoStudent;
 use App\Models\DocumentChecklist;
+use App\Models\StudentNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,10 @@ class StudentDocumentController extends Controller
     {
         $student = User::findOrFail($studentId);
         $checklists = DocumentChecklist::where('status', true)->get();
+        $notes = StudentNote::where('student_id', $studentId)
+            ->with('author')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         if (Auth::user()->hasRole('rto')) {
             $rtoStudentExists = RtoStudent::where('rto_id', Auth::id())
@@ -24,10 +29,10 @@ class StudentDocumentController extends Controller
             if (!$rtoStudentExists) {
                 abort(403, 'Unauthorized access to student documents.');
             }
-            return view('rto.student_documents.index', compact('student', 'checklists'));
+            return view('rto.student_documents.index', compact('student', 'checklists', 'notes'));
         }
 
-        return view('admin.student_documents.index', compact('student', 'checklists'));
+        return view('admin.student_documents.index', compact('student', 'checklists', 'notes'));
     }
 
     public function store(Request $request, $studentId)

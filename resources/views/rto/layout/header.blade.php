@@ -2,7 +2,7 @@
     <!-- LEFT: Toggle + Title -->
     <div class="flex items-center gap-3">
         <button id="menuBtn" class="text-2xl text-gray-700 focus:outline-none">
-            <img src="{{ asset('public/assets/images/todle.svg') }}" class="w-8" />
+            <img src="{{ asset('assets/images/todle.svg') }}" class="w-8" />
         </button>
         <h2 class="font-semibold text-lg">@yield('page-title', 'Dashboard')</h2>
     </div>
@@ -34,7 +34,8 @@
                 <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                 <form method="POST" action="{{ route('logout') }}" class="block">
                     @csrf
-                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                    <button type="submit"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
                 </form>
             </div>
         </div>
