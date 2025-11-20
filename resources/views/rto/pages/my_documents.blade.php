@@ -161,10 +161,14 @@
                     <table id="studentsTable" class="min-w-full table-fixed w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-student" style="width: 25%;">Student</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-contact" style="width: 25%;">Contact</th>
-                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-status" style="width: 40%;">Document Status</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-actions" style="width: 25%;">Actions</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-student"
+                                    style="width: 25%;">Student</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-contact"
+                                    style="width: 25%;">Contact</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-status"
+                                    style="width: 40%;">Document Status</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider border-b col-actions"
+                                    style="width: 25%;">Actions</th>
                             </tr>
                         </thead>
 
@@ -287,16 +291,20 @@
                                                         }
                                                     @endphp
                                                     <div class="group relative">
-                                                        <div class="status-icon {{ $hasDocument ? 'success' : 'failure' }}">
-                                                            <i class="bi {{ $hasDocument ? 'bi-check' : 'bi-x' }} text-white" style="font-size: 10px;"></i>
+                                                        <div
+                                                            class="status-icon {{ $hasDocument ? 'success' : 'failure' }}">
+                                                            <i class="bi {{ $hasDocument ? 'bi-check' : 'bi-x' }} text-white"
+                                                                style="font-size: 10px;"></i>
                                                         </div>
-                                                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                                        <div
+                                                            class="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                                                             {{ $checklist->name }}
                                                         </div>
                                                     </div>
                                                 @endforeach
                                             </div>
-                                            <div class="status-counter {{ $completedCount == $totalCount ? 'complete' : 'incomplete' }}">
+                                            <div
+                                                class="status-counter {{ $completedCount == $totalCount ? 'complete' : 'incomplete' }}">
                                                 {{ $completedCount }}/{{ $totalCount }}
                                             </div>
                                         </div>
@@ -309,8 +317,9 @@
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
+
                                             <div id="dropdown-{{ $index }}"
-                                                class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
+                                                class="hidden absolute right-0 top-1/2 -translate-y-1/2 w-32 bg-white rounded-md shadow-lg z-10 border">
                                                 <button
                                                     onclick="openUploadModal({{ $student->id }}, '{{ $student->name }}')"
                                                     class="block w-full text-left px-4 py-2 text-sm text-brand hover:bg-gray-50 rounded-md">
@@ -319,6 +328,7 @@
                                             </div>
                                         </div>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -337,17 +347,18 @@
                         <i class="bi bi-pen mr-2"></i>Current Signature
                     </h3>
 
-                    @if($signature)
+                    @if ($signature)
                         <div class="border border-gray-200 rounded-lg p-4 mb-4">
-                            <img src="{{ asset($signature->signature_path) }}"
-                                 alt="Current Signature"
-                                 class="max-w-full h-auto max-h-32 mx-auto">
+                            <img src="{{ asset($signature->signature_path) }}" alt="Current Signature"
+                                class="max-w-full h-auto max-h-32 mx-auto">
                         </div>
                         <div class="flex gap-2">
-                            <button id="updateBtn" class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors">
+                            <button id="updateBtn"
+                                class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors">
                                 <i class="bi bi-pencil mr-1"></i>Update
                             </button>
-                            <button id="deleteBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                            <button id="deleteBtn"
+                                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
                                 <i class="bi bi-trash mr-1"></i>Delete
                             </button>
                         </div>
@@ -387,7 +398,8 @@
                             <canvas id="signaturePad" width="400" height="200" class="w-full"></canvas>
                         </div>
                         <div class="flex gap-2 mt-2">
-                            <button id="clearBtn" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                            <button id="clearBtn"
+                                class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
                                 Clear
                             </button>
                         </div>
@@ -397,17 +409,19 @@
                     <div id="uploadSection" class="hidden">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Upload Signature Image</label>
                         <input type="file" id="signatureFile" accept="image/png,image/jpg,image/jpeg"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
                         <p class="text-xs text-gray-500 mt-1">Accepted formats: PNG, JPG, JPEG (Max: 2MB)</p>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="mt-6 flex gap-2">
-                        <button id="saveBtn" class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors">
+                        <button id="saveBtn"
+                            class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors">
                             <i class="bi bi-check-circle mr-1"></i><span id="saveText">Save Signature</span>
                         </button>
-                        @if($signature)
-                            <button id="cancelBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors hidden">
+                        @if ($signature)
+                            <button id="cancelBtn"
+                                class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors hidden">
                                 Cancel
                             </button>
                         @endif
@@ -517,11 +531,22 @@
                 dom: 'rt<"flex justify-end mt-4"p>',
                 scrollX: false,
                 autoWidth: false,
-                columnDefs: [
-                    { targets: 0, width: '20%', className: 'col-student' },
-                    { targets: 1, width: '20%', className: 'col-contact' },
+                columnDefs: [{
+                        targets: 0,
+                        width: '20%',
+                        className: 'col-student'
+                    },
+                    {
+                        targets: 1,
+                        width: '20%',
+                        className: 'col-contact'
+                    },
                     // { targets: 2, width: '52%', className: 'col-status text-center' },
-                    { targets: 3, width: '8%', className: 'col-actions text-right' }
+                    {
+                        targets: 3,
+                        width: '8%',
+                        className: 'col-actions text-right'
+                    }
                 ]
             });
 
@@ -529,7 +554,9 @@
             // Run adjust a couple times (immediate + slight delay) and on resize
             try {
                 docTable.columns.adjust();
-                setTimeout(function() { docTable.columns.adjust(); }, 60);
+                setTimeout(function() {
+                    docTable.columns.adjust();
+                }, 60);
 
                 let dtResizeTimer = null;
                 $(window).on('resize', function() {
@@ -1012,19 +1039,39 @@
         /* Sticky/pinned Actions column (keeps header and body aligned to the right) */
         #studentsTable th.col-actions,
         #studentsTable td.col-actions {
-            position: -webkit-sticky; /* Safari */
+            position: -webkit-sticky;
+            /* Safari */
             position: sticky;
             right: 0;
             background: white;
             z-index: 5;
-            min-width: 80px;
+            min-width: 100px;
             width: 8% !important;
             text-align: right !important;
             padding-right: 1.25rem !important;
+            overflow: visible !important;
+        }
+
+        /* Apply hover grey background to sticky Actions column */
+        #studentsTable tbody tr:hover td.col-actions {
+            background: rgb(249, 250, 251);
+        }
+
+        /* Dropdown inside actions cell should be visible */
+        #studentsTable td.col-actions .relative {
+            position: relative;
+            z-index: 25;
+        }
+
+        #studentsTable td.col-actions .absolute {
+            z-index: 30 !important;
+            overflow: visible !important;
         }
 
         /* Ensure the head cell sits above body cells when sticky */
-        #studentsTable thead th.col-actions { z-index: 6; }
+        #studentsTable thead th.col-actions {
+            z-index: 6;
+        }
 
         /* Status column: wider, centered content */
         #studentsTable th.col-status,
@@ -1033,14 +1080,24 @@
             min-width: 200px;
             text-align: center !important;
             vertical-align: middle;
-            white-space: normal; /* allow wrapping inside status grid on small screens */
+            white-space: normal;
+            /* allow wrapping inside status grid on small screens */
+            overflow: visible !important;
+            position: relative;
         }
 
         /* Student / Contact columns: fixed percentages */
         #studentsTable th.col-student,
-        #studentsTable td.col-student { width: 20% !important; min-width: 140px; }
+        #studentsTable td.col-student {
+            width: 20% !important;
+            min-width: 140px;
+        }
+
         #studentsTable th.col-contact,
-        #studentsTable td.col-contact { width: 20% !important; min-width: 140px; }
+        #studentsTable td.col-contact {
+            width: 20% !important;
+            min-width: 140px;
+        }
 
         /* Document Status Icons Grid Layout */
         .document-status-container {
@@ -1050,6 +1107,7 @@
             justify-content: center;
             padding: 6px 8px;
             gap: 6px;
+            min-height: 80px;
         }
 
         .status-icons-grid {
@@ -1058,10 +1116,20 @@
             gap: 6px;
             justify-content: center;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Tailwind equivalent: use utilities where possible
-           Example: <div class="grid gap-1 justify-center" style="grid-template-columns:repeat(5,20px)"> */
+        /* Tooltip styling for status icons */
+        .status-icons-grid .group {
+            position: relative;
+        }
+
+        .status-icons-grid .group .absolute {
+            bottom: auto;
+            top: -28px;
+            z-index: 20 !important;
+        }
 
         .status-icon {
             width: 15px;
@@ -1075,22 +1143,54 @@
             line-height: 1;
         }
 
-        .status-icon.success { background-color: #28a745; }
-        .status-icon.failure { background-color: #dc3545; }
+        .status-icon.success {
+            background-color: #28a745;
+        }
 
-        .status-counter { font-size: 11px; font-weight: 600; text-align: center; }
-        .status-counter.complete { color: #28a745; }
-        .status-counter.incomplete { color: #fd7e14; }
+        .status-icon.failure {
+            background-color: #dc3545;
+        }
+
+        .status-counter {
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-counter.complete {
+            color: #28a745;
+        }
+
+        .status-counter.incomplete {
+            color: #fd7e14;
+        }
 
         /* Consistent row height but allow wrapping in status column on small screens */
-        #studentsTable tbody tr { min-height: 64px; }
+        #studentsTable tbody tr {
+            min-height: 64px;
+        }
 
         /* Responsive: allow the icons to wrap and the counter to remain centered */
         @media (max-width: 768px) {
-            .status-icons-grid { grid-template-columns: repeat(4, 18px); gap: 5px; }
-            .status-icon { width: 18px; height: 18px; }
-            #studentsTable th, #studentsTable td { white-space: normal; }
-            #studentsTable th.col-actions, #studentsTable td.col-actions { min-width: 64px; }
+            .status-icons-grid {
+                grid-template-columns: repeat(4, 18px);
+                gap: 5px;
+            }
+
+            .status-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            #studentsTable th,
+            #studentsTable td {
+                white-space: normal;
+            }
+
+            #studentsTable th.col-actions,
+            #studentsTable td.col-actions {
+                min-width: 64px;
+            }
         }
 
         /* DataTables pagination styling */

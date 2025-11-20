@@ -27,7 +27,7 @@ class RtoPersonalDocumentController extends Controller
         $request->validate([
             'label' => 'required|string|max:255',
             'files' => 'required|array',
-            'files.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png,zip|max:51200', // 50MB
+            'files.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png,zip|max:51200',
         ]);
 
         foreach ($request->file('files') as $file) {
