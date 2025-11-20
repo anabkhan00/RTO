@@ -22,21 +22,27 @@
                 <p class="text-gray-600 mt-1">Manage and track your students</p>
             </div>
             <div class="flex gap-3">
-                <button
-                    class="bg-brand text-white flex items-center font-medium text-sm px-4 py-2 rounded-lg hover:bg-gold transition-colors"
-                    id="openModalBtn">
-                    <i class="bi bi-plus-circle mr-2"></i> Add Student
-                </button>
-                <button
-                    class="bg-green-600 text-white flex items-center font-medium text-sm px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    id="openUploadBtn">
-                    <i class="bi bi-upload mr-2"></i> Upload CSV
-                </button>
-                <a href="/rto/students/csv-format"
-                    class="bg-gray-600 text-white flex items-center font-medium text-sm px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-                    <i class="bi bi-download mr-2"></i> Download Format
-                </a>
-            </div>
+    <!-- Small Action Button -->
+    <button
+        class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors"
+        id="openModalBtn">
+        Add Student
+    </button>
+
+    <!-- Upload Button (Keep Icon, Slightly Smaller) -->
+    <button
+        class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
+        id="openUploadBtn">
+        <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
+    </button>
+
+    <!-- Download Button (Keep Icon, Slightly Smaller) -->
+    <a href="/rto/students/csv-format"
+        class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
+        <i class="bi bi-download mr-2 text-sm"></i> Download Format
+    </a>
+</div>
+
         </div>
     </div>
 
@@ -119,11 +125,11 @@
                 </div>
                 <div class="flex items-end gap-2">
                     <button id="applyFilters"
-                        class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors text-sm font-medium">
+                        class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                         Apply Filters
                     </button>
                     <button id="resetFilters"
-                        class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
+                        class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
                         Reset
                     </button>
                 </div>
@@ -211,30 +217,75 @@
                                 // Pastel color palette
                                 $palette = [
                                     ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-100'],
-                                    ['bg' => 'bg-purple-50', 'text' => 'text-purple-700', 'border' => 'border-purple-100'],
-                                    ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
-                                    ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
+                                    [
+                                        'bg' => 'bg-purple-50',
+                                        'text' => 'text-purple-700',
+                                        'border' => 'border-purple-100',
+                                    ],
+                                    [
+                                        'bg' => 'bg-emerald-50',
+                                        'text' => 'text-emerald-700',
+                                        'border' => 'border-emerald-100',
+                                    ],
+                                    [
+                                        'bg' => 'bg-orange-50',
+                                        'text' => 'text-orange-700',
+                                        'border' => 'border-orange-100',
+                                    ],
                                     ['bg' => 'bg-pink-50', 'text' => 'text-pink-700', 'border' => 'border-pink-100'],
-                                    ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
+                                    [
+                                        'bg' => 'bg-indigo-50',
+                                        'text' => 'text-indigo-700',
+                                        'border' => 'border-indigo-100',
+                                    ],
                                     ['bg' => 'bg-teal-50', 'text' => 'text-teal-700', 'border' => 'border-teal-100'],
                                     ['bg' => 'bg-cyan-50', 'text' => 'text-cyan-700', 'border' => 'border-cyan-100'],
                                 ];
 
                                 // Progress status mapping
                                 $progressColors = [
-                                    'Assigned' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-100'],
-                                    'Interview' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
-                                    'Placed' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
-                                    'Completed' => ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
+                                    'Assigned' => [
+                                        'bg' => 'bg-gray-50',
+                                        'text' => 'text-gray-700',
+                                        'border' => 'border-gray-100',
+                                    ],
+                                    'Interview' => [
+                                        'bg' => 'bg-orange-50',
+                                        'text' => 'text-orange-700',
+                                        'border' => 'border-orange-100',
+                                    ],
+                                    'Placed' => [
+                                        'bg' => 'bg-emerald-50',
+                                        'text' => 'text-emerald-700',
+                                        'border' => 'border-emerald-100',
+                                    ],
+                                    'Completed' => [
+                                        'bg' => 'bg-indigo-50',
+                                        'text' => 'text-indigo-700',
+                                        'border' => 'border-indigo-100',
+                                    ],
                                 ];
 
                                 // Days left color logic
                                 $daysLeft = rand(10, 300);
-                                $daysColor = $daysLeft > 150 ?
-                                    ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'] :
-                                    ($daysLeft >= 30 ?
-                                        ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'] :
-                                        ['bg' => 'bg-red-50', 'text' => 'text-red-700', 'border' => 'border-red-100']);
+                                $daysColor =
+                                    $daysLeft > 150
+                                        ? [
+                                            'bg' => 'bg-emerald-50',
+                                            'text' => 'text-emerald-700',
+                                            'border' => 'border-emerald-100',
+                                        ]
+                                        : ($daysLeft >= 30
+                                            ? [
+                                                'bg' => 'bg-orange-50',
+                                                'text' => 'text-orange-700',
+                                                'border' => 'border-orange-100',
+                                            ]
+                                            : [
+                                                'bg' => 'bg-red-50',
+                                                'text' => 'text-red-700',
+                                                'border' => 'border-red-100',
+                                            ]);
 
                                 // Dynamic assignments
                                 $industry = $student->industry ?? 'Healthcare';
@@ -247,7 +298,8 @@
                             @endphp
 
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
+                                <span
+                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
                                     {{ $industry }}
                                 </span>
                             </td>
@@ -266,22 +318,28 @@
                             <!-- Course -->
 
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
+                                <span
+                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
                                     {{ $courseName }}
                                 </span>
                             </td>
 
                             <!-- Days Left -->
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
-                                    @if($daysLeft > 150) @elseif($daysLeft >= 30) @else @endif
+                                <span
+                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
+                                    @if ($daysLeft > 150)
+                                    @elseif($daysLeft >= 30)
+                                    @else
+                                    @endif
                                     {{ $daysLeft }} Days left
                                 </span>
                             </td>
 
                             <!-- Progress -->
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
+                                <span
+                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
                                     <i class="bi bi-person mr-1"></i>
                                     {{ $progress }}
                                 </span>
@@ -327,9 +385,7 @@
         <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden relative">
             <!-- Modal Header with Gradient -->
             <div class="bg-gradient-to-r from-brand to-gold px-6 py-4">
-                <h2 id="modalTitle" class="text-xl font-semibold text-white flex items-center">
-                    <i class="bi bi-person-plus mr-2"></i> Add Student
-                </h2>
+                <h2 id="modalTitle" class="text-xl font-semibold text-white">Add Student</h2>
                 <button id="closeModalBtn" class="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl">
                     &times;
                 </button>
@@ -454,14 +510,14 @@
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all"></textarea>
                     </div> --}}
 
-                    <div class="flex justify-end gap-3 pt-4 border-t">
-                        <button type="button" id="cancelBtn"
-                            class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                            Cancel
-                        </button>
+                    <div class="flex gap-3 pt-4 border-t">
                         <button type="submit"
-                            class="px-6 py-2 bg-brand text-white rounded-lg hover:bg-gold transition-colors">
-                            <i class="bi bi-check-circle mr-1"></i> Save Student
+                            class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                            Save Student
+                        </button>
+                        <button type="button" id="cancelBtn"
+                            class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                            Cancel
                         </button>
                     </div>
                 </form>
@@ -503,14 +559,14 @@
                         <p class="text-blue-600 text-xs mt-2">First row should contain headers</p> --}}
                     </div>
 
-                    <div class="flex justify-end gap-3 pt-4 border-t">
-                        <button type="button" id="cancelUploadBtn"
-                            class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                            Cancel
-                        </button>
+                    <div class="flex gap-3 pt-4 border-t">
                         <button type="submit"
-                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            class="bg-green-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors font-medium">
                             <i class="bi bi-upload mr-1"></i> Upload CSV
+                        </button>
+                        <button type="button" id="cancelUploadBtn"
+                            class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                            Cancel
                         </button>
                     </div>
                 </form>
@@ -547,7 +603,7 @@
         // Open modals
         openModalBtn.addEventListener('click', () => {
             studentModal.classList.remove('hidden');
-            document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus mr-2"></i> Add Student';
+            document.getElementById('modalTitle').textContent = 'Add Student';
             document.getElementById('studentForm').reset();
         });
 
@@ -682,7 +738,7 @@
 
         // Edit student function
         function editStudent(id, name, email, phone, address, courseId) {
-            document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil mr-2"></i> Edit Student';
+            document.getElementById('modalTitle').textContent = 'Edit Student';
             document.getElementById('studentName').value = name;
             document.getElementById('studentEmail').value = email;
             document.getElementById('studentPhone').value = phone;

@@ -79,7 +79,7 @@
             </div>
 
             <div class="flex justify-end">
-                <button type="submit" class="px-8 py-3 bg-brand text-white rounded-md hover:bg-gold transition-colors">
+                <button type="submit" class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                     Update Profile
                 </button>
             </div>

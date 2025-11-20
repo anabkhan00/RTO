@@ -87,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end mt-4 gap-3">
+                <div class="flex justify-between mt-4 items-center">
                     @php
                         $status = 'Interview';
 
@@ -123,7 +123,7 @@
                     </span>
 
                     <button type="submit"
-                        class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-gold transition-colors text-sm">
+                        class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                         Update
                     </button>
                 </div>
@@ -143,25 +143,30 @@
         <div class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Notes</h3>
             <div class="location-tab-content block bg-white rounded-lg border shadow-sm p-4">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
                     <!-- All Notes Display -->
                     <div class="lg:col-span-2">
                         <h4 class="text-sm font-medium text-gray-700 mb-3">All Notes</h4>
-                        <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 min-h-32 max-h-64 overflow-y-auto space-y-3" id="allNotesDisplay">
-                            @if(count($notes) > 0)
-                                @foreach($notes as $note)
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 min-h-32 max-h-64 overflow-y-auto space-y-3"
+                            id="allNotesDisplay">
+                            @if (count($notes) > 0)
+                                @foreach ($notes as $note)
                                     @php
                                         $roleColors = [
                                             'admin' => 'bg-red-50 border-red-200 text-red-800',
                                             'rto' => 'bg-blue-50 border-blue-200 text-blue-800',
-                                            'coordinator' => 'bg-green-50 border-green-200 text-green-800'
+                                            'coordinator' => 'bg-green-50 border-green-200 text-green-800',
                                         ];
-                                        $roleColor = $roleColors[$note->author_role] ?? 'bg-gray-50 border-gray-200 text-gray-800';
+                                        $roleColor =
+                                            $roleColors[$note->author_role] ??
+                                            'bg-gray-50 border-gray-200 text-gray-800';
                                     @endphp
                                     <div class="p-3 rounded-lg border {{ $roleColor }}">
                                         <div class="flex justify-between items-start mb-2">
-                                            <span class="text-xs font-medium uppercase tracking-wide">{{ $note->author_role }}</span>
-                                            <span class="text-xs opacity-75">{{ $note->created_at->format('M j, Y') }}</span>
+                                            <span
+                                                class="text-xs font-medium uppercase tracking-wide">{{ $note->author_role }}</span>
+                                            <span
+                                                class="text-xs opacity-75">{{ $note->created_at->format('M j, Y') }}</span>
                                         </div>
                                         <p class="text-sm mb-1">{{ $note->content }}</p>
                                         <p class="text-xs opacity-75">by {{ $note->author->name }}</p>
@@ -177,16 +182,18 @@
                     </div>
 
                     <!-- Add Notes Form -->
-                    <div>
+                    <div class="flex flex-col h-full">
                         <h4 class="text-sm font-medium text-gray-700 mb-3">Add Note</h4>
-                        <form id="notesForm" class="space-y-3">
+
+                        <form id="notesForm" class="flex-grow">
                             @csrf
                             <textarea name="content" placeholder="Add a note about this student..."
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                                 rows="4" required></textarea>
+
                             <button type="submit"
-                                class="w-full bg-brand text-white py-2 rounded-lg hover:bg-gold transition-colors text-sm font-medium">
-                                <i class="bi bi-plus-circle mr-2"></i>Save Note
+                                class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                                Save Note
                             </button>
                         </form>
 
@@ -209,6 +216,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -313,9 +321,9 @@
                                 <p class="text-xs text-gray-500 mt-1">Supported: PDF, DOC, DOCX, JPG, PNG, ZIP</p>
                             </div>
 
-                            <div class="pt-2 flex justify-end">
+                            <div class="pt-2 flex">
                                 <button type="submit" id="uploadBtn"
-                                    class="bg-brand text-white py-2 px-4 rounded-lg hover:bg-gold transition-colors text-sm font-medium ">
+                                    class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                                     <span id="uploadText"><i class="bi bi-upload mr-2"></i>Upload Documents</span>
                                     <span id="uploadLoader" class="hidden">
                                         <i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Uploading...
@@ -353,10 +361,11 @@
 
                 <div class="flex justify-end gap-3">
                     <button type="button" id="skipChecklist"
-                        class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                        class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 font-medium">
                         Skip
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-md hover:bg-gold">
+                    <button type="submit"
+                        class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold font-medium">
                         Save Types
                     </button>
                 </div>
@@ -455,8 +464,9 @@
                                     'rto': 'bg-blue-50 border-blue-200 text-blue-800',
                                     'coordinator': 'bg-green-50 border-green-200 text-green-800'
                                 };
-                                const roleColor = roleColors[response.note.author_role] || 'bg-gray-50 border-gray-200 text-gray-800';
-                                
+                                const roleColor = roleColors[response.note.author_role] ||
+                                    'bg-gray-50 border-gray-200 text-gray-800';
+
                                 const noteHtml = `
                                     <div class="p-3 rounded-lg border ${roleColor}">
                                         <div class="flex justify-between items-start mb-2">
@@ -467,14 +477,14 @@
                                         <p class="text-xs opacity-75">by ${response.note.author_name}</p>
                                     </div>
                                 `;
-                                
+
                                 const notesDisplay = document.getElementById('allNotesDisplay');
                                 const emptyState = notesDisplay.querySelector('.text-center');
                                 if (emptyState) {
                                     emptyState.remove();
                                 }
                                 notesDisplay.insertAdjacentHTML('afterbegin', noteHtml);
-                                
+
                                 textarea.value = '';
                                 toastr.success('Note added successfully');
                             }
@@ -514,7 +524,7 @@
             // Document upload functionality
             $('form[enctype="multipart/form-data"]').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 const uploadBtn = $('#uploadBtn');
                 const uploadText = $('#uploadText');
                 const uploadLoader = $('#uploadLoader');
@@ -614,12 +624,18 @@
             });
         });
     </script>
-    
+
     <style>
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
+
         .animate-spin {
             animation: spin 1s linear infinite;
         }

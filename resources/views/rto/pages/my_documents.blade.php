@@ -62,7 +62,7 @@
                                     class="w-full bg-white/20 border border-white/30 text-white text-sm rounded-lg p-3 focus:ring-2 focus:ring-white/50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-brand hover:file:bg-gray-100" />
                             </div>
                             <button type="submit" id="uploadBtn"
-                                class="w-full bg-white text-brand font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                class="bg-white text-brand text-xs px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors font-medium">
                                 <span id="uploadText"><i class="bi bi-upload mr-2"></i>Upload</span>
                                 <span id="uploadLoader" class="hidden"><i
                                         class="bi bi-arrow-clockwise animate-spin mr-2"></i>Uploading...</span>
@@ -123,10 +123,16 @@
         </div>
 
         <div id="studentsDocumentsContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div class="p-6">
-                    <!-- Filters -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <!-- Filter Section -->
+            <div class="bg-white rounded-lg shadow-sm mb-6">
+                <div class="p-4 border-b border-gray-200">
+                    <button id="docToggleFilters" class="flex items-center justify-between w-full text-left">
+                        <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+                        <i id="docFilterIcon" class="bi bi-chevron-down text-gray-500 transition-transform"></i>
+                    </button>
+                </div>
+                <div id="docFilterContent" class="hidden p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <input type="text" id="docSearchFilter" placeholder="Search by name or email..."
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
@@ -151,12 +157,16 @@
                         </div>
                         <div>
                             <button id="docResetFilters"
-                                class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                                class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
                                 Reset Filters
                             </button>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Students Table Section -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table id="studentsTable" class="min-w-full table-fixed w-full">
                         <thead class="bg-gray-50">
@@ -354,12 +364,12 @@
                         </div>
                         <div class="flex gap-2">
                             <button id="updateBtn"
-                                class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors">
-                                <i class="bi bi-pencil mr-1"></i>Update
+                                class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                                Update
                             </button>
                             <button id="deleteBtn"
-                                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                                <i class="bi bi-trash mr-1"></i>Delete
+                                class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors font-medium">
+                                Delete
                             </button>
                         </div>
                     @else
@@ -399,7 +409,7 @@
                         </div>
                         <div class="flex gap-2 mt-2">
                             <button id="clearBtn"
-                                class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 font-medium">
                                 Clear
                             </button>
                         </div>
@@ -416,12 +426,12 @@
                     <!-- Action Buttons -->
                     <div class="mt-6 flex gap-2">
                         <button id="saveBtn"
-                            class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors">
-                            <i class="bi bi-check-circle mr-1"></i><span id="saveText">Save Signature</span>
+                            class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                            <span id="saveText">Save Signature</span>
                         </button>
                         @if ($signature)
                             <button id="cancelBtn"
-                                class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors hidden">
+                                class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium hidden">
                                 Cancel
                             </button>
                         @endif
@@ -466,11 +476,11 @@
 
                     <div class="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" id="cancelStudentUpload"
-                            class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                            class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
                             Cancel
                         </button>
                         <button type="submit" id="studentUploadBtn"
-                            class="px-6 py-2 bg-brand text-white rounded-lg hover:bg-gold transition-colors">
+                            class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                             <span id="studentUploadText"><i class="bi bi-upload mr-1"></i> Upload Documents</span>
                             <span id="studentUploadLoader" class="hidden">
                                 <i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Uploading...
@@ -508,10 +518,10 @@
 
                 <div class="flex justify-end gap-3">
                     <button type="button" id="skipChecklist"
-                        class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                        class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 font-medium">
                         Skip
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-md hover:bg-gold">
+                    <button type="submit" class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold font-medium">
                         Save Types
                     </button>
                 </div>
@@ -987,6 +997,15 @@
             // Reset form
             $('#eSignForm')[0].reset();
             toastr.success('ESign document created successfully!');
+        });
+
+        // Documents filter toggle functionality
+        $('#docToggleFilters').on('click', function() {
+            const filterContent = $('#docFilterContent');
+            const filterIcon = $('#docFilterIcon');
+
+            filterContent.toggleClass('hidden');
+            filterIcon.toggleClass('rotate-180');
         });
     </script>
 

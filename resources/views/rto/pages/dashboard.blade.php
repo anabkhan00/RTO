@@ -244,7 +244,7 @@
               <div class="bg-white rounded-lg p-3 flex-1 shadow-sm">
                   <div class="flex justify-between items-center mb-3">
                       <h2 class="font-semibold text-sm text-brand">Students Referral Outcome</h2>
-                      <button class="border border-gold text-dark text-xs px-3 py-1 rounded-md">
+                      <button class="border border-gold text-dark text-xs px-3 py-1.5 rounded-md font-medium">
                           This Month
                       </button>
                   </div>
@@ -281,37 +281,47 @@
                   <div class="p-4 border-b border-gray-200">
                       <h2 class="text-lg font-semibold text-brand">Students Overview</h2>
                   </div>
-                  <div class="p-6">
+                  <div class="p-4">
 
-                  <!-- Filters -->
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                      <div>
-                          <input type="text" id="dashSearchFilter" placeholder="Search by name or email..."
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                      </div>
-                      <div>
-                          <select id="dashProgressFilter"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                              <option value="">All Progress</option>
-                              <option value="Assigned">Assigned</option>
-                              <option value="Interview">Interview</option>
-                              <option value="Placed">Placed</option>
-                          </select>
-                      </div>
-                      <div>
-                          <select id="dashIndustryFilter"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                              <option value="">All Industries</option>
-                              <option value="Healthcare">Healthcare</option>
-                              <option value="Tech">Tech</option>
-                              <option value="Marketing">Marketing</option>
-                          </select>
-                      </div>
-                      <div>
-                          <button id="dashResetFilters"
-                              class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm">
-                              Reset Filters
+                  <!-- Filter Section -->
+                  <div class="mb-6">
+                      <div class="border-b border-gray-200 pb-4">
+                          <button id="dashToggleFilters" class="flex items-center justify-between w-full text-left">
+                              <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+                              <i id="dashFilterIcon" class="bi bi-chevron-down text-gray-500 transition-transform"></i>
                           </button>
+                      </div>
+                      <div id="dashFilterContent" class="hidden pt-4">
+                          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              <div>
+                                  <input type="text" id="dashSearchFilter" placeholder="Search by name or email..."
+                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                              </div>
+                              <div>
+                                  <select id="dashProgressFilter"
+                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                      <option value="">All Progress</option>
+                                      <option value="Assigned">Assigned</option>
+                                      <option value="Interview">Interview</option>
+                                      <option value="Placed">Placed</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <select id="dashIndustryFilter"
+                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                      <option value="">All Industries</option>
+                                      <option value="Healthcare">Healthcare</option>
+                                      <option value="Tech">Tech</option>
+                                      <option value="Marketing">Marketing</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <button id="dashResetFilters"
+                                      class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                                      Reset Filters
+                                  </button>
+                              </div>
+                          </div>
                       </div>
                   </div>
 
@@ -603,6 +613,15 @@
                       const allDropdowns = document.querySelectorAll('[id^="dash-dropdown-"]');
                       allDropdowns.forEach(dd => dd.classList.add('hidden'));
                   }
+              });
+
+              // Dashboard filter toggle functionality
+              document.getElementById('dashToggleFilters').addEventListener('click', function() {
+                  const filterContent = document.getElementById('dashFilterContent');
+                  const filterIcon = document.getElementById('dashFilterIcon');
+
+                  filterContent.classList.toggle('hidden');
+                  filterIcon.classList.toggle('rotate-180');
               });
 
               // 🗺️ Initialize Google Map
