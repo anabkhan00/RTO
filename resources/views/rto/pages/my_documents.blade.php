@@ -261,7 +261,8 @@
                                     $totalCount = $checklists->count();
                                 @endphp
 
-                                <tr class="hover:bg-gray-50 transition-colors">
+                                <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                    onclick="window.location.href = '{{ route('rto.student-documents.index', $student->id) }}#document-section'">
                                     <!-- Student -->
                                     <td class="px-4 py-3 whitespace-nowrap col-student">
                                         <div class="flex items-center">
@@ -521,7 +522,8 @@
                         class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 font-medium">
                         Skip
                     </button>
-                    <button type="submit" class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold font-medium">
+                    <button type="submit"
+                        class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold font-medium">
                         Save Types
                     </button>
                 </div>

@@ -22,26 +22,26 @@
                 <p class="text-gray-600 mt-1">Manage and track your students</p>
             </div>
             <div class="flex gap-3">
-    <!-- Small Action Button -->
-    <button
-        class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors"
-        id="openModalBtn">
-        Add Student
-    </button>
+                <!-- Small Action Button -->
+                <button
+                    class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors"
+                    id="openModalBtn">
+                    Add Student
+                </button>
 
-    <!-- Upload Button (Keep Icon, Slightly Smaller) -->
-    <button
-        class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
-        id="openUploadBtn">
-        <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
-    </button>
+                <!-- Upload Button (Keep Icon, Slightly Smaller) -->
+                <button
+                    class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
+                    id="openUploadBtn">
+                    <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
+                </button>
 
-    <!-- Download Button (Keep Icon, Slightly Smaller) -->
-    <a href="/rto/students/csv-format"
-        class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
-        <i class="bi bi-download mr-2 text-sm"></i> Download Format
-    </a>
-</div>
+                <!-- Download Button (Keep Icon, Slightly Smaller) -->
+                <a href="/rto/students/csv-format"
+                    class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
+                    <i class="bi bi-download mr-2 text-sm"></i> Download Format
+                </a>
+            </div>
 
         </div>
     </div>
