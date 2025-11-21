@@ -1,5 +1,5 @@
       @extends('rto.master_layout.index')
-@section('page-title', 'Dashboard')
+      @section('page-title', 'Dashboard')
       @section('content')
           <div class="w-full p-3 flex flex-nowrap gap-6">
               <!-- Total Students Card -->
@@ -283,69 +283,74 @@
                   </div>
                   <div class="p-4">
 
-                  <!-- Filter Section -->
-                  <div class="mb-6">
-                      <div class="border-b border-gray-200 pb-4">
-                          <button id="dashToggleFilters" class="flex items-center justify-between w-full text-left">
-                              <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
-                              <i id="dashFilterIcon" class="bi bi-chevron-down text-gray-500 transition-transform"></i>
-                          </button>
-                      </div>
-                      <div id="dashFilterContent" class="hidden pt-4">
-                          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                              <div>
-                                  <input type="text" id="dashSearchFilter" placeholder="Search by name or email..."
-                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                              </div>
-                              <div>
-                                  <select id="dashProgressFilter"
-                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                                      <option value="">All Progress</option>
-                                      <option value="Assigned">Assigned</option>
-                                      <option value="Interview">Interview</option>
-                                      <option value="Placed">Placed</option>
-                                  </select>
-                              </div>
-                              <div>
-                                  <select id="dashIndustryFilter"
-                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                                      <option value="">All Industries</option>
-                                      <option value="Healthcare">Healthcare</option>
-                                      <option value="Tech">Tech</option>
-                                      <option value="Marketing">Marketing</option>
-                                  </select>
-                              </div>
-                              <div>
-                                  <button id="dashResetFilters"
-                                      class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
-                                      Reset Filters
-                                  </button>
+                      <!-- Filter Section -->
+                      <div class="mb-6">
+                          <div class="border-b border-gray-200 pb-4">
+                              <button id="dashToggleFilters" class="flex items-center justify-between w-full text-left">
+                                  <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+                                  <i id="dashFilterIcon"
+                                      class="bi bi-chevron-down text-gray-500 transition-transform"></i>
+                              </button>
+                          </div>
+                          <div id="dashFilterContent" class="hidden pt-4">
+                              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                  <div>
+                                      <input type="text" id="dashSearchFilter"
+                                          placeholder="Search by name or email..."
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                                  </div>
+                                  <div>
+                                      <select id="dashProgressFilter"
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                          <option value="">All Progress</option>
+                                          <option value="Assigned">Assigned</option>
+                                          <option value="Interview">Interview</option>
+                                          <option value="Placed">Placed</option>
+                                      </select>
+                                  </div>
+                                  <div>
+                                      <select id="dashIndustryFilter"
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                          <option value="">All Industries</option>
+                                          <option value="Healthcare">Healthcare</option>
+                                          <option value="Tech">Tech</option>
+                                          <option value="Marketing">Marketing</option>
+                                      </select>
+                                  </div>
+                                  <div>
+                                      <button id="dashResetFilters"
+                                          class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                                          Reset Filters
+                                      </button>
+                                  </div>
                               </div>
                           </div>
                       </div>
-                  </div>
 
                   </div>
                   <!-- Table -->
                   <div class="overflow-x-auto">
-                      <table id="dashStudentsDataTable" class="min-w-full" style="table-layout: fixed;">
-                          <colgroup>
-                              <col style="width: 18%;">
-                              <col style="width: 16%;">
-                              <col style="width: 20%;">
-                              <col style="width: 14%;">
-                              <col style="width: 12%;">
-                              <col style="width: 12%;">
-                              <col style="width: 8%;">
-                          </colgroup>
+                      <table id="studentsTable" class="min-w-full">
                           <thead class="bg-gray-50">
                               <tr>
                                   <th
                                       class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                                       Name</th>
+                                  {{-- <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            RTO</th> --}}
                                   <th
                                       class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                                       Industry</th>
+                                  {{-- <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Sectors</th> --}}
+                                  {{-- <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Email</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Phone</th> --}}
                                   <th
                                       class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                                       Course</th>
@@ -355,93 +360,207 @@
                                   <th
                                       class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                                       Progress</th>
+                                  {{-- <th
+                                      class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                      Address</th> --}}
+                                  {{-- <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Assign Coordinator</th> --}}
                                   <th
                                       class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                                      Created at</th>
+                                      Created At</th>
                                   <th
                                       class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                                       Actions</th>
                               </tr>
                           </thead>
                           <tbody class="bg-white divide-y divide-gray-200">
-                              @foreach ($students as $student)
-                                  @php
-                                      $palette = [
-                                          ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-100'],
-                                          ['bg' => 'bg-purple-50', 'text' => 'text-purple-700', 'border' => 'border-purple-100'],
-                                          ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
-                                          ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
-                                          ['bg' => 'bg-pink-50', 'text' => 'text-pink-700', 'border' => 'border-pink-100'],
-                                          ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
-                                          ['bg' => 'bg-teal-50', 'text' => 'text-teal-700', 'border' => 'border-teal-100'],
-                                          ['bg' => 'bg-cyan-50', 'text' => 'text-cyan-700', 'border' => 'border-cyan-100'],
-                                      ];
-
-                                      $progressColors = [
-                                          'Assigned' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-100'],
-                                          'Interview' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'],
-                                          'Placed' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'],
-                                          'Completed' => ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'border' => 'border-indigo-100'],
-                                      ];
-
-                                      $daysLeft = rand(10, 300);
-                                      $daysColor = $daysLeft > 150 ?
-                                          ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-100'] :
-                                          ($daysLeft >= 30 ?
-                                              ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-100'] :
-                                              ['bg' => 'bg-red-50', 'text' => 'text-red-700', 'border' => 'border-red-100']);
-
-                                      $industry = $student->industry ?? 'Healthcare';
-                                      $courseName = $student->course->name ?? 'No Course';
-                                      $progress = 'Placed';
-
-                                      $industryColor = $palette[abs(crc32($industry)) % count($palette)];
-                                      $courseColor = $palette[abs(crc32($courseName)) % count($palette)];
-                                      $progressColor = $progressColors[$progress] ?? $palette[6];
-                                  @endphp
-                                  <tr class="hover:bg-gray-50 transition-colors">
+                              @foreach ($students as $index => $student)
+                                  <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                      onclick="window.location.href='{{ route('rto.student-documents.index', $student->id) }}'">
+                                      <!-- Name with Priority Badge -->
                                       <td class="px-4 py-3 whitespace-nowrap">
-                                          <div class="flex items-center">
-                                              {{-- <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
-                                                  {{ substr($student->name, 0, 1) }}
-                                              </div> --}}
-                                              <span class="text-sm font-medium text-gray-900">{{ $student->name }}</span>
-                                          </div>
+                                          <span class="text-sm font-semibold text-gray-900">
+                                              {{ $student->name }}
+                                          </span>
                                       </td>
+                                      <!-- RTO -->
+                                      {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->rto_number ?? '-----' }}</td> --}}
+                                      <!-- Industry -->
+
+                                      @php
+                                          // Pastel color palette
+                                          $palette = [
+                                              [
+                                                  'bg' => 'bg-blue-50',
+                                                  'text' => 'text-blue-700',
+                                                  'border' => 'border-blue-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-purple-50',
+                                                  'text' => 'text-purple-700',
+                                                  'border' => 'border-purple-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-emerald-50',
+                                                  'text' => 'text-emerald-700',
+                                                  'border' => 'border-emerald-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-orange-50',
+                                                  'text' => 'text-orange-700',
+                                                  'border' => 'border-orange-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-pink-50',
+                                                  'text' => 'text-pink-700',
+                                                  'border' => 'border-pink-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-indigo-50',
+                                                  'text' => 'text-indigo-700',
+                                                  'border' => 'border-indigo-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-teal-50',
+                                                  'text' => 'text-teal-700',
+                                                  'border' => 'border-teal-100',
+                                              ],
+                                              [
+                                                  'bg' => 'bg-cyan-50',
+                                                  'text' => 'text-cyan-700',
+                                                  'border' => 'border-cyan-100',
+                                              ],
+                                          ];
+
+                                          // Progress status mapping
+                                          $progressColors = [
+                                              'Assigned' => [
+                                                  'bg' => 'bg-gray-50',
+                                                  'text' => 'text-gray-700',
+                                                  'border' => 'border-gray-100',
+                                              ],
+                                              'Interview' => [
+                                                  'bg' => 'bg-orange-50',
+                                                  'text' => 'text-orange-700',
+                                                  'border' => 'border-orange-100',
+                                              ],
+                                              'Placed' => [
+                                                  'bg' => 'bg-emerald-50',
+                                                  'text' => 'text-emerald-700',
+                                                  'border' => 'border-emerald-100',
+                                              ],
+                                              'Completed' => [
+                                                  'bg' => 'bg-indigo-50',
+                                                  'text' => 'text-indigo-700',
+                                                  'border' => 'border-indigo-100',
+                                              ],
+                                          ];
+
+                                          // Days left color logic
+                                          $daysLeft = rand(10, 300);
+                                          $daysColor =
+                                              $daysLeft > 150
+                                                  ? [
+                                                      'bg' => 'bg-emerald-50',
+                                                      'text' => 'text-emerald-700',
+                                                      'border' => 'border-emerald-100',
+                                                  ]
+                                                  : ($daysLeft >= 30
+                                                      ? [
+                                                          'bg' => 'bg-orange-50',
+                                                          'text' => 'text-orange-700',
+                                                          'border' => 'border-orange-100',
+                                                      ]
+                                                      : [
+                                                          'bg' => 'bg-red-50',
+                                                          'text' => 'text-red-700',
+                                                          'border' => 'border-red-100',
+                                                      ]);
+
+                                          // Dynamic assignments
+                                          $industry = $student->industry ?? 'Healthcare';
+                                          $courseName = $student->course->name ?? 'No Course';
+                                          $progress = 'Completed';
+
+                                          $industryColor = $palette[abs(crc32($industry)) % count($palette)];
+                                          $courseColor = $palette[abs(crc32($courseName)) % count($palette)];
+                                          $progressColor = $progressColors[$progress] ?? $palette[6];
+                                      @endphp
+
                                       <td class="px-4 py-3 whitespace-nowrap">
-                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
+                                          <span
+                                              class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
                                               {{ $industry }}
                                           </span>
                                       </td>
+                                      <!-- Sectors -->
+                                      {{-- <td class="px-4 py-3 whitespace-nowrap">
+                                <a href="#" class="text-brand hover:text-gold text-sm font-medium">
+                                    VIEW / EDIT
+                                    <i class="bi bi-layers ml-1"></i>
+                                </a>
+                            </td> --}}
+                                      <!-- Email -->
+                                      {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
+                            <!-- Phone -->
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->phone ?? '-----' }}
+                            </td> --}}
+                                      <!-- Course -->
+
                                       <td class="px-4 py-3 whitespace-nowrap">
-                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
+                                          <span
+                                              class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
                                               {{ $courseName }}
                                           </span>
                                       </td>
+
+                                      <!-- Days Left -->
                                       <td class="px-4 py-3 whitespace-nowrap">
-                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
-                                              @if($daysLeft > 150) @elseif($daysLeft >= 30) @else @endif
+                                          <span
+                                              class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
+                                              @if ($daysLeft > 150)
+                                              @elseif($daysLeft >= 30)
+                                              @else
+                                              @endif
                                               {{ $daysLeft }} Days left
                                           </span>
                                       </td>
+
+                                      <!-- Progress -->
                                       <td class="px-4 py-3 whitespace-nowrap">
-                                          <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
+                                          <span
+                                              class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
                                               <i class="bi bi-person mr-1"></i>
                                               {{ $progress }}
                                           </span>
                                       </td>
-                                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->created_at->format('j M Y') }}</td>
-                                      <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                      <!-- Address -->
+                                      {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                                          {{ $student->address ?? '-----' }}</td> --}}
+                                      <!-- Assign Coordinator -->
+                                      {{-- <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <span class="text-sm text-gray-900 mr-2">Admin</span>
+                                    <a href="#" class="text-brand hover:text-gold text-xs font-medium">change</a>
+                                </div>
+                            </td> --}}
+                                      <!-- Created At -->
+                                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                                          {{ $student->created_at->format('j M Y') }}</td>
+                                      <!-- Actions -->
+                                      <td class="px-4 py-3 whitespace-nowrap text-sm font-medium"
+                                          onclick="event.stopPropagation()">
                                           <div class="relative">
-                                              <button onclick="toggleDashDropdown({{ $loop->index }})"
+                                              <button onclick="toggleDropdown({{ $index }})"
                                                   class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
                                                   <i class="bi bi-three-dots-vertical"></i>
                                               </button>
-                                              <div id="dash-dropdown-{{ $loop->index }}"
+                                              <div id="dropdown-{{ $index }}"
                                                   class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
-                                                  <a href="{{ route('rto.student-documents.index', $student->id) }}"
-                                                      class="block px-4 py-2 text-sm text-brand hover:bg-gray-50 rounded-md">
-                                                      <i class="bi bi-eye mr-2"></i>View
+                                                  <a href="#" onclick="deleteStudent({{ $student->id }})"
+                                                      class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
+                                                      <i class="bi bi-trash mr-2"></i>Delete
                                                   </a>
                                               </div>
                                           </div>
@@ -564,13 +683,17 @@
                   }
               });
               // Initialize DataTable
-              const table = $('#dashStudentsDataTable').DataTable({
+              $('#studentsTable').DataTable({
                   "pageLength": 25,
                   "searching": false,
-                  "ordering": false,
+                  "ordering": true,
                   "info": false,
                   "lengthChange": false,
-                  "dom": 'rt<"bottom"p>',
+                  "columnDefs": [{
+                      "orderable": false,
+                      "targets": [6]
+                  }],
+                  "dom": 'rt<"flex justify-end mt-4"p>',
                   "scrollX": true
               });
 

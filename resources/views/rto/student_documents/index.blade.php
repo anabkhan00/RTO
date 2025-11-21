@@ -222,7 +222,7 @@
         </div>
 
         <!-- Document Management Section (Checklist & Upload) -->
-        <div class="mb-8">
+        <div id="document-section" class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Document Management</h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Checklist Status Card -->
@@ -622,6 +622,26 @@
                     }
                 });
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash === '#document-section') {
+                const element = document.getElementById('document-section');
+                if (element) {
+                    // Smooth scroll + thoda top se offset (navbar ke liye)
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                    // Optional: thoda highlight effect (jaise flash)
+                    // element.style.transition = 'background-color 0.6s';
+                    // element.style.backgroundColor = '#f0fdf4'; // light green
+                    setTimeout(() => {
+                        element.style.backgroundColor = '';
+                    }, 2000);
+                }
+            }
         });
     </script>
 
