@@ -75,4 +75,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Esignature::class);
     }
+
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class, 'rto_id');
+    }
 }

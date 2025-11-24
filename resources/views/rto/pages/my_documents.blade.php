@@ -532,6 +532,85 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to activate a tab
+            function activateTab(tabId) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(function(content) {
+                    content.classList.add('hidden');
+                });
+
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-button').forEach(function(btn) {
+                    btn.classList.remove('active');
+                });
+
+                // Show selected tab content
+                const content = document.getElementById(tabId + 'Content');
+                if (content) {
+                    content.classList.remove('hidden');
+                }
+
+                // Mark the tab button as active
+                const tabButton = document.querySelector(`[data-tab="${tabId}"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                }
+
+                // Special logic for eSign tab
+                if (tabId === 'eSign') {
+                    $('#myDocumentsTab').removeClass('hidden');
+                    $('#myDocumentsTab')
+                        .removeClass('active border-brand text-brand')
+                        .addClass('border-transparent text-gray-500');
+
+                    $('#eSignTab').removeClass('hidden');
+                    $('#eSignTab')
+                        .addClass('active border-brand text-brand')
+                        .removeClass('border-transparent text-gray-500');
+
+                    setTimeout(function() {
+                        const canvas = document.getElementById('signaturePad');
+
+                        if (canvas) {
+                            if (!window.signaturePad) {
+                                window.signaturePad = new SignaturePad(canvas, {
+                                    backgroundColor: 'rgba(255, 255, 255, 0)',
+                                    penColor: 'rgb(0, 0, 0)'
+                                });
+                            }
+
+                            function resizeCanvas() {
+                                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                                canvas.width = canvas.offsetWidth * ratio;
+                                canvas.height = canvas.offsetHeight * ratio;
+                                canvas.getContext('2d').scale(ratio, ratio);
+                                window.signaturePad.clear();
+                            }
+
+                            resizeCanvas();
+                        }
+                    }, 150);
+                }
+            }
+
+            // Check URL for tab parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+
+            if (tabParam === 'eSignTab') {
+                activateTab('eSign');
+            }
+
+            // Tab button click handler
+            document.querySelectorAll('.tab-button').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    activateTab(targetTab);
+                });
+            });
+        });
+
         $(document).ready(function() {
             // Initialize DataTables for students table with fixed layout and explicit column widths
             const docTable = $('#studentsTable').DataTable({

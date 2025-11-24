@@ -59,6 +59,11 @@
                     Document Checklist
                 </a>
 
+                <a href="{{ route('admin.contracts') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.contracts*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    Contracts
+                </a>
+
                 <a href="/profile"
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->is('profile') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Profile
