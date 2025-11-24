@@ -59,6 +59,11 @@ Route::middleware(['auth', 'role:rto'])->group(function () {
     // Student Notes Routes
     Route::post('/rto/students/{student}/notes', [StudentNoteController::class, 'store']);
     Route::get('/rto/students/{student}/notes', [StudentNoteController::class, 'index']);
+    
+    // Contracts Routes
+    Route::get('/rto/contracts', [App\Http\Controllers\ContractController::class, 'rtoIndex'])->name('rto.contracts');
+    Route::post('/rto/contracts/{contract}/sign', [App\Http\Controllers\ContractController::class, 'signContract']);
+    Route::get('/rto/contracts/{contract}/view', [App\Http\Controllers\ContractController::class, 'viewContract'])->name('rto.contracts.view');
 
 });
 
@@ -128,6 +133,12 @@ Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('ad
     Route::put('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'update']);
     Route::delete('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'destroy']);
     Route::patch('/document-checklist/{id}/toggle-status', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'toggleStatus']);
+    
+    // Contracts Routes
+    Route::get('/contracts', [App\Http\Controllers\ContractController::class, 'adminIndex'])->name('contracts');
+    Route::post('/contracts', [App\Http\Controllers\ContractController::class, 'store']);
+    Route::get('/contracts/{contract}/view', [App\Http\Controllers\ContractController::class, 'adminViewContract'])->name('contracts.view');
+    Route::delete('/contracts/{contract}', [App\Http\Controllers\ContractController::class, 'destroy']);
 });
 
 

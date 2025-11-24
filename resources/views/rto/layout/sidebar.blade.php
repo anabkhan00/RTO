@@ -23,6 +23,11 @@
                     Documents
                 </a>
 
+                <a href="{{ route('rto.contracts') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('rto.contracts*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    Contracts
+                </a>
+
                 <a href="/profile"
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->is('profile') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Settings
