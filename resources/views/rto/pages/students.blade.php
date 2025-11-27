@@ -428,7 +428,7 @@
                             </select>
                         </div> --}}
 
-                        <div>
+                        {{-- <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="bi bi-flag mr-1"></i> Priority
                             </label>
@@ -439,7 +439,7 @@
                                 <option value="Medium Priority">Medium Priority</option>
                                 <option value="Low Priority">Low Priority</option>
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -463,7 +463,7 @@
                             </select>
                         </div>
 
-                        <div>
+                        <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="bi bi-person mr-1"></i> Address <span class="text-red-500">*</span>
                             </label>

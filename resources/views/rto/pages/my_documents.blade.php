@@ -532,84 +532,46 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to activate a tab
-            function activateTab(tabId) {
-                // Hide all tab contents
-                document.querySelectorAll('.tab-content').forEach(function(content) {
-                    content.classList.add('hidden');
-                });
+        // Global function to activate a tab
+        function activateTab(tabName) {
+            // Remove active class from all tabs
+            $('.tab-button').removeClass('active border-brand text-brand').addClass('border-transparent text-gray-500');
 
-                // Remove active class from all tabs
-                document.querySelectorAll('.tab-button').forEach(function(btn) {
-                    btn.classList.remove('active');
-                });
+            // Hide all tab contents
+            $('.tab-content').addClass('hidden');
 
-                // Show selected tab content
-                const content = document.getElementById(tabId + 'Content');
-                if (content) {
-                    content.classList.remove('hidden');
-                }
-
-                // Mark the tab button as active
-                const tabButton = document.querySelector(`[data-tab="${tabId}"]`);
-                if (tabButton) {
-                    tabButton.classList.add('active');
-                }
-
-                // Special logic for eSign tab
-                if (tabId === 'eSign') {
-                    $('#myDocumentsTab').removeClass('hidden');
-                    $('#myDocumentsTab')
-                        .removeClass('active border-brand text-brand')
-                        .addClass('border-transparent text-gray-500');
-
-                    $('#eSignTab').removeClass('hidden');
-                    $('#eSignTab')
-                        .addClass('active border-brand text-brand')
-                        .removeClass('border-transparent text-gray-500');
-
-                    setTimeout(function() {
-                        const canvas = document.getElementById('signaturePad');
-
-                        if (canvas) {
-                            if (!window.signaturePad) {
-                                window.signaturePad = new SignaturePad(canvas, {
-                                    backgroundColor: 'rgba(255, 255, 255, 0)',
-                                    penColor: 'rgb(0, 0, 0)'
-                                });
-                            }
-
-                            function resizeCanvas() {
-                                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                                canvas.width = canvas.offsetWidth * ratio;
-                                canvas.height = canvas.offsetHeight * ratio;
-                                canvas.getContext('2d').scale(ratio, ratio);
-                                window.signaturePad.clear();
-                            }
-
-                            resizeCanvas();
+            // Show corresponding content and activate tab
+            if (tabName === 'myDocuments') {
+                $('#myDocumentsContent').removeClass('hidden');
+                $('#myDocumentsTab').addClass('active border-brand text-brand').removeClass('border-transparent text-gray-500');
+            } else if (tabName === 'studentsDocuments') {
+                $('#studentsDocumentsContent').removeClass('hidden');
+                $('#studentsDocumentsTab').addClass('active border-brand text-brand').removeClass('border-transparent text-gray-500');
+            } else if (tabName === 'eSign') {
+                $('#eSignContent').removeClass('hidden');
+                $('#eSignTab').addClass('active border-brand text-brand').removeClass('border-transparent text-gray-500');
+                
+                // Initialize signature pad
+                setTimeout(function() {
+                    const canvas = document.getElementById('signaturePad');
+                    if (canvas && !window.signaturePad) {
+                        window.signaturePad = new SignaturePad(canvas, {
+                            backgroundColor: 'rgba(255, 255, 255, 0)',
+                            penColor: 'rgb(0, 0, 0)'
+                        });
+                        
+                        function resizeCanvas() {
+                            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                            canvas.width = canvas.offsetWidth * ratio;
+                            canvas.height = canvas.offsetHeight * ratio;
+                            canvas.getContext('2d').scale(ratio, ratio);
+                            window.signaturePad.clear();
                         }
-                    }, 150);
-                }
+                        resizeCanvas();
+                    }
+                }, 150);
             }
-
-            // Check URL for tab parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const tabParam = urlParams.get('tab');
-
-            if (tabParam === 'eSignTab') {
-                activateTab('eSign');
-            }
-
-            // Tab button click handler
-            document.querySelectorAll('.tab-button').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const targetTab = this.getAttribute('data-tab');
-                    activateTab(targetTab);
-                });
-            });
-        });
+        }
 
         $(document).ready(function() {
             // Initialize DataTables for students table with fixed layout and explicit column widths
@@ -681,29 +643,32 @@
                 docTable.search('').columns().search('').draw();
             });
 
-            // Tab functionality
+            // Check URL for tab parameter on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+
+            if (tabParam === 'eSignTab') {
+                activateTab('eSign');
+            } else if (tabParam === 'studentsDocumentsTab') {
+                activateTab('studentsDocuments');
+            } else if (tabParam === 'myDocumentsTab') {
+                activateTab('myDocuments');
+            }
+
+            // Tab functionality - use the same activateTab function
             $('.tab-button').on('click', function() {
                 const tabId = $(this).attr('id');
-
-                // Remove active class from all tabs
-                $('.tab-button').removeClass('active border-brand text-brand').addClass(
-                    'border-transparent text-gray-500');
-
-                // Add active class to clicked tab
-                $(this).addClass('active border-brand text-brand').removeClass(
-                    'border-transparent text-gray-500');
-
-                // Hide all tab contents
-                $('.tab-content').addClass('hidden');
-
-                // Show corresponding content
+                let targetTab = 'myDocuments';
+                
                 if (tabId === 'myDocumentsTab') {
-                    $('#myDocumentsContent').removeClass('hidden');
+                    targetTab = 'myDocuments';
                 } else if (tabId === 'studentsDocumentsTab') {
-                    $('#studentsDocumentsContent').removeClass('hidden');
+                    targetTab = 'studentsDocuments';
                 } else if (tabId === 'eSignTab') {
-                    $('#eSignContent').removeClass('hidden');
+                    targetTab = 'eSign';
                 }
+                
+                activateTab(targetTab);
             });
 
             $('form').on('submit', function() {

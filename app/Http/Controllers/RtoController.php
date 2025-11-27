@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Course;
+use App\Models\Industry;
 use App\Models\RtoStudent;
 use App\Models\StudentNote;
-use Illuminate\Support\Facades\Hash;
+use App\Models\StudentIndustry;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class RtoController extends Controller
 {
@@ -241,6 +243,22 @@ class RtoController extends Controller
 
         $user->update($updateData);
         return back()->with('success', 'Profile updated successfully');
+    }
+
+    public function industries()
+    {
+        $rtoId = Auth::id();
+        $studentIds = RtoStudent::where('rto_id', $rtoId)->pluck('student_id');
+
+        $studentIndustries = StudentIndustry::with(['student', 'industry'])
+            ->whereIn('student_id', $studentIds)
+            ->whereHas('industry', function($query) {
+                $query->where('status', true);
+            })
+            ->latest()
+            ->get();
+
+        return view('rto.pages.industries', compact('studentIndustries'));
     }
 
     public function csvFormat()

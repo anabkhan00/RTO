@@ -1,12 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RtoController;
-use App\Http\Controllers\Admin\RolePermissionController;
-use App\Http\Controllers\StudentDocumentController;
-use App\Http\Controllers\StudentNoteController;
+
+use App\Http\Controllers\{
+    RtoController,
+    AuthController,
+    UserController,
+    ProfileController,
+    ContractController,
+    EsignatureController,
+    StudentNoteController,
+    StudentDocumentController,
+    RtoPersonalDocumentController
+};
+
+use App\Http\Controllers\Admin\{
+    CourseController,
+    StudentController,
+    IndustryController,
+    CoordinatorController,
+    RolePermissionController,
+    DocumentChecklistController,
+    RtoController as AdminRtoController,
+};
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,113 +49,187 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 });
 
 // RTO Dashboard
-Route::middleware(['auth', 'role:rto'])->group(function () {
-    Route::get('/rto/dashboard', [RtoController::class, 'dashboard'])->name('rto.dashboard');
-    Route::get('/rto/students', [RtoController::class, 'students'])->name('rto.students');
-    Route::post('/rto/students', [RtoController::class, 'storeStudent']);
-    Route::put('/rto/students/{id}', [RtoController::class, 'updateStudent']);
-    Route::post('/rto/students/{id}/notes', [RtoController::class, 'saveStudentNotes']);
-    Route::delete('/rto/students/{id}', [RtoController::class, 'destroyStudent']);
-    Route::post('/rto/students/upload', [RtoController::class, 'uploadStudents']);
-    Route::get('/rto/students/csv-format', [RtoController::class, 'csvFormat']);
-    Route::get('/rto/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('rto.student-documents.index');
-    Route::post('/rto/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('rto.student-documents.store');
-    Route::get('/rto/student-documents/{student}/existing-checklists', [StudentDocumentController::class, 'getExistingChecklists']);
-    Route::post('/rto/student-documents/assign-types/{student}', [StudentDocumentController::class, 'assignTypes']);
-    Route::delete('/rto/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
-    Route::get('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'index'])->name('rto.my-documents');
-    Route::post('/rto/my-documents', [App\Http\Controllers\RtoPersonalDocumentController::class, 'store']);
-    Route::delete('/rto/my-documents/{document}', [App\Http\Controllers\RtoPersonalDocumentController::class, 'destroy']);
+Route::middleware(['auth', 'role:rto'])->prefix('rto')->group(function () {
 
-    // E-Signature Routes
-    Route::get('/rto/esignature', [App\Http\Controllers\EsignatureController::class, 'index'])->name('rto.esignature');
-    Route::post('/rto/esignature', [App\Http\Controllers\EsignatureController::class, 'store']);
-    Route::put('/rto/esignature/{esignature}', [App\Http\Controllers\EsignatureController::class, 'update']);
-    Route::delete('/rto/esignature/{esignature}', [App\Http\Controllers\EsignatureController::class, 'destroy']);
+    /** -------------------------
+     *  Dashboard
+     * -------------------------- */
+    Route::get('/dashboard', [RtoController::class, 'dashboard'])->name('rto.dashboard');
 
-    // Student Notes Routes
-    Route::post('/rto/students/{student}/notes', [StudentNoteController::class, 'store']);
-    Route::get('/rto/students/{student}/notes', [StudentNoteController::class, 'index']);
-    
-    // Contracts Routes
-    Route::get('/rto/contracts', [App\Http\Controllers\ContractController::class, 'rtoIndex'])->name('rto.contracts');
-    Route::post('/rto/contracts/{contract}/sign', [App\Http\Controllers\ContractController::class, 'signContract']);
-    Route::get('/rto/contracts/{contract}/view', [App\Http\Controllers\ContractController::class, 'viewContract'])->name('rto.contracts.view');
 
+    /** -------------------------
+     *  Students
+     * -------------------------- */
+    Route::controller(RtoController::class)->group(function () {
+        Route::get('/students', 'students')->name('rto.students');
+        Route::post('/students', 'storeStudent');
+        Route::put('/students/{id}', 'updateStudent');
+        Route::delete('/students/{id}', 'destroyStudent');
+        Route::post('/students/upload', 'uploadStudents');
+        Route::get('/students/csv-format', 'csvFormat');
+        Route::post('/students/{id}/notes', 'saveStudentNotes');
+    });
+
+
+    /** -------------------------
+     *  Student Notes
+     * -------------------------- */
+    Route::controller(StudentNoteController::class)->prefix('students/{student}')->group(function () {
+        Route::get('/notes', 'index');
+        Route::post('/notes', 'store');
+    });
+
+
+    /** -------------------------
+     *  Student Documents
+     * -------------------------- */
+    Route::controller(StudentDocumentController::class)->prefix('student-documents')->group(function () {
+        Route::get('/{student}', 'index')->name('rto.student-documents.index');
+        Route::post('/{student}', 'store')->name('rto.student-documents.store');
+        Route::get('/{student}/existing-checklists', 'getExistingChecklists');
+        Route::post('/assign-types/{student}', 'assignTypes');
+        Route::delete('/{document}', 'destroy');
+    });
+
+
+    /** -------------------------
+     *  Personal Documents
+     * -------------------------- */
+    Route::controller(RtoPersonalDocumentController::class)->prefix('my-documents')->group(function () {
+        Route::get('/', 'index')->name('rto.my-documents');
+        Route::post('/', 'store');
+        Route::delete('/{document}', 'destroy');
+    });
+
+
+    /** -------------------------
+     *  Industries
+     * -------------------------- */
+    Route::get('/industries', [RtoController::class, 'industries'])->name('rto.industries');
+
+
+    /** -------------------------
+     *  E-Signature
+     * -------------------------- */
+    Route::controller(EsignatureController::class)->prefix('esignature')->group(function () {
+        Route::get('/', 'index')->name('rto.esignature');
+        Route::post('/', 'store');
+        Route::put('/{esignature}', 'update');
+        Route::delete('/{esignature}', 'destroy');
+    });
+
+
+    /** -------------------------
+     *  Contracts
+     * -------------------------- */
+    Route::controller(ContractController::class)->prefix('contracts')->group(function () {
+        Route::get('/', 'rtoIndex')->name('rto.contracts');
+        Route::post('/{contract}/sign', 'signContract');
+        Route::get('/{contract}/view', 'viewContract')->name('rto.contracts.view');
+    });
 });
+
 
 // Universal Profile Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show']);
-    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update']);
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin|coordinator'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.pages.dashboard');
-    })->name('dashboard');
+Route::middleware(['auth', 'role:admin|coordinator'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::get('/rto', [App\Http\Controllers\Admin\RtoController::class, 'index'])->name('add_rto');
-    Route::post('/rto', [App\Http\Controllers\Admin\RtoController::class, 'store']);
-    Route::put('/rto/{id}', [App\Http\Controllers\Admin\RtoController::class, 'update']);
-    Route::delete('/rto/{id}', [App\Http\Controllers\Admin\RtoController::class, 'destroy']);
-    Route::patch('/rto/{id}/toggle-status', [App\Http\Controllers\Admin\RtoController::class, 'toggleStatus']);
-    Route::get('/rto/{id}/details', [App\Http\Controllers\Admin\RtoController::class, 'details']);
+        // Dashboard
+        Route::get('/dashboard', fn() => view('admin.pages.dashboard'))->name('dashboard');
 
-    Route::get('/students', [App\Http\Controllers\Admin\StudentController::class, 'index'])->name('students');
-    Route::post('/students', [App\Http\Controllers\Admin\StudentController::class, 'store']);
-    Route::put('/students/{id}', [App\Http\Controllers\Admin\StudentController::class, 'update']);
-    Route::delete('/students/{id}', [App\Http\Controllers\Admin\StudentController::class, 'destroy']);
-    Route::post('/students/upload', [App\Http\Controllers\Admin\StudentController::class, 'upload']);
-    Route::get('/students/download', [App\Http\Controllers\Admin\StudentController::class, 'download'])->name('students.download');
-    Route::get('/students/csv-format', [App\Http\Controllers\Admin\StudentController::class, 'csvFormat']);
+        // RTO
+        Route::controller(AdminRtoController::class)->group(function () {
+            Route::get('/rto', 'index')->name('add_rto');
+            Route::post('/rto', 'store');
+            Route::put('/rto/{id}', 'update');
+            Route::delete('/rto/{id}', 'destroy');
+            Route::patch('/rto/{id}/toggle-status', 'toggleStatus');
+            Route::get('/rto/{id}/details', 'details');
+        });
 
-    Route::get('/courses', [App\Http\Controllers\Admin\CourseController::class, 'index'])->name('courses');
-    Route::post('/courses', [App\Http\Controllers\Admin\CourseController::class, 'store']);
-    Route::put('/courses/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update']);
-    Route::delete('/courses/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy']);
+        // Students
+        Route::controller(StudentController::class)->group(function () {
+            Route::get('/students', 'index')->name('students');
+            Route::post('/students', 'store');
+            Route::put('/students/{id}', 'update');
+            Route::delete('/students/{id}', 'destroy');
+            Route::post('/students/upload', 'upload');
+            Route::get('/students/download', 'download')->name('students.download');
+            Route::get('/students/csv-format', 'csvFormat');
+        });
 
-    Route::get('/industries', [App\Http\Controllers\Admin\IndustryController::class, 'index'])->name('Industries');
-    Route::post('/industries', [App\Http\Controllers\Admin\IndustryController::class, 'store']);
-    Route::put('/industries/{id}', [App\Http\Controllers\Admin\IndustryController::class, 'update']);
-    Route::delete('/industries/{id}', [App\Http\Controllers\Admin\IndustryController::class, 'destroy']);
-    Route::patch('/industries/{id}/toggle-status', [App\Http\Controllers\Admin\IndustryController::class, 'toggleStatus']);
+        // Courses
+        Route::controller(CourseController::class)->group(function () {
+            Route::get('/courses', 'index')->name('courses');
+            Route::post('/courses', 'store');
+            Route::put('/courses/{id}', 'update');
+            Route::delete('/courses/{id}', 'destroy');
+        });
 
-    Route::get('/coordinator', [App\Http\Controllers\Admin\CoordinatorController::class, 'index'])->name('Coordinator');
-    Route::post('/coordinator', [App\Http\Controllers\Admin\CoordinatorController::class, 'store']);
-    Route::put('/coordinator/{id}', [App\Http\Controllers\Admin\CoordinatorController::class, 'update']);
-    Route::delete('/coordinator/{id}', [App\Http\Controllers\Admin\CoordinatorController::class, 'destroy']);
-    Route::patch('/coordinator/{id}/reset-password', [App\Http\Controllers\Admin\CoordinatorController::class, 'resetPassword']);
+        // Industries
+        Route::controller(IndustryController::class)->group(function () {
+            Route::get('/industries', 'index')->name('Industries');
+            Route::post('/industries', 'store');
+            Route::put('/industries/{id}', 'update');
+            Route::delete('/industries/{id}', 'destroy');
+            Route::patch('/industries/{id}/toggle-status', 'toggleStatus');
+        });
 
-    // Role & Permission Management
-    Route::get('/roles', [RolePermissionController::class, 'roles'])->name('roles');
-    Route::post('/roles', [RolePermissionController::class, 'storeRole']);
-    Route::put('/roles/{id}', [RolePermissionController::class, 'updateRole']);
-    Route::delete('/roles/{id}', [RolePermissionController::class, 'deleteRole']);
-    Route::get('/permissions', [RolePermissionController::class, 'permissions'])->name('permissions');
-    Route::post('/permissions', [RolePermissionController::class, 'storePermission']);
-    Route::put('/permissions/{id}', [RolePermissionController::class, 'updatePermission']);
-    Route::delete('/permissions/{id}', [RolePermissionController::class, 'deletePermission']);
-    Route::get('/assign-permissions', [RolePermissionController::class, 'assignPermissions'])->name('assign-permissions');
-    Route::post('/assign-permissions', [RolePermissionController::class, 'updateRolePermissions']);
+        // Coordinator
+        Route::controller(CoordinatorController::class)->group(function () {
+            Route::get('/coordinator', 'index')->name('Coordinator');
+            Route::post('/coordinator', 'store');
+            Route::put('/coordinator/{id}', 'update');
+            Route::delete('/coordinator/{id}', 'destroy');
+            Route::patch('/coordinator/{id}/reset-password', 'resetPassword');
+        });
 
-    Route::get('/student-documents/{student}', [StudentDocumentController::class, 'index'])->name('student-documents.index');
-    Route::post('/student-documents/{student}', [StudentDocumentController::class, 'store'])->name('student-documents.store');
-    Route::post('/student-documents/assign-types/{student}', [StudentDocumentController::class, 'assignTypes']);
-    Route::delete('/student-documents/{document}', [StudentDocumentController::class, 'destroy']);
+        // Role & Permissions
+        Route::controller(RolePermissionController::class)->group(function () {
+            Route::get('/roles', 'roles')->name('roles');
+            Route::post('/roles', 'storeRole');
+            Route::put('/roles/{id}', 'updateRole');
+            Route::delete('/roles/{id}', 'deleteRole');
 
-    Route::get('/document-checklist', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'index'])->name('document-checklist');
-    Route::post('/document-checklist', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'store']);
-    Route::put('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'update']);
-    Route::delete('/document-checklist/{id}', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'destroy']);
-    Route::patch('/document-checklist/{id}/toggle-status', [App\Http\Controllers\Admin\DocumentChecklistController::class, 'toggleStatus']);
-    
-    // Contracts Routes
-    Route::get('/contracts', [App\Http\Controllers\ContractController::class, 'adminIndex'])->name('contracts');
-    Route::post('/contracts', [App\Http\Controllers\ContractController::class, 'store']);
-    Route::get('/contracts/{contract}/view', [App\Http\Controllers\ContractController::class, 'adminViewContract'])->name('contracts.view');
-    Route::delete('/contracts/{contract}', [App\Http\Controllers\ContractController::class, 'destroy']);
-});
+            Route::get('/permissions', 'permissions')->name('permissions');
+            Route::post('/permissions', 'storePermission');
+            Route::put('/permissions/{id}', 'updatePermission');
+            Route::delete('/permissions/{id}', 'deletePermission');
 
+            Route::get('/assign-permissions', 'assignPermissions')->name('assign-permissions');
+            Route::post('/assign-permissions', 'updateRolePermissions');
+        });
 
+        // Student Documents
+        Route::controller(StudentDocumentController::class)->group(function () {
+            Route::get('/student-documents/{student}', 'index')->name('student-documents.index');
+            Route::post('/student-documents/{student}', 'store')->name('student-documents.store');
+            Route::post('/student-documents/assign-types/{student}', 'assignTypes');
+            Route::delete('/student-documents/{document}', 'destroy');
+        });
+
+        // Document Checklist
+        Route::controller(DocumentChecklistController::class)->group(function () {
+            Route::get('/document-checklist', 'index')->name('document-checklist');
+            Route::post('/document-checklist', 'store');
+            Route::put('/document-checklist/{id}', 'update');
+            Route::delete('/document-checklist/{id}', 'destroy');
+            Route::patch('/document-checklist/{id}/toggle-status', 'toggleStatus');
+        });
+
+        // Contracts
+        Route::controller(ContractController::class)->group(function () {
+            Route::get('/contracts', 'adminIndex')->name('contracts');
+            Route::post('/contracts', 'store');
+            Route::get('/contracts/{contract}/view', 'adminViewContract')->name('contracts.view');
+            Route::delete('/contracts/{contract}', 'destroy');
+        });
+    });
