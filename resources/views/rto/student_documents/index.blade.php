@@ -118,9 +118,10 @@
                     @endphp
 
                     <span
-                        class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $colors['bg'] }} {{ $colors['text'] }} {{ $colors['border'] }} border shadow-sm">
+                        class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full {{ $colors['bg'] }} {{ $colors['text'] }} {{ $colors['border'] }} border shadow">
                         {{ $status }}
                     </span>
+
 
                     <button type="submit"
                         class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
@@ -129,15 +130,6 @@
                 </div>
 
             </form>
-        </div>
-
-        <!-- Map & Notes Section -->
-        <div class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Location</h3>
-            <div class="location-tab-content block bg-white rounded-lg border shadow-sm p-4">
-                <div id="studentMap" class="w-full h-64 rounded-lg border border-gray-300"></div>
-                <p class="text-xs text-gray-500 mt-3">Student location marker displayed on map</p>
-            </div>
         </div>
 
         <div class="mb-8">
@@ -192,7 +184,7 @@
                                 rows="4" required></textarea>
 
                             <button type="submit"
-                                class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                                class="bg-brand text-white text-xs px-3 py-1.5 mt-3 rounded-md hover:bg-gold transition-colors font-medium">
                                 Save Note
                             </button>
                         </form>
@@ -218,6 +210,15 @@
                     </div>
 
                 </div>
+            </div>
+        </div>
+
+        <!-- Map & Notes Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-medium text-brand mb-4">Location</h3>
+            <div class="location-tab-content block bg-white rounded-lg border shadow-sm p-4">
+                <div id="studentMap" class="w-full h-64 rounded-lg border border-gray-300"></div>
+                <p class="text-xs text-gray-500 mt-3">Student location marker displayed on map</p>
             </div>
         </div>
 

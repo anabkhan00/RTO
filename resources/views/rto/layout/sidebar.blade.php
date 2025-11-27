@@ -18,6 +18,11 @@
                     Students
                 </a>
 
+                <a href="{{ route('rto.industries') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('rto.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    Industries
+                </a>
+
                 <a href="{{ route('rto.my-documents') }}"
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('rto.my-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Documents

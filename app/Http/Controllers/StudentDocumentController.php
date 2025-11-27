@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\User;
 use App\Models\StudentDocument;
 use App\Models\RtoStudent;
@@ -16,6 +17,7 @@ class StudentDocumentController extends Controller
     public function index($studentId)
     {
         $student = User::findOrFail($studentId);
+        $courses = Course::all();
         $checklists = DocumentChecklist::where('status', true)->get();
         $notes = StudentNote::where('student_id', $studentId)
             ->with('author')
@@ -29,7 +31,7 @@ class StudentDocumentController extends Controller
             if (!$rtoStudentExists) {
                 abort(403, 'Unauthorized access to student documents.');
             }
-            return view('rto.student_documents.index', compact('student', 'checklists', 'notes'));
+            return view('rto.student_documents.index', compact('student', 'checklists', 'notes','courses'));
         }
 
         return view('admin.student_documents.index', compact('student', 'checklists', 'notes'));
