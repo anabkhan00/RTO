@@ -1,61 +1,151 @@
 @extends('admin.master_layout.index')
+@section('page-title', 'Industries')
 @section('content')
-    <div class="w-full flex justify-end mb-4">
-        <button class="bg-brand text-white flex font-medium text-sm px-5 py-2 rounded-md hover:bg-gold" id="openModalBtn">
-            + Add Industry
-        </button>
+    <!-- Header Section -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Industries Management</h1>
+                <p class="text-gray-600 mt-1">Manage and track all industries</p>
+            </div>
+            <button id="openModalBtn"
+                class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
+                Add Industry
+            </button>
+        </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-x-auto">
-        <table id="industriesTable" class="min-w-full border-collapse w-full">
-            <thead>
-                <tr class="text-left text-brand font-normal text-sm border-b">
-                    <th class="p-3 whitespace-nowrap">Industry Name</th>
-                    <th class="p-3 whitespace-nowrap">Email</th>
-                    <th class="p-3 whitespace-nowrap">Phone</th>
-                    <th class="p-3 whitespace-nowrap">Address</th>
-                    <th class="p-3 whitespace-nowrap">CPN</th>
-                    <th class="p-3 whitespace-nowrap">Status</th>
-                    <th class="p-3 whitespace-nowrap">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($industries as $industry)
-                <tr class="border-b font-medium text-xs hover:bg-gray-50">
-                    <td class="p-3 whitespace-nowrap">{{ $industry->name }}</td>
-                    <td class="p-3 whitespace-nowrap">{{ $industry->email }}</td>
-                    <td class="p-3 whitespace-nowrap">{{ $industry->phone }}</td>
-                    <td class="p-3 whitespace-nowrap">{{ Str::limit($industry->address, 30) }}</td>
-                    <td class="p-3 whitespace-nowrap">{{ $industry->contact_person }}</td>
-                    <td class="p-3 whitespace-nowrap">
-                        <form method="POST" action="/admin/Industries/{{ $industry->id }}/toggle-status" class="inline">
-                            @csrf
-                            @method('PATCH')
-                            <div class="flex items-center space-x-2">
-                                <span class="w-2.5 h-2.5 rounded-full {{ $industry->status ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                                <select name="status" onchange="this.form.submit()" class="{{ $industry->status ? 'text-green-500' : 'text-red-500' }} font-medium bg-transparent border-none focus:ring-0 cursor-pointer">
-                                    <option value="1" {{ $industry->status ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ !$industry->status ? 'selected' : '' }}>Inactive</option>
-                                </select>
-                            </div>
-                        </form>
-                    </td>
-                    <td class="p-3 whitespace-nowrap">
-                        <button onclick="editIndustry({{ $industry->id }}, '{{ $industry->name }}', '{{ addslashes($industry->description) }}', '{{ $industry->contact_person }}', '{{ $industry->email }}', '{{ $industry->phone }}', '{{ addslashes($industry->address) }}', '{{ $industry->website }}')" class="text-blue-500 hover:text-blue-700 mr-2">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button onclick="deleteIndustry({{ $industry->id }})" class="text-red-500 hover:text-red-700">
-                            <i class="bi bi-trash3-fill"></i>
-                        </button>
-                        <form id="delete-form-{{ $industry->id }}" method="POST" action="/admin/Industries/{{ $industry->id }}" class="hidden">
-                            @csrf
-                            @method('DELETE')
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <!-- Filter Section -->
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-4 border-b border-gray-200">
+            <button id="toggleFilters" class="flex items-center justify-between w-full text-left">
+                <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+                <i id="filterIcon" class="bi bi-chevron-down text-gray-500 transition-transform"></i>
+            </button>
+        </div>
+        <div id="filterContent" class="hidden p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name</label>
+                    <input type="text" id="searchFilter" placeholder="Search industries..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="statusFilter"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button id="applyFilters"
+                        class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                        Apply Filters
+                    </button>
+                    <button id="resetFilters"
+                        class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Industries Table -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table id="industriesTable" class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Industry Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Contact Info</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Contact Person</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Address</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Website</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($industries as $index => $industry)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-purple-50 text-purple-700 border-purple-100 border shadow-sm">
+                                    {{ $industry->name }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-600">
+                                <div class="space-y-1">
+                                    <div class="flex items-center">
+                                        <i class="bi bi-envelope text-xs mr-1"></i>
+                                        {{ $industry->email }}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="bi bi-phone text-xs mr-1"></i>
+                                        {{ $industry->phone }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ $industry->contact_person }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ Str::limit($industry->address, 40) }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                @if($industry->website)
+                                    <a href="{{ $industry->website }}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                                        <i class="bi bi-globe text-xs mr-1"></i>
+                                        Visit
+                                    </a>
+                                @else
+                                    <span class="text-gray-400">N/A</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                @if($industry->status)
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-700 border-emerald-100 border shadow-sm">
+                                        <i class="bi bi-check-circle mr-1"></i>Active
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-red-50 text-red-700 border-red-100 border shadow-sm">
+                                        <i class="bi bi-x-circle mr-1"></i>Inactive
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                <div class="relative">
+                                    <button onclick="toggleDropdown({{ $index }})"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <div id="dropdown-{{ $index }}"
+                                        class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
+                                        <button onclick="editIndustry({{ $industry->id }}, '{{ $industry->name }}', '{{ addslashes($industry->description) }}', '{{ $industry->contact_person }}', '{{ $industry->email }}', '{{ $industry->phone }}', '{{ addslashes($industry->address) }}', '{{ $industry->website }}')"
+                                            class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md">
+                                            <i class="bi bi-pencil mr-2"></i>Edit
+                                        </button>
+                                        <form method="POST" action="/admin/Industries/{{ $industry->id }}/toggle-status" class="block">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-md">
+                                                <i class="bi bi-toggle-{{ $industry->status ? 'on' : 'off' }} mr-2"></i>{{ $industry->status ? 'Deactivate' : 'Activate' }}
+                                            </button>
+                                        </form>
+                                        <button onclick="deleteIndustry({{ $industry->id }})"
+                                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
+                                            <i class="bi bi-trash mr-2"></i>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                                <form id="delete-form-{{ $industry->id }}" method="POST" action="/admin/Industries/{{ $industry->id }}" class="hidden">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
     <!-- Modal -->
     <div id="industryModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
@@ -180,28 +270,118 @@ function deleteIndustry(id) {
     });
 }
 
-$(document).ready(function() {
-    $('#industriesTable').DataTable({
-        "pageLength": 25,
-        "searching": true,
-        "ordering": true,
-        "columnDefs": [
-            { "orderable": false, "targets": [6] }
-        ],
-        "dom": '<"top"lf><"dataTables_scroll overflow-x-auto"rt><"bottom"ip>',
-        "scrollX": true,
-        "language": {
-            "search": "Search:",
-            "lengthMenu": "Show _MENU_ entries",
-            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-            "paginate": {
-                "first": "First",
-                "last": "Last",
-                "next": "Next",
-                "previous": "Previous"
-            }
+// Filter toggle functionality
+document.getElementById('toggleFilters').addEventListener('click', function() {
+    const filterContent = document.getElementById('filterContent');
+    const filterIcon = document.getElementById('filterIcon');
+    filterContent.classList.toggle('hidden');
+    filterIcon.classList.toggle('rotate-180');
+});
+
+// Dropdown toggle functionality
+function toggleDropdown(index) {
+    const dropdown = document.getElementById(`dropdown-${index}`);
+    const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+    allDropdowns.forEach(dd => {
+        if (dd !== dropdown) {
+            dd.classList.add('hidden');
         }
+    });
+    dropdown.classList.toggle('hidden');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('[onclick^="toggleDropdown"]')) {
+        const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+        allDropdowns.forEach(dd => dd.classList.add('hidden'));
+    }
+});
+
+$(document).ready(function() {
+    const industriesTable = $('#industriesTable').DataTable({
+        "pageLength": 25,
+        "searching": false,
+        "ordering": true,
+        "info": false,
+        "lengthChange": false,
+        "columnDefs": [{
+            "orderable": false,
+            "targets": [6]
+        }],
+        "dom": 'rt<"flex justify-end mt-4"p>',
+        "scrollX": true
+    });
+
+    // Filter functionality
+    const searchFilter = document.getElementById('searchFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const applyFilters = document.getElementById('applyFilters');
+    const resetFilters = document.getElementById('resetFilters');
+
+    function filterTable() {
+        const searchTerm = searchFilter.value.toLowerCase();
+        const selectedStatus = statusFilter.value;
+
+        industriesTable.rows().every(function() {
+            const row = this.node();
+            const name = row.cells[0].textContent.toLowerCase();
+            const status = row.cells[5].textContent;
+
+            let showRow = true;
+
+            if (searchTerm && !name.includes(searchTerm)) {
+                showRow = false;
+            }
+
+            if (selectedStatus && !status.includes(selectedStatus)) {
+                showRow = false;
+            }
+
+            if (showRow) {
+                $(row).show();
+            } else {
+                $(row).hide();
+            }
+        });
+    }
+
+    searchFilter.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    applyFilters.addEventListener('click', filterTable);
+
+    resetFilters.addEventListener('click', () => {
+        searchFilter.value = '';
+        statusFilter.value = '';
+        industriesTable.rows().every(function() {
+            $(this.node()).show();
+        });
     });
 });
 </script>
-  @endsection
+
+<style>
+    /* DataTables pagination styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.25rem 0.75rem;
+        margin: 0 0.125rem;
+        border-radius: 0.375rem;
+        background-color: #e5e7eb;
+        color: #374151;
+        border: none;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #d1d5db;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background-color: var(--brand);
+        color: white;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        text-align: right;
+    }
+</style>
+@endsection

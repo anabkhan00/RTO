@@ -26,7 +26,7 @@ use App\Http\Controllers\Admin\{
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('admin.auth.login');
 });
 
 // Authentication Routes
@@ -49,7 +49,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 });
 
 // RTO Dashboard
-Route::middleware(['auth', 'role:rto'])->prefix('rto')->group(function () {
+Route::middleware(['auth', 'role:rto|admin'])->prefix('rto')->group(function () {
 
     /** -------------------------
      *  Dashboard
@@ -67,7 +67,7 @@ Route::middleware(['auth', 'role:rto'])->prefix('rto')->group(function () {
         Route::delete('/students/{id}', 'destroyStudent');
         Route::post('/students/upload', 'uploadStudents');
         Route::get('/students/csv-format', 'csvFormat');
-        Route::post('/students/{id}/notes', 'saveStudentNotes');
+        // Route::post('/students/{id}/notes', 'saveStudentNotes');
     });
 
 
@@ -143,10 +143,11 @@ Route::middleware(['auth', 'role:admin|coordinator'])
     ->group(function () {
 
         // Dashboard
-        Route::get('/dashboard', fn() => view('admin.pages.dashboard'))->name('dashboard');
+        // Route::get('/dashboard', fn() => view('admin.pages.dashboard'))->name('dashboard');
 
         // RTO
         Route::controller(AdminRtoController::class)->group(function () {
+            Route::get('dashboard', 'dashboard')->name('dashboard');
             Route::get('/rto', 'index')->name('add_rto');
             Route::post('/rto', 'store');
             Route::put('/rto/{id}', 'update');
@@ -164,6 +165,11 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::post('/students/upload', 'upload');
             Route::get('/students/download', 'download')->name('students.download');
             Route::get('/students/csv-format', 'csvFormat');
+        });
+
+        Route::controller(StudentNoteController::class)->prefix('students/{student}')->group(function () {
+            Route::get('/notes', 'index');
+            Route::post('/notes', 'store');
         });
 
         // Courses

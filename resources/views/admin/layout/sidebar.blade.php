@@ -7,7 +7,7 @@
             <nav class="mt-2 space-y-1 px-6">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.dashboard') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Dashboard <span class="text-xs"> (Overview)</span>
+                    Dashboard
                 </a>
 
                 <a href="{{ route('admin.add_rto') }}"

@@ -5,7 +5,7 @@
              <img src="{{ asset('assets/images/todle.svg') }}" class="w-8" />
 
          </button>
-         <h2 class="font-semibold text-lg">RTO</h2>
+         <h2 class="font-semibold text-lg">@yield('page-title', 'Dashboard')</h2>
      </div>
 
      <!-- CENTER: Search -->
@@ -32,7 +32,7 @@
                  <img src="{{ asset('assets/images/profile.svg') }}" class="w-10" />
              </button>
              <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
-                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                 <a href="{{ url('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                  <form method="POST" action="{{ route('logout') }}" class="block">
                      @csrf
                      <button type="submit"

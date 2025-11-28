@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Response;
+use App\Models\Course;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Response;
 
 class StudentController extends Controller
 {
     public function index()
     {
         $students = User::with('course')->where('role', 'user')->latest()->get();
-        $courses = \App\Models\Course::where('status', true)->get();
+        $courses = Course::where('status', true)->get();
         return view('admin.pages.students', compact('students', 'courses'));
     }
 
@@ -80,7 +81,7 @@ class StudentController extends Controller
         $csvData = file_get_contents($file);
         $rows = array_map('str_getcsv', explode("\n", $csvData));
         $header = array_shift($rows);
-        
+
         $imported = 0;
         foreach ($rows as $row) {
             if (count($row) >= 2 && !empty($row[0]) && !empty($row[1])) {
@@ -91,7 +92,7 @@ class StudentController extends Controller
                         $course = \App\Models\Course::where('code', $row[4])->first();
                         $courseId = $course ? $course->id : null;
                     }
-                    
+
                     $student = User::create([
                         'name' => $row[0],
                         'email' => $row[1],
@@ -113,7 +114,7 @@ class StudentController extends Controller
     public function download()
     {
         $students = User::where('role', 'user')->get();
-        
+
         $csvData = "Name,Email,Phone,Address,Created Date\n";
         foreach ($students as $student) {
             $csvData .= '"' . $student->name . '","' . $student->email . '","' . ($student->phone ?? 'N/A') . '","' . ($student->address ?? 'N/A') . '","' . $student->created_at->format('Y-m-d') . '"' . "\n";
@@ -130,7 +131,7 @@ class StudentController extends Controller
         $csvData = "name,email,phone,address,course_code\n";
         $csvData .= "John Doe,john@example.com,1234567890,123 Main St,CS101\n";
         $csvData .= "Jane Smith,jane@example.com,0987654321,456 Oak Ave,IT201\n";
-        
+
         return Response::make($csvData, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="student_import_format.csv"',
