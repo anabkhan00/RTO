@@ -34,7 +34,7 @@ class StudentDocumentController extends Controller
             return view('rto.student_documents.index', compact('student', 'checklists', 'notes','courses'));
         }
 
-        return view('admin.student_documents.index', compact('student', 'checklists', 'notes'));
+        return view('admin.student_documents.index', compact('student', 'checklists', 'notes','courses'));
     }
 
     public function store(Request $request, $studentId)

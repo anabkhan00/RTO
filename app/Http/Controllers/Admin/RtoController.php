@@ -2,13 +2,42 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Course;
+use App\Models\RtoStudent;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class RtoController extends Controller
 {
+    public function dashboard()
+    {
+        $studentIds = RtoStudent::pluck('student_id');
+
+        $totalStudents = $studentIds->count();
+        $activeCourses = Course::count();
+        $thisMonthStudents = User::whereIn('id', $studentIds)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+        $completedStudents = 0; // Placeholder
+        $recentStudents = User::whereIn('id', $studentIds)
+            ->latest()
+            ->take(5)
+            ->get();
+        $students = User::with('course')->whereIn('id', $studentIds)->latest()->get();
+
+        return view('admin.pages.dashboard', compact(
+            'totalStudents',
+            'activeCourses',
+            'thisMonthStudents',
+            'completedStudents',
+            'recentStudents',
+            'students'
+        ));
+    }
+
     public function index()
     {
         $rtos = User::where('role', 'rto')->latest()->get();
