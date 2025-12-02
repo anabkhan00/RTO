@@ -80,4 +80,21 @@ class User extends Authenticatable
     {
         return $this->hasMany(Contract::class, 'rto_id');
     }
+
+    public function studentDetail()
+    {
+        return $this->hasOne(StudentDetail::class);
+    }
+
+    // All RTOs assigned to this student
+    public function rtos()
+    {
+        return $this->belongsToMany(User::class, 'rto_students', 'student_id', 'rto_id');
+    }
+
+    // Get the primary/first RTO
+    public function primaryRto()
+    {
+        return $this->rtos()->first();
+    }
 }

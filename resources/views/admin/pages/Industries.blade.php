@@ -1,17 +1,43 @@
 @extends('admin.master_layout.index')
 @section('page-title', 'Industries')
+<style>
+    .bg-blue-100,
+    .bg-purple-100,
+    .bg-green-100,
+    .bg-orange-100,
+    .bg-pink-100,
+    .bg-indigo-100,
+    .bg-teal-100,
+    .bg-rose-100 {
+        background-color: rgba(0, 0, 0, 0.03) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+</style>
 @section('content')
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Industries Management</h1>
-                <p class="text-gray-600 mt-1">Manage and track all industries</p>
+                <h1 class="text-2xl font-bold text-gray-800">Industry Management</h1>
+                <p class="text-gray-600 mt-1">Manage and track industries</p>
             </div>
-            <button id="openModalBtn"
-                class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
-                Add Industry
-            </button>
+            <div class="flex gap-3">
+                <a href="{{ route('admin.industries.create') }}"
+                    class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
+                    Add Industry
+                </a>
+
+                {{-- <button
+                    class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
+                    id="openUploadBtn">
+                    <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
+                </button>
+
+                <a href="/admin/industries/csv-format"
+                    class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
+                    <i class="bi bi-download mr-2 text-sm"></i> Download Format
+                </a> --}}
+            </div>
         </div>
     </div>
 
@@ -26,8 +52,13 @@
         <div id="filterContent" class="hidden p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/Description</label>
                     <input type="text" id="searchFilter" placeholder="Search industries..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="text" id="emailFilter" placeholder="Search email..."
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                 </div>
                 <div>
@@ -35,9 +66,19 @@
                     <select id="statusFilter"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                         <option value="">All Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                     </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                    <input type="date" id="fromDate"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                    <input type="date" id="toDate"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                 </div>
                 <div class="flex items-end gap-2">
                     <button id="applyFilters"
@@ -59,329 +100,313 @@
             <table id="industriesTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Industry Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Contact Info</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Contact Person</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Address</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Website</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Actions</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Name</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Contact Info</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Contact Person</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Status</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Created At</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($industries as $index => $industry)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-purple-50 text-purple-700 border-purple-100 border shadow-sm">
-                                    {{ $industry->name }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-600">
-                                <div class="space-y-1">
-                                    <div class="flex items-center">
-                                        <i class="bi bi-envelope text-xs mr-1"></i>
-                                        {{ $industry->email }}
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="bi bi-phone text-xs mr-1"></i>
-                                        {{ $industry->phone }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ $industry->contact_person }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600">{{ Str::limit($industry->address, 40) }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                @if($industry->website)
-                                    <a href="{{ $industry->website }}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
-                                        <i class="bi bi-globe text-xs mr-1"></i>
-                                        Visit
-                                    </a>
-                                @else
-                                    <span class="text-gray-400">N/A</span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                @if($industry->status)
-                                    <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-700 border-emerald-100 border shadow-sm">
-                                        <i class="bi bi-check-circle mr-1"></i>Active
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-red-50 text-red-700 border-red-100 border shadow-sm">
-                                        <i class="bi bi-x-circle mr-1"></i>Inactive
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                                <div class="relative">
-                                    <button onclick="toggleDropdown({{ $index }})"
-                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <div id="dropdown-{{ $index }}"
-                                        class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
-                                        <button onclick="editIndustry({{ $industry->id }}, '{{ $industry->name }}', '{{ addslashes($industry->description) }}', '{{ $industry->contact_person }}', '{{ $industry->email }}', '{{ $industry->phone }}', '{{ addslashes($industry->address) }}', '{{ $industry->website }}')"
-                                            class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md">
-                                            <i class="bi bi-pencil mr-2"></i>Edit
-                                        </button>
-                                        <form method="POST" action="/admin/Industries/{{ $industry->id }}/toggle-status" class="block">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-md">
-                                                <i class="bi bi-toggle-{{ $industry->status ? 'on' : 'off' }} mr-2"></i>{{ $industry->status ? 'Deactivate' : 'Activate' }}
-                                            </button>
-                                        </form>
-                                        <button onclick="deleteIndustry({{ $industry->id }})"
-                                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
-                                            <i class="bi bi-trash mr-2"></i>Delete
-                                        </button>
-                                    </div>
-                                </div>
-                                <form id="delete-form-{{ $industry->id }}" method="POST" action="/admin/Industries/{{ $industry->id }}" class="hidden">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
+                    <!-- DataTables will populate this via AJAX -->
                 </tbody>
             </table>
         </div>
     </div>
-    <!-- Modal -->
-    <div id="industryModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
-        <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl p-10 relative max-h-[90vh] overflow-y-auto">
-            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
-                &times;
-            </button>
 
-            <h2 id="modalTitle" class="text-2xl font-semibold text-brand pb-3">Add Industry</h2>
+    <!-- CSV Upload Modal -->
+    <div id="uploadModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden relative">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+                <h2 class="text-xl font-semibold text-white flex items-center">
+                    <i class="bi bi-upload mr-2"></i> Upload Industries CSV
+                </h2>
+                <button id="closeUploadBtn" class="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl">
+                    &times;
+                </button>
+            </div>
 
-            <form id="industryForm" method="POST" action="{{ route('admin.Industries') }}" class="space-y-4">
-                @csrf
-                <input type="hidden" id="industryId" name="_method" value="">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-6">
+                <form method="POST" action="/admin/industries/upload" enctype="multipart/form-data" class="space-y-5">
+                    @csrf
                     <div>
-                        <label class="block text-sm font-medium text-brand">Industry Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" id="industryName" placeholder="Enter Industry Name" required
-                            class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="bi bi-file-earmark-spreadsheet mr-1"></i> Select CSV File
+                        </label>
+                        <input type="file" name="csv_file" accept=".csv" required
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-brand">Contact Person <span class="text-red-500">*</span></label>
-                        <input type="text" name="contact_person" id="industryContactPerson" placeholder="Enter Contact Person" required
-                            class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="font-medium text-blue-800 mb-2 flex items-center">
+                            <i class="bi bi-info-circle mr-1"></i> CSV Format:
+                        </p>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-brand">Email <span class="text-red-500">*</span></label>
-                        <input type="email" name="email" id="industryEmail" placeholder="Enter Email" required
-                            class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
+                    <div class="flex gap-3 pt-4 border-t">
+                        <button type="submit"
+                            class="bg-green-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors font-medium">
+                            <i class="bi bi-upload mr-1"></i> Upload CSV
+                        </button>
+                        <button type="button" id="cancelUploadBtn"
+                            class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                            Cancel
+                        </button>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-brand">Phone <span class="text-red-500">*</span></label>
-                        <input type="text" name="phone" id="industryPhone" placeholder="Enter Phone" required
-                            class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-brand">Website</label>
-                        <input type="url" name="website" id="industryWebsite" placeholder="Enter Website URL"
-                            class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200" />
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-brand">Address <span class="text-red-500">*</span></label>
-                    <textarea name="address" id="industryAddress" placeholder="Enter Address" required rows="2"
-                        class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-brand">Description <span class="text-red-500">*</span></label>
-                    <textarea name="description" id="industryDescription" placeholder="Enter Industry Description" required rows="3"
-                        class="w-full border border-gold bg-white text-sm rounded-md p-2 shadow-graysoft focus:shadow-graydeep focus:ring-2 focus:ring-gold focus:outline-none transition-all duration-200"></textarea>
-                </div>
-
-                <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelBtn" class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-6 py-2 bg-brand text-white rounded-md hover:bg-gold">
-                        Save
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
-<script>
-const modal = document.getElementById('industryModal');
-const openBtn = document.getElementById('openModalBtn');
-const closeBtn = document.getElementById('closeModalBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-const form = document.getElementById('industryForm');
-const modalTitle = document.getElementById('modalTitle');
+    <script>
+        // Initialize DataTables with server-side processing
+        let industriesTable = $('#industriesTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ route('admin.industries.data') }}",
+                "type": "GET",
+                "data": function(d) {
+                    d.search = $('#searchFilter').val();
+                    d.email = $('#emailFilter').val();
+                    d.status = $('#statusFilter').val();
+                    d.from_date = $('#fromDate').val();
+                    d.to_date = $('#toDate').val();
+                }
+            },
+            "columns": [{
+                    "data": "name",
+                    "orderable": true
+                },
+                {
+                    "data": "contact_info",
+                    "orderable": false
+                },
+                {
+                    "data": "contact_person",
+                    "orderable": true
+                },
+                {
+                    "data": "status",
+                    "orderable": true
+                },
+                {
+                    "data": "created_at",
+                    "orderable": true
+                },
+                {
+                    "data": "actions",
+                    "orderable": false
+                }
+            ],
+            "pageLength": 25,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "lengthChange": false,
+            "dom": 'rt<"flex justify-end mt-4"p>',
+            "scrollX": true,
+            "createdRow": function(row, data, dataIndex) {
+                $(row).addClass('hover:bg-gray-50 transition-colors cursor-pointer');
 
-openBtn.addEventListener('click', () => {
-    resetForm();
-    modalTitle.textContent = 'Add Industry';
-    form.action = '{{ route("admin.Industries") }}';
-    document.getElementById('industryId').value = '';
-    modal.classList.remove('hidden');
-});
+                // Prevent row click on actions column
+                $(row).find('td:last-child').on('click', function(e) {
+                    e.stopPropagation();
+                });
 
-closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
-
-function editIndustry(id, name, description, contactPerson, email, phone, address, website) {
-    modalTitle.textContent = 'Edit Industry';
-    form.action = `/admin/Industries/${id}`;
-    document.getElementById('industryId').value = 'PUT';
-    document.getElementById('industryName').value = name;
-    document.getElementById('industryDescription').value = description;
-    document.getElementById('industryContactPerson').value = contactPerson;
-    document.getElementById('industryEmail').value = email;
-    document.getElementById('industryPhone').value = phone;
-    document.getElementById('industryAddress').value = address;
-    document.getElementById('industryWebsite').value = website || '';
-    modal.classList.remove('hidden');
-}
-
-function resetForm() {
-    form.reset();
-    document.getElementById('industryId').value = '';
-}
-
-function deleteIndustry(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('delete-form-' + id).submit();
-        }
-    });
-}
-
-// Filter toggle functionality
-document.getElementById('toggleFilters').addEventListener('click', function() {
-    const filterContent = document.getElementById('filterContent');
-    const filterIcon = document.getElementById('filterIcon');
-    filterContent.classList.toggle('hidden');
-    filterIcon.classList.toggle('rotate-180');
-});
-
-// Dropdown toggle functionality
-function toggleDropdown(index) {
-    const dropdown = document.getElementById(`dropdown-${index}`);
-    const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
-    allDropdowns.forEach(dd => {
-        if (dd !== dropdown) {
-            dd.classList.add('hidden');
-        }
-    });
-    dropdown.classList.toggle('hidden');
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('[onclick^="toggleDropdown"]')) {
-        const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
-        allDropdowns.forEach(dd => dd.classList.add('hidden'));
-    }
-});
-
-$(document).ready(function() {
-    const industriesTable = $('#industriesTable').DataTable({
-        "pageLength": 25,
-        "searching": false,
-        "ordering": true,
-        "info": false,
-        "lengthChange": false,
-        "columnDefs": [{
-            "orderable": false,
-            "targets": [6]
-        }],
-        "dom": 'rt<"flex justify-end mt-4"p>',
-        "scrollX": true
-    });
-
-    // Filter functionality
-    const searchFilter = document.getElementById('searchFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const applyFilters = document.getElementById('applyFilters');
-    const resetFilters = document.getElementById('resetFilters');
-
-    function filterTable() {
-        const searchTerm = searchFilter.value.toLowerCase();
-        const selectedStatus = statusFilter.value;
-
-        industriesTable.rows().every(function() {
-            const row = this.node();
-            const name = row.cells[0].textContent.toLowerCase();
-            const status = row.cells[5].textContent;
-
-            let showRow = true;
-
-            if (searchTerm && !name.includes(searchTerm)) {
-                showRow = false;
-            }
-
-            if (selectedStatus && !status.includes(selectedStatus)) {
-                showRow = false;
-            }
-
-            if (showRow) {
-                $(row).show();
-            } else {
-                $(row).hide();
+                // Row click navigation
+                $(row).on('click', function(e) {
+                    window.location.href = data.row_url;
+                });
             }
         });
-    }
 
-    searchFilter.addEventListener('input', filterTable);
-    statusFilter.addEventListener('change', filterTable);
-    applyFilters.addEventListener('click', filterTable);
+        // Modal functionality
+        const uploadModal = document.getElementById('uploadModal');
+        const openUploadBtn = document.getElementById('openUploadBtn');
+        const closeUploadBtn = document.getElementById('closeUploadBtn');
+        const cancelUploadBtn = document.getElementById('cancelUploadBtn');
 
-    resetFilters.addEventListener('click', () => {
-        searchFilter.value = '';
-        statusFilter.value = '';
-        industriesTable.rows().every(function() {
-            $(this.node()).show();
+        openUploadBtn.addEventListener('click', () => {
+            uploadModal.classList.remove('hidden');
         });
-    });
-});
-</script>
 
-<style>
-    /* DataTables pagination styling */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.25rem 0.75rem;
-        margin: 0 0.125rem;
-        border-radius: 0.375rem;
-        background-color: #e5e7eb;
-        color: #374151;
-        border: none;
-    }
+        [closeUploadBtn, cancelUploadBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                uploadModal.classList.add('hidden');
+            });
+        });
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #d1d5db;
-    }
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target === uploadModal) {
+                uploadModal.classList.add('hidden');
+            }
+        });
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: var(--brand);
-        color: white;
-    }
+        // Filter functionality
+        $('#applyFilters').on('click', function() {
+            industriesTable.ajax.reload();
+        });
 
-    .dataTables_wrapper .dataTables_paginate {
-        text-align: right;
-    }
-</style>
+        $('#resetFilters').on('click', function() {
+            $('#searchFilter').val('');
+            $('#emailFilter').val('');
+            $('#statusFilter').val('');
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            industriesTable.ajax.reload();
+        });
+
+        // Dropdown functionality for DataTables dynamic content
+        $(document).on('click', 'button[onclick*="toggleDropdown"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const onclickAttr = $(this).attr('onclick');
+            const match = onclickAttr.match(/toggleDropdown\((\d+)\)/);
+
+            if (match) {
+                const id = match[1];
+                const dropdown = document.getElementById(`dropdown-${id}`);
+                const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+
+                allDropdowns.forEach(dd => {
+                    if (dd !== dropdown) {
+                        dd.classList.add('hidden');
+                    }
+                });
+
+                if (dropdown) {
+                    dropdown.classList.toggle('hidden');
+                }
+            }
+        });
+
+        // Close dropdowns when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.relative').length) {
+                document.querySelectorAll('[id^="dropdown-"]').forEach(dd => {
+                    dd.classList.add('hidden');
+                });
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        $(document).on('click', '[id^="dropdown-"]', function(e) {
+            e.stopPropagation();
+        });
+
+        // Global function for onclick attributes
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(`dropdown-${id}`);
+            if (!dropdown) return;
+
+            // Close other dropdowns
+            document.querySelectorAll('[id^="dropdown-"]').forEach(dd => {
+                if (dd !== dropdown) dd.classList.add('hidden');
+            });
+
+            // Toggle this dropdown
+            dropdown.classList.toggle('hidden');
+        }
+
+
+        // Filter toggle functionality
+        document.getElementById('toggleFilters').addEventListener('click', function() {
+            const filterContent = document.getElementById('filterContent');
+            const filterIcon = document.getElementById('filterIcon');
+
+            filterContent.classList.toggle('hidden');
+            filterIcon.classList.toggle('rotate-180');
+        });
+
+        // Toggle Status function
+        function toggleStatus(id) {
+            Swal.fire({
+                title: 'Toggle Status?',
+                text: "This will change the industry's status",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, toggle it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/industries/${id}/toggle-status`;
+                    form.innerHTML = `
+                        @csrf
+                        @method('PATCH')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Delete Industry function
+        function deleteIndustry(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create and submit delete form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/industries/${id}`;
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    </script>
+
+    <style>
+        /* DataTables pagination styling */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.25rem 0.75rem;
+            margin: 0 0.125rem;
+            border-radius: 0.375rem;
+            background-color: #e5e7eb;
+            color: #374151;
+            border: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #d1d5db;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: var(--brand);
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: right;
+        }
+    </style>
 @endsection

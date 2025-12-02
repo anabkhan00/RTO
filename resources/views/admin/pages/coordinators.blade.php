@@ -1,5 +1,5 @@
 @extends('admin.master_layout.index')
-@section('page-title', 'Courses')
+@section('page-title', 'Coordinators')
 <style>
     .bg-blue-100,
     .bg-purple-100,
@@ -18,13 +18,13 @@
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Course Management</h1>
-                <p class="text-gray-600 mt-1">Manage and track courses</p>
+                <h1 class="text-2xl font-bold text-gray-800">Coordinator Management</h1>
+                <p class="text-gray-600 mt-1">Manage and track coordinators</p>
             </div>
             <div class="flex gap-3">
-                <a href="{{ route('admin.courses.create') }}"
+                <a href="{{ route('admin.coordinators.create') }}"
                     class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
-                    Add Course
+                    Add Coordinator
                 </a>
 
                 {{-- <button
@@ -33,7 +33,7 @@
                     <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
                 </button>
 
-                <a href="/admin/courses/csv-format"
+                <a href="/admin/coordinators/csv-format"
                     class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
                     <i class="bi bi-download mr-2 text-sm"></i> Download Format
                 </a> --}}
@@ -52,18 +52,14 @@
         <div id="filterContent" class="hidden p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/Code</label>
-                    <input type="text" id="searchFilter" placeholder="Search courses..."
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/Email</label>
+                    <input type="text" id="searchFilter" placeholder="Search coordinators..."
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select id="statusFilter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                        <option value="">All Status</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <input type="text" id="phoneFilter" placeholder="Search phone..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
@@ -89,10 +85,10 @@
         </div>
     </div>
 
-    <!-- Courses Table -->
+    <!-- Coordinators Table -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table id="coursesTable" class="min-w-full">
+            <table id="coordinatorsTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
                         <th
@@ -100,10 +96,10 @@
                             Name</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Code</th>
+                            Email</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Credit Hours</th>
+                            Phone</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Status</th>
@@ -127,7 +123,7 @@
         <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden relative">
             <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
                 <h2 class="text-xl font-semibold text-white flex items-center">
-                    <i class="bi bi-upload mr-2"></i> Upload Courses CSV
+                    <i class="bi bi-upload mr-2"></i> Upload Coordinators CSV
                 </h2>
                 <button id="closeUploadBtn" class="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl">
                     &times;
@@ -135,7 +131,7 @@
             </div>
 
             <div class="p-6">
-                <form method="POST" action="/admin/courses/upload" enctype="multipart/form-data" class="space-y-5">
+                <form method="POST" action="/admin/coordinators/upload" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -168,43 +164,26 @@
 
     <script>
         // Initialize DataTables with server-side processing
-        let coursesTable = $('#coursesTable').DataTable({
+        let coordinatorsTable = $('#coordinatorsTable').DataTable({
             "processing": true,
             "serverSide": true,
             "ajax": {
-                "url": "{{ route('admin.courses.data') }}",
+                "url": "{{ route('admin.coordinators.data') }}",
                 "type": "GET",
                 "data": function(d) {
                     d.search = $('#searchFilter').val();
-                    d.status = $('#statusFilter').val();
+                    d.phone = $('#phoneFilter').val();
                     d.from_date = $('#fromDate').val();
                     d.to_date = $('#toDate').val();
                 }
             },
-            "columns": [{
-                    "data": "name",
-                    "orderable": true
-                },
-                {
-                    "data": "code",
-                    "orderable": true
-                },
-                {
-                    "data": "credit_hours",
-                    "orderable": false
-                },
-                {
-                    "data": "status",
-                    "orderable": true
-                },
-                {
-                    "data": "created_at",
-                    "orderable": true
-                },
-                {
-                    "data": "actions",
-                    "orderable": false
-                }
+            "columns": [
+                {"data": "name", "orderable": true},
+                {"data": "email", "orderable": true},
+                {"data": "phone", "orderable": true},
+                {"data": "status", "orderable": true},
+                {"data": "created_at", "orderable": true},
+                {"data": "actions", "orderable": false}
             ],
             "pageLength": 25,
             "searching": false,
@@ -252,15 +231,15 @@
 
         // Filter functionality
         $('#applyFilters').on('click', function() {
-            coursesTable.ajax.reload();
+            coordinatorsTable.ajax.reload();
         });
 
         $('#resetFilters').on('click', function() {
             $('#searchFilter').val('');
-            $('#statusFilter').val('');
+            $('#phoneFilter').val('');
             $('#fromDate').val('');
             $('#toDate').val('');
-            coursesTable.ajax.reload();
+            coordinatorsTable.ajax.reload();
         });
 
         // Dropdown functionality for DataTables dynamic content
@@ -326,8 +305,59 @@
             filterIcon.classList.toggle('rotate-180');
         });
 
-        // Delete Course function
-        function deleteCourse(id) {
+        // Toggle Status function
+        function toggleStatus(id) {
+            Swal.fire({
+                title: 'Toggle Status?',
+                text: "This will change the coordinator's status",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, toggle it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/coordinators/${id}/toggle-status`;
+                    form.innerHTML = `
+                        @csrf
+                        @method('PATCH')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Reset Password function
+        function resetPassword(id) {
+            Swal.fire({
+                title: 'Reset Password?',
+                text: "Password will be reset to 'password'",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, reset it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create and submit reset form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/coordinators/${id}/reset-password`;
+                    form.innerHTML = `
+                        @csrf
+                        @method('PATCH')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Delete Coordinator function
+        function deleteCoordinator(id) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -341,7 +371,7 @@
                     // Create and submit delete form
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/admin/courses/${id}`;
+                    form.action = `/admin/coordinators/${id}`;
                     form.innerHTML = `
                         @csrf
                         @method('DELETE')

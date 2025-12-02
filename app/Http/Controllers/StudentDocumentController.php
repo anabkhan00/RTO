@@ -2,27 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
 use App\Models\User;
-use App\Models\StudentDocument;
+use App\Models\Course;
+use App\Models\Industry;
 use App\Models\RtoStudent;
-use App\Models\DocumentChecklist;
 use App\Models\StudentNote;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Models\StudentDocument;
+use App\Models\DocumentChecklist;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class StudentDocumentController extends Controller
 {
     public function index($studentId)
     {
-        $student = User::findOrFail($studentId);
+        $student = User::with('rtos')->findOrFail($studentId); // eager load RTOs
         $courses = Course::all();
         $checklists = DocumentChecklist::where('status', true)->get();
+        $industries = Industry::all();
+        $rtos = User::where('role', 'rto')->latest()->get();
         $notes = StudentNote::where('student_id', $studentId)
             ->with('author')
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $studentRtoId = $student->rtos->first()?->id ?? null;
 
         if (Auth::user()->hasRole('rto')) {
             $rtoStudentExists = RtoStudent::where('rto_id', Auth::id())
@@ -31,10 +36,10 @@ class StudentDocumentController extends Controller
             if (!$rtoStudentExists) {
                 abort(403, 'Unauthorized access to student documents.');
             }
-            return view('rto.student_documents.index', compact('student', 'checklists', 'notes','courses'));
+            return view('rto.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries'));
         }
 
-        return view('admin.student_documents.index', compact('student', 'checklists', 'notes','courses'));
+        return view('admin.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries', 'rtos','studentRtoId'));
     }
 
     public function store(Request $request, $studentId)

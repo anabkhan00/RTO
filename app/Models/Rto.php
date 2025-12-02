@@ -20,6 +20,12 @@ class Rto extends Model
         'status'
     ];
 
+    // Add accessor for code (using rto_number as code)
+    public function getCodeAttribute()
+    {
+        return $this->rto_number;
+    }
+
     protected $casts = [
         'status' => 'boolean',
     ];

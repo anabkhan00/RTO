@@ -145,22 +145,28 @@ Route::middleware(['auth', 'role:admin|coordinator'])
         // Dashboard
         // Route::get('/dashboard', fn() => view('admin.pages.dashboard'))->name('dashboard');
 
-        // RTO
+        // Dashboard
+        Route::get('dashboard', [AdminRtoController::class, 'dashboard'])->name('dashboard');
+
+        // RTOs
         Route::controller(AdminRtoController::class)->group(function () {
-            Route::get('dashboard', 'dashboard')->name('dashboard');
-            Route::get('/rto', 'index')->name('add_rto');
-            Route::post('/rto', 'store');
-            Route::put('/rto/{id}', 'update');
-            Route::delete('/rto/{id}', 'destroy');
-            Route::patch('/rto/{id}/toggle-status', 'toggleStatus');
-            Route::get('/rto/{id}/details', 'details');
+            Route::get('/rtos', 'index')->name('rtos');
+            Route::get('/rtos/create', 'create')->name('rtos.create');
+            Route::get('/rtos/data', 'data')->name('rtos.data');
+            Route::post('/rtos', 'store')->name('rtos.store');
+            Route::get('/rtos/{id}/edit', 'edit')->name('rtos.edit');
+            Route::put('/rtos/{id}', 'update')->name('rtos.update');
+            Route::delete('/rtos/{id}', 'destroy');
+            Route::patch('/rtos/{id}/toggle-status', 'toggleStatus');
         });
 
         // Students
         Route::controller(StudentController::class)->group(function () {
             Route::get('/students', 'index')->name('students');
-            Route::post('/students', 'store');
-            Route::put('/students/{id}', 'update');
+            Route::get('/students/create', 'create')->name('students.create');
+            Route::get('/students/data', 'data')->name('students.data');
+            Route::post('/students', 'store')->name('students.store');
+            Route::put('/students/{id}', 'update')->name('students.update');
             Route::delete('/students/{id}', 'destroy');
             Route::post('/students/upload', 'upload');
             Route::get('/students/download', 'download')->name('students.download');
@@ -175,27 +181,37 @@ Route::middleware(['auth', 'role:admin|coordinator'])
         // Courses
         Route::controller(CourseController::class)->group(function () {
             Route::get('/courses', 'index')->name('courses');
-            Route::post('/courses', 'store');
-            Route::put('/courses/{id}', 'update');
+            Route::get('/courses/create', 'create')->name('courses.create');
+            Route::get('/courses/data', 'data')->name('courses.data');
+            Route::post('/courses', 'store')->name('courses.store');
+            Route::get('/courses/{id}/edit', 'edit')->name('courses.edit');
+            Route::put('/courses/{id}', 'update')->name('courses.update');
             Route::delete('/courses/{id}', 'destroy');
         });
 
         // Industries
         Route::controller(IndustryController::class)->group(function () {
-            Route::get('/industries', 'index')->name('Industries');
-            Route::post('/industries', 'store');
-            Route::put('/industries/{id}', 'update');
+            Route::get('/industries', 'index')->name('industries');
+            Route::get('/industries/create', 'create')->name('industries.create');
+            Route::get('/industries/data', 'data')->name('industries.data');
+            Route::post('/industries', 'store')->name('industries.store');
+            Route::get('/industries/{id}/edit', 'edit')->name('industries.edit');
+            Route::put('/industries/{id}', 'update')->name('industries.update');
             Route::delete('/industries/{id}', 'destroy');
             Route::patch('/industries/{id}/toggle-status', 'toggleStatus');
         });
 
-        // Coordinator
+        // Coordinators
         Route::controller(CoordinatorController::class)->group(function () {
-            Route::get('/coordinator', 'index')->name('Coordinator');
-            Route::post('/coordinator', 'store');
-            Route::put('/coordinator/{id}', 'update');
-            Route::delete('/coordinator/{id}', 'destroy');
-            Route::patch('/coordinator/{id}/reset-password', 'resetPassword');
+            Route::get('/coordinators', 'index')->name('coordinators');
+            Route::get('/coordinators/create', 'create')->name('coordinators.create');
+            Route::get('/coordinators/data', 'data')->name('coordinators.data');
+            Route::post('/coordinators', 'store')->name('coordinators.store');
+            Route::get('/coordinators/{id}/edit', 'edit')->name('coordinators.edit');
+            Route::put('/coordinators/{id}', 'update')->name('coordinators.update');
+            Route::delete('/coordinators/{id}', 'destroy');
+            Route::patch('/coordinators/{id}/reset-password', 'resetPassword');
+            Route::patch('/coordinators/{id}/toggle-status', 'toggleStatus');
         });
 
         // Role & Permissions
