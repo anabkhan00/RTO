@@ -10,9 +10,9 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.add_rto') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.add_rto') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    RTO
+                <a href="{{ route('admin.rtos') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.rtos*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    RTOs
                 </a>
 
                 <a href="{{ route('admin.students') }}"
@@ -25,13 +25,13 @@
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.courses*') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Courses
                 </a>
-                <a href="{{ route('admin.Industries') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.Industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                <a href="{{ route('admin.industries') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Industries
                 </a>
-                <a href="{{ route('admin.Coordinator') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.Coordinator*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Coordinator
+                <a href="{{ route('admin.coordinators') }}"
+                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.coordinators*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                    Coordinators
                 </a>
 
                 <!-- Create Users -->
@@ -80,9 +80,9 @@
             @csrf
         </form>
 
-        <button onclick="event.preventDefault(); document.getElementById('logoutForm').submit();"
+        {{-- <button onclick="event.preventDefault(); document.getElementById('logoutForm').submit();"
             class="m-6 py-2 border border-brand text-brand rounded-md hover:bg-brand hover:text-white transition">
             Logout
-        </button>
+        </button> --}}
 
     </aside>

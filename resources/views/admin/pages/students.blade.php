@@ -23,11 +23,10 @@
             </div>
             <div class="flex gap-3">
                 <!-- Small Action Button -->
-                <button
-                    class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors"
-                    id="openModalBtn">
+                <a href="{{ route('admin.students.create') }}"
+                    class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                     Add Student
-                </button>
+                </a>
 
                 <!-- Upload Button (Keep Icon, Slightly Smaller) -->
                 <button
@@ -63,23 +62,8 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                    <select id="locationFilter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                        <option value="">Select Province</option>
-                        <option value="Alberta">Alberta</option>
-                        <option value="British Columbia">British Columbia</option>
-                        <option value="Manitoba">Manitoba</option>
-                        <option value="New Brunswick">New Brunswick</option>
-                        <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
-                        <option value="Nova Scotia">Nova Scotia</option>
-                        <option value="Ontario">Ontario</option>
-                        <option value="Prince Edward Island">Prince Edward Island</option>
-                        <option value="Quebec">Quebec</option>
-                        <option value="Saskatchewan">Saskatchewan</option>
-                        <option value="Northwest Territories">Northwest Territories</option>
-                        <option value="Nunavut">Nunavut</option>
-                        <option value="Yukon">Yukon</option>
-                    </select>
+                    <input type="text" id="locationFilter" placeholder="Search location..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                 </div>
 
                 <div>
@@ -87,9 +71,9 @@
                     <select id="priorityFilter"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                         <option value="">All Priorities</option>
-                        <option value="High Priority">High Priority</option>
-                        <option value="Medium Priority">Medium Priority</option>
-                        <option value="Low Priority">Low Priority</option>
+                        <option value="high_priority">High Priority</option>
+                        <option value="medium Priority">Medium Priority</option>
+                        <option value="low_priority">Low Priority</option>
                     </select>
                 </div>
                 <div>
@@ -97,10 +81,10 @@
                     <select id="courseFilter"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                         <option value="">All Courses</option>
-                        <option value="Web Development">Web Development</option>
-                        <option value="Graphic Design">Graphic Design</option>
-                        <option value="Mobile Apps">Mobile Apps</option>
-                        <option value="Data Science">Data Science</option>
+                        @foreach ($courses as $course)
+                            <option value="{{ $course->id }}">{{ $course->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div>
@@ -108,9 +92,11 @@
                     <select id="progressFilter"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                         <option value="">All Status</option>
-                        <option value="Assigned">Assigned</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Placed">Placed</option>
+                        <option value="completed_placements">Completed Placements</option>
+                        <option value="active_placements">Active Placements</option>
+                        <option value="booked_placements">Booked Placements</option>
+                        <option value="awaiting_placements">Awaiting Placements</option>
+                        <option value="flagged_placements">Flagged Placements</option>
                     </select>
                 </div>
                 <div>
@@ -143,24 +129,12 @@
             <table id="studentsTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        {{-- <th
+                        <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Name</th> --}}
-                        {{-- <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            RTO</th> --}}
+                            Name</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Industry</th>
-                        {{-- <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Sectors</th> --}}
-                        {{-- <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Email</th>
-                        <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Phone</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Course</th>
@@ -173,9 +147,6 @@
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Address</th>
-                        {{-- <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Assign Coordinator</th> --}}
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
@@ -185,196 +156,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach ($students as $index => $student)
-                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
-                            onclick="window.location.href='{{ route('admin.student-documents.index', $student->id) }}'">
-                            <!-- Name with Priority Badge -->
-                            {{-- <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <span
-                                        class="inline-flex px-2 py-1 text-xs font-medium rounded-full mr-2
-                                    @if ($student->priority == 'High Priority') bg-red-100 text-red-800
-                                    @elseif($student->priority == 'Medium Priority') bg-orange-100 text-orange-800
-                                    @else bg-green-100 text-green-800 @endif">
-                                        {{ $student->priority ?? 'Medium Priority' }}
-                                    </span>
-                                    <div class="flex-shrink-0 h-8 w-8">
-                                        <div
-                                            class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs">
-                                            {{ substr($student->name, 0, 1) }}
-                                        </div>
-                                    </div>
-                                    <div class="ml-3">
-                                        <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
-                                    </div>
-                                </div>
-                            </td> --}}
-                            <!-- RTO -->
-                            {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->rto_number ?? '-----' }}</td> --}}
-                            <!-- Industry -->
-
-                            @php
-                                // Pastel color palette
-                                $palette = [
-                                    ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-100'],
-                                    [
-                                        'bg' => 'bg-purple-50',
-                                        'text' => 'text-purple-700',
-                                        'border' => 'border-purple-100',
-                                    ],
-                                    [
-                                        'bg' => 'bg-emerald-50',
-                                        'text' => 'text-emerald-700',
-                                        'border' => 'border-emerald-100',
-                                    ],
-                                    [
-                                        'bg' => 'bg-orange-50',
-                                        'text' => 'text-orange-700',
-                                        'border' => 'border-orange-100',
-                                    ],
-                                    ['bg' => 'bg-pink-50', 'text' => 'text-pink-700', 'border' => 'border-pink-100'],
-                                    [
-                                        'bg' => 'bg-indigo-50',
-                                        'text' => 'text-indigo-700',
-                                        'border' => 'border-indigo-100',
-                                    ],
-                                    ['bg' => 'bg-teal-50', 'text' => 'text-teal-700', 'border' => 'border-teal-100'],
-                                    ['bg' => 'bg-cyan-50', 'text' => 'text-cyan-700', 'border' => 'border-cyan-100'],
-                                ];
-
-                                // Progress status mapping
-                                $progressColors = [
-                                    'Assigned' => [
-                                        'bg' => 'bg-gray-50',
-                                        'text' => 'text-gray-700',
-                                        'border' => 'border-gray-100',
-                                    ],
-                                    'Interview' => [
-                                        'bg' => 'bg-orange-50',
-                                        'text' => 'text-orange-700',
-                                        'border' => 'border-orange-100',
-                                    ],
-                                    'Placed' => [
-                                        'bg' => 'bg-emerald-50',
-                                        'text' => 'text-emerald-700',
-                                        'border' => 'border-emerald-100',
-                                    ],
-                                    'Completed' => [
-                                        'bg' => 'bg-indigo-50',
-                                        'text' => 'text-indigo-700',
-                                        'border' => 'border-indigo-100',
-                                    ],
-                                ];
-
-                                // Days left color logic
-                                $daysLeft = rand(10, 300);
-                                $daysColor =
-                                    $daysLeft > 150
-                                        ? [
-                                            'bg' => 'bg-emerald-50',
-                                            'text' => 'text-emerald-700',
-                                            'border' => 'border-emerald-100',
-                                        ]
-                                        : ($daysLeft >= 30
-                                            ? [
-                                                'bg' => 'bg-orange-50',
-                                                'text' => 'text-orange-700',
-                                                'border' => 'border-orange-100',
-                                            ]
-                                            : [
-                                                'bg' => 'bg-red-50',
-                                                'text' => 'text-red-700',
-                                                'border' => 'border-red-100',
-                                            ]);
-
-                                // Dynamic assignments
-                                $industry = $student->industry ?? 'Healthcare';
-                                $courseName = $student->course->name ?? 'No Course';
-                                $progress = 'Completed';
-
-                                $industryColor = $palette[abs(crc32($industry)) % count($palette)];
-                                $courseColor = $palette[abs(crc32($courseName)) % count($palette)];
-                                $progressColor = $progressColors[$progress] ?? $palette[6];
-                            @endphp
-
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industryColor['bg'] }} {{ $industryColor['text'] }} {{ $industryColor['border'] }} border shadow-sm">
-                                    {{ $industry }}
-                                </span>
-                            </td>
-                            <!-- Sectors -->
-                            {{-- <td class="px-4 py-3 whitespace-nowrap">
-                                <a href="#" class="text-brand hover:text-gold text-sm font-medium">
-                                    VIEW / EDIT
-                                    <i class="bi bi-layers ml-1"></i>
-                                </a>
-                            </td> --}}
-                            <!-- Email -->
-                            {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
-                            <!-- Phone -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->phone ?? '-----' }}
-                            </td> --}}
-                            <!-- Course -->
-
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $courseColor['bg'] }} {{ $courseColor['text'] }} {{ $courseColor['border'] }} border shadow-sm">
-                                    {{ $courseName }}
-                                </span>
-                            </td>
-
-                            <!-- Days Left -->
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $daysColor['bg'] }} {{ $daysColor['text'] }} {{ $daysColor['border'] }} border shadow-sm">
-                                    @if ($daysLeft > 150)
-                                    @elseif($daysLeft >= 30)
-                                    @else
-                                    @endif
-                                    {{ $daysLeft }} Days left
-                                </span>
-                            </td>
-
-                            <!-- Progress -->
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $progressColor['bg'] }} {{ $progressColor['text'] }} {{ $progressColor['border'] }} border shadow-sm">
-                                    <i class="bi bi-person mr-1"></i>
-                                    {{ $progress }}
-                                </span>
-                            </td>
-                            <!-- Address -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                                {{ $student->address ?? '-----' }}</td>
-                            <!-- Assign Coordinator -->
-                            {{-- <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-900 mr-2">Admin</span>
-                                    <a href="#" class="text-brand hover:text-gold text-xs font-medium">change</a>
-                                </div>
-                            </td> --}}
-                            <!-- Created At -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                                {{ $student->created_at->format('j M Y') }}</td>
-                            <!-- Actions -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium" onclick="event.stopPropagation()">
-                                <div class="relative">
-                                    <button onclick="toggleDropdown({{ $index }})"
-                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <div id="dropdown-{{ $index }}"
-                                        class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border">
-                                        <a href="#" onclick="deleteStudent({{ $student->id }})"
-                                            class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
-                                            <i class="bi bi-trash mr-2"></i>Delete
-                                        </a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
+                    <!-- DataTables will populate this via AJAX -->
                 </tbody>
             </table>
         </div>
@@ -416,17 +198,18 @@
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
                         </div>
 
-                        {{-- <div>
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="bi bi-building mr-1"></i> RTO
                             </label>
                             <select name="rto" id="studentRto"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select RTO</option>
-                                <option value="Alfie Training">Alfie Training</option>
-                                <option value="Open Colleges">Open Colleges</option>
+                                @foreach ($rtos as $rto)
+                                    <option value="{{ $rto->id }}">{{ $rto->name }}</option>
+                                @endforeach
                             </select>
-                        </div> --}}
+                        </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -435,9 +218,9 @@
                             <select name="priority" id="studentPriority"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select Priority</option>
-                                <option value="High Priority">High Priority</option>
-                                <option value="Medium Priority">Medium Priority</option>
-                                <option value="Low Priority">Low Priority</option>
+                                <option value="high_priority">High Priority</option>
+                                <option value="medium_priority">Medium Priority</option>
+                                <option value="low_priority">Low Priority</option>
                             </select>
                         </div>
 
@@ -456,23 +239,28 @@
                             <select name="course_id" id="studentCourse"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
                                 <option value="">Select Course</option>
-                                <option value="1">Web Development</option>
-                                <option value="2">Graphic Design</option>
-                                <option value="3">Mobile Apps</option>
-                                <option value="4">Data Science</option>
+                                @foreach ($courses as $course)
+                                    <option value="{{ $course->id }}">{{ $course->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
-                        <div class="col-span-2">
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-person mr-1"></i> Address <span class="text-red-500">*</span>
+                                <i class="bi bi-book mr-1"></i> Industry
                             </label>
-                            <input type="text" name="address" id="studentAddress" placeholder="Enter Student Address"
-                                required
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
+                            <select name="course_id" id="studentIndustry"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
+                                <option value="">Select Industry</option>
+                                @foreach ($industries as $industry)
+                                    <option value="{{ $industry->id }}">{{ $industry->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        {{-- <div>
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="bi bi-briefcase mr-1"></i> Industry
                             </label>
@@ -482,33 +270,27 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-person-check mr-1"></i> Coordinator
+                                <i class="bi bi-clipboard-check mr-1"></i> Progress Status
                             </label>
-                            <select name="coordinator" id="studentCoordinator"
+                            <select name="progress_status" id="studentProgressStatus"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
-                                <option value="">Select Coordinator</option>
-                                <option value="Zain">Zain</option>
-                                <option value="Bilal">Bilal</option>
-                                <option value="Nico">Nico</option>
-                                <option value="Melanie Teran">Melanie Teran</option>
-                                <option value="Ahmed">Ahmed</option>
-                                <option value="Fatima">Fatima</option>
-                                <option value="Hassan">Hassan</option>
-                                <option value="Ayesha">Ayesha</option>
-                                <option value="Omar">Omar</option>
-                                <option value="Zara">Zara</option>
-                                <option value="Usman">Usman</option>
+                                <option value="awaiting_placements">Awaiting</option>
+                                <option value="booked_placements">Booked</option>
+                                <option value="active_placements">Active</option>
+                                <option value="completed_placements">Completed</option>
+                                <option value="flagged_placements">Flagged</option>
                             </select>
-                        </div> --}}
-                    </div>
+                        </div>
 
-                    {{-- <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-geo-alt mr-1"></i> Address
-                        </label>
-                        <textarea name="address" id="studentAddress" placeholder="Enter Address" rows="3"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all"></textarea>
-                    </div> --}}
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-geo-alt mr-1"></i> Address <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="address" id="studentAddress" placeholder="Enter Student Address"
+                                required
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
+                        </div>
+                    </div>
 
                     <div class="flex gap-3 pt-4 border-t">
                         <button type="submit"
@@ -575,48 +357,105 @@
     </div>
 
     <script>
-        // Initialize DataTables for students table
-        $('#studentsTable').DataTable({
+        // Initialize DataTables with server-side processing
+        let studentsTable = $('#studentsTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ route('admin.students.data') }}",
+                "type": "GET",
+                "data": function(d) {
+                    d.search = $('#searchFilter').val();
+                    d.location = $('#locationFilter').val();
+                    d.priority = $('#priorityFilter').val();
+                    d.course = $('#courseFilter').val();
+                    d.progress = $('#progressFilter').val();
+                    d.from_date = $('#fromDate').val();
+                    d.to_date = $('#toDate').val();
+                }
+            },
+            "columns": [{
+                    "data": "name",
+                    "orderable": true
+                },
+                {
+                    "data": "industry",
+                    "orderable": false
+                },
+                {
+                    "data": "course",
+                    "orderable": false
+                },
+                {
+                    "data": "days_left",
+                    "orderable": false
+                },
+                {
+                    "data": "progress",
+                    "orderable": false
+                },
+                {
+                    "data": "address",
+                    "orderable": true
+                },
+                {
+                    "data": "created_at",
+                    "orderable": true
+                },
+                {
+                    "data": "actions",
+                    "orderable": false
+                }
+            ],
             "pageLength": 25,
             "searching": false,
             "ordering": true,
             "info": false,
             "lengthChange": false,
-            "columnDefs": [{
-                "orderable": false,
-                "targets": [6]
-            }],
             "dom": 'rt<"flex justify-end mt-4"p>',
-            "scrollX": true
+            "scrollX": true,
+            "createdRow": function(row, data, dataIndex) {
+                $(row).addClass('hover:bg-gray-50 transition-colors cursor-pointer');
+
+                // Prevent row click on actions column
+                $(row).find('td:last-child').on('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                // Row click navigation
+                $(row).on('click', function(e) {
+                    window.location.href = data.row_url;
+                });
+            }
         });
 
         // Modal functionality
         const studentModal = document.getElementById('studentModal');
         const uploadModal = document.getElementById('uploadModal');
-        const openModalBtn = document.getElementById('openModalBtn');
+        // const openModalBtn = document.getElementById('openModalBtn');
         const openUploadBtn = document.getElementById('openUploadBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
+        // const closeModalBtn = document.getElementById('closeModalBtn');
         const closeUploadBtn = document.getElementById('closeUploadBtn');
         const cancelBtn = document.getElementById('cancelBtn');
         const cancelUploadBtn = document.getElementById('cancelUploadBtn');
 
         // Open modals
-        openModalBtn.addEventListener('click', () => {
-            studentModal.classList.remove('hidden');
-            document.getElementById('modalTitle').textContent = 'Add Student';
-            document.getElementById('studentForm').reset();
-        });
+        // openModalBtn.addEventListener('click', () => {
+        //     studentModal.classList.remove('hidden');
+        //     document.getElementById('modalTitle').textContent = 'Add Student';
+        //     document.getElementById('studentForm').reset();
+        // });
 
         openUploadBtn.addEventListener('click', () => {
             uploadModal.classList.remove('hidden');
         });
 
         // Close modals
-        [closeModalBtn, cancelBtn].forEach(btn => {
-            btn.addEventListener('click', () => {
-                studentModal.classList.add('hidden');
-            });
-        });
+        // [closeModalBtn, cancelBtn].forEach(btn => {
+        //     btn.addEventListener('click', () => {
+        //         studentModal.classList.add('hidden');
+        //     });
+        // });
 
         [closeUploadBtn, cancelUploadBtn].forEach(btn => {
             btn.addEventListener('click', () => {
@@ -633,108 +472,76 @@
             });
         });
 
-        // Filter functionality
-        const searchFilter = document.getElementById('searchFilter');
-        const rtoFilter = document.getElementById('rtoFilter');
-        const priorityFilter = document.getElementById('priorityFilter');
-        const courseFilter = document.getElementById('courseFilter');
-        const progressFilter = document.getElementById('progressFilter');
-        const fromDate = document.getElementById('fromDate');
-        const toDate = document.getElementById('toDate');
-        const applyFilters = document.getElementById('applyFilters');
-        const resetFilters = document.getElementById('resetFilters');
-        const tableRows = document.querySelectorAll('#studentsTable tbody tr');
-
-        function filterTable() {
-            const searchTerm = searchFilter.value.toLowerCase();
-            const selectedRto = rtoFilter.value;
-            const selectedPriority = priorityFilter.value;
-            const selectedCourse = courseFilter.value;
-            const selectedProgress = progressFilter.value;
-            const fromDateValue = fromDate.value;
-            const toDateValue = toDate.value;
-
-            tableRows.forEach(row => {
-                const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                const rto = row.querySelector('td:nth-child(2)').textContent;
-                const email = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
-                const course = row.querySelector('td:nth-child(7)').textContent;
-                const progress = row.querySelector('td:nth-child(9)').textContent;
-
-                let showRow = true;
-
-                // Search filter
-                if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm)) {
-                    showRow = false;
-                }
-
-                // RTO filter
-                if (selectedRto && !rto.includes(selectedRto)) {
-                    showRow = false;
-                }
-
-                // Priority filter
-                if (selectedPriority && !row.textContent.includes(selectedPriority)) {
-                    showRow = false;
-                }
-
-                // Course filter
-                if (selectedCourse && !course.includes(selectedCourse)) {
-                    showRow = false;
-                }
-
-                // Progress filter
-                if (selectedProgress && !progress.includes(selectedProgress)) {
-                    showRow = false;
-                }
-
-                row.style.display = showRow ? '' : 'none';
-            });
-        }
-
-        // Real-time search
-        searchFilter.addEventListener('input', filterTable);
-
-        // Apply filters button
-        applyFilters.addEventListener('click', filterTable);
-
-        // Reset filters
-        resetFilters.addEventListener('click', () => {
-            searchFilter.value = '';
-            rtoFilter.value = '';
-            priorityFilter.value = '';
-            courseFilter.value = '';
-            progressFilter.value = '';
-            fromDate.value = '';
-            toDate.value = '';
-            tableRows.forEach(row => {
-                row.style.display = '';
-            });
+        // Filter functionality - only on Apply Filters button click
+        $('#applyFilters').on('click', function() {
+            studentsTable.ajax.reload();
         });
 
-        // Dropdown toggle functionality
-        function toggleDropdown(index) {
-            const dropdown = document.getElementById(`dropdown-${index}`);
-            const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+        $('#resetFilters').on('click', function() {
+            $('#searchFilter').val('');
+            $('#locationFilter').val('');
+            $('#priorityFilter').val('');
+            $('#courseFilter').val('');
+            $('#progressFilter').val('');
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            studentsTable.ajax.reload();
+        });
 
-            // Close all other dropdowns
-            allDropdowns.forEach(dd => {
-                if (dd !== dropdown) {
-                    dd.classList.add('hidden');
-                }
-            });
+        // Dropdown functionality for DataTables dynamic content
+        $(document).on('click', 'button[onclick*="toggleDropdown"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-            // Toggle current dropdown
-            dropdown.classList.toggle('hidden');
-        }
+            // Extract ID from onclick attribute
+            const onclickAttr = $(this).attr('onclick');
+            const match = onclickAttr.match(/toggleDropdown\((\d+)\)/);
 
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('[onclick^="toggleDropdown"]')) {
+            if (match) {
+                const id = match[1];
+                const dropdown = document.getElementById(`dropdown-${id}`);
                 const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
-                allDropdowns.forEach(dd => dd.classList.add('hidden'));
+
+                // Close all other dropdowns
+                allDropdowns.forEach(dd => {
+                    if (dd !== dropdown) {
+                        dd.classList.add('hidden');
+                    }
+                });
+
+                // Toggle current dropdown
+                if (dropdown) {
+                    dropdown.classList.toggle('hidden');
+                }
             }
         });
+
+        // Close dropdowns when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.relative').length) {
+                document.querySelectorAll('[id^="dropdown-"]').forEach(dd => {
+                    dd.classList.add('hidden');
+                });
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        $(document).on('click', '[id^="dropdown-"]', function(e) {
+            e.stopPropagation();
+        });
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(`dropdown-${id}`);
+            if (!dropdown) return;
+
+            // Close other dropdowns
+            document.querySelectorAll('[id^="dropdown-"]').forEach(dd => {
+                if (dd !== dropdown) dd.classList.add('hidden');
+            });
+
+            // Toggle this dropdown
+            dropdown.classList.toggle('hidden');
+        }
 
         // Edit student function
         function editStudent(id, name, email, phone, address, courseId) {

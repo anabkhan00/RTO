@@ -10,58 +10,141 @@
         <!-- Student Update Section -->
         <div class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Student Information</h3>
-
-            <form action="/admin/students/{{ $student->id }}" method="POST" class="bg-white rounded-lg border p-6 shadow-sm">
+            <form action="{{ route('admin.students.update', $student->id) }}" method="POST"
+                class="bg-white rounded-lg border p-6 shadow-sm">
                 @csrf
                 @method('PUT')
 
                 <div class="grid grid-cols-12 gap-6">
-                    <!-- Student Form Fields -->
+                    <!-- Student Info -->
                     <div class="col-span-12 lg:col-span-7">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Name -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                                <input type="text" name="name" value="{{ $student->name }}" required
+                                <input type="text" name="name" value="{{ old('name', $student->name) }}" required
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
                             </div>
 
+                            <!-- Email -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                <input type="email" name="email" value="{{ $student->email }}" required
+                                <input type="email" name="email" value="{{ old('email', $student->email) }}" required
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
                             </div>
 
+                            <!-- Phone -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                                <input type="text" name="phone" value="{{ $student->phone }}"
+                                <input type="text" name="phone" value="{{ old('phone', $student->phone) }}"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
                             </div>
 
+                            <!-- RTO -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
-                                <select name="course_id"
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-building mr-1"></i> RTO
+                                </label>
+                                <select name="rto_id" id="studentRto"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                                    <option value="">Select Course</option>
-                                    @foreach ($courses ?? [] as $course)
-                                        <option value="{{ $course->id }}"
-                                            {{ $student->course_id == $course->id ? 'selected' : '' }}>{{ $course->name }}
+                                    <option value="">Select RTO</option>
+                                    @foreach ($rtos as $rto)
+                                        <option value="{{ $rto->id }}"
+                                            {{ old('rto_id', $studentRtoId) == $rto->id ? 'selected' : '' }}>
+                                            {{ $rto->name }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
 
+
+                            <!-- Priority -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><i class="bi bi-flag mr-1"></i>
+                                    Priority</label>
+                                <select name="priority"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                    <option value="">Select Priority</option>
+                                    <option value="high_priority"
+                                        {{ old('priority', $student->studentDetail->priority ?? '') == 'high_priority' ? 'selected' : '' }}>
+                                        High Priority</option>
+                                    <option value="medium_priority"
+                                        {{ old('priority', $student->studentDetail->priority ?? '') == 'medium_priority' ? 'selected' : '' }}>
+                                        Medium Priority</option>
+                                    <option value="low_priority"
+                                        {{ old('priority', $student->studentDetail->priority ?? '') == 'low_priority' ? 'selected' : '' }}>
+                                        Low Priority</option>
+                                </select>
+                            </div>
+
+                            <!-- Course -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+                                <select name="course_id"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                    <option value="">Select Course</option>
+                                    @foreach ($courses as $course)
+                                        <option value="{{ $course->id }}"
+                                            {{ old('course_id', $student->course_id) == $course->id ? 'selected' : '' }}>
+                                            {{ $course->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Industry -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><i class="bi bi-book mr-1"></i>
+                                    Industry</label>
+                                <select name="industry_id"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                    <option value="">Select Industry</option>
+                                    @foreach ($industries as $industry)
+                                        <option value="{{ $industry->id }}"
+                                            {{ old('industry_id', $student->studentDetail->industry_id ?? '') == $industry->id ? 'selected' : '' }}>
+                                            {{ $industry->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Progress Status -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><i
+                                        class="bi bi-clipboard-check mr-1"></i> Progress Status</label>
+                                <select name="progress_status"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                    <option value="awaiting_placements"
+                                        {{ old('progress_status', $student->studentDetail->progress_status ?? '') == 'awaiting_placements' ? 'selected' : '' }}>
+                                        Awaiting Placements</option>
+                                    <option value="booked_placements"
+                                        {{ old('progress_status', $student->studentDetail->progress_status ?? '') == 'booked_placements' ? 'selected' : '' }}>
+                                        Booked Placements</option>
+                                    <option value="active_placements"
+                                        {{ old('progress_status', $student->studentDetail->progress_status ?? '') == 'active_placements' ? 'selected' : '' }}>
+                                        Active Placements</option>
+                                    <option value="completed_placements"
+                                        {{ old('progress_status', $student->studentDetail->progress_status ?? '') == 'completed_placements' ? 'selected' : '' }}>
+                                        Completed Placements</option>
+                                    <option value="flagged_placements"
+                                        {{ old('progress_status', $student->studentDetail->progress_status ?? '') == 'flagged_placements' ? 'selected' : '' }}>
+                                        Flagged Placements</option>
+                                </select>
+                            </div>
+
+                            <!-- Address -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                                <input type="text" name="address" value="{{ $student->address }}" required
+                                <input type="text" name="address" value="{{ old('address', $student->address) }}"
+                                    required
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- Profile Image & Status -->
+                    <!-- Profile Image -->
                     <div class="col-span-12 lg:col-span-5">
                         <div class="space-y-6">
-                            <!-- Profile Image Upload - Expanded -->
                             <div>
                                 <h4 class="text-sm font-medium text-gray-700 mb-3">Profile Image</h4>
                                 <div id="profileDropzone"
@@ -71,12 +154,13 @@
                                         <p class="text-sm text-gray-600 font-medium">Drop image here or click to upload</p>
                                         <p class="text-xs text-gray-500 mt-2">PNG, JPG, GIF up to 5MB</p>
                                     </div>
-                                    <div id="imagePreview" class="hidden">
-                                        <img id="previewImg"
+                                    <div id="imagePreview" class="{{ $student->profile_image ? '' : 'hidden' }}">
+                                        <img id="previewImg" src="{{ $student->profile_image_url ?? '' }}"
                                             class="max-w-full h-48 mx-auto rounded-lg object-cover shadow-sm" />
                                         <button type="button" id="removeImage"
                                             class="mt-3 px-3 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition-colors">
-                                            <i class="bi bi-trash mr-1"></i>Remove Image</button>
+                                            <i class="bi bi-trash mr-1"></i>Remove Image
+                                        </button>
                                     </div>
                                 </div>
                                 <input type="file" id="profileImageInput" name="profile_image" accept="image/*"
@@ -87,49 +171,37 @@
                     </div>
                 </div>
 
-                <div class="flex justify-between mt-4 items-center">
-                    @php
-                        $status = 'Interview';
-
-                        $statusColors = [
-                            'Assigned' => [
-                                'bg' => 'bg-gray-50',
-                                'text' => 'text-gray-700',
-                                'border' => 'border-gray-100',
-                            ],
-                            'Interview' => [
-                                'bg' => 'bg-orange-50',
-                                'text' => 'text-orange-700',
-                                'border' => 'border-orange-100',
-                            ],
-                            'Placed' => [
-                                'bg' => 'bg-emerald-50',
-                                'text' => 'text-emerald-700',
-                                'border' => 'border-emerald-100',
-                            ],
-                            'Completed' => [
-                                'bg' => 'bg-indigo-50',
-                                'text' => 'text-indigo-700',
-                                'border' => 'border-indigo-100',
-                            ],
-                        ];
-
-                        $colors = $statusColors[$status] ?? $statusColors['Assigned'];
-                    @endphp
-
-                    <span
+                <div class="flex justify-between mt-4 items-center"> @php
+                    $status = 'Interview';
+                    $statusColors = [
+                        'Assigned' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-100'],
+                        'Interview' => [
+                            'bg' => 'bg-orange-50',
+                            'text' => 'text-orange-700',
+                            'border' => 'border-orange-100',
+                        ],
+                        'Placed' => [
+                            'bg' => 'bg-emerald-50',
+                            'text' => 'text-emerald-700',
+                            'border' => 'border-emerald-100',
+                        ],
+                        'Completed' => [
+                            'bg' => 'bg-indigo-50',
+                            'text' => 'text-indigo-700',
+                            'border' => 'border-indigo-100',
+                        ],
+                    ];
+                    $colors = $statusColors[$status] ?? $statusColors['Assigned'];
+                @endphp <span
                         class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full {{ $colors['bg'] }} {{ $colors['text'] }} {{ $colors['border'] }} border shadow">
-                        {{ $status }}
-                    </span>
-
-
+                        {{ $status }} </span>
                     <button type="submit"
                         class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                         Update
                     </button>
                 </div>
-
             </form>
+
         </div>
 
         <div class="mb-8">
