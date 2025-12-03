@@ -92,6 +92,13 @@ class IndustryController extends Controller
         return back()->with('success', 'Industry status updated successfully');
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $industry = Industry::findOrFail($id);
+        $industry->update(['status' => $request->status]);
+        return response()->json(['success' => true]);
+    }
+
     public function upload(Request $request)
     {
         $request->validate([
@@ -218,9 +225,9 @@ class IndustryController extends Controller
                 'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($industry->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $industry->name . '</div></div>',
                 'contact_info' => '<div class="space-y-1"><div class="flex items-center text-xs"><i class="bi bi-envelope mr-1"></i>' . ($industry->email ?? 'N/A') . '</div><div class="flex items-center text-xs"><i class="bi bi-phone mr-1"></i>' . ($industry->phone ?? 'N/A') . '</div></div>',
                 'contact_person' => $industry->contact_person ?? '-----',
-                'status' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $statusColor . ' border shadow-sm">' . ($industry->status ? 'Active' : 'Inactive') . '</span>',
+                'status' => '<select onchange="updateStatus(' . $industry->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($industry->status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value="1"' . ($industry->status ? ' selected' : '') . '>Active</option><option value="0"' . (!$industry->status ? ' selected' : '') . '>Inactive</option></select>',
                 'created_at' => $industry->created_at->format('j M Y'),
-                'actions' => '<div class="relative"><button onclick="toggleDropdown(' . $industry->id . ')" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"><i class="bi bi-three-dots-vertical"></i></button><div id="dropdown-' . $industry->id . '" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border"><a href="' . route('admin.industries.edit', $industry->id) . '" class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md"><i class="bi bi-pencil mr-2"></i>Edit</a><a href="#" onclick="toggleStatus(' . $industry->id . ')" class="block px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md"><i class="bi bi-toggle-on mr-2"></i>Toggle Status</a><a href="#" onclick="deleteIndustry(' . $industry->id . ')" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"><i class="bi bi-trash mr-2"></i>Delete</a></div></div>'
+                'actions' => '<div class="text-center"><div class="relative inline-block dropdown-container" onclick="event.stopPropagation()"><button onclick="toggleDropdown(' . $industry->id . ')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"><i class="bi bi-three-dots-vertical text-gray-700"></i></button><div id="dropdown-' . $industry->id . '" class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1"><a href="#" onclick="deleteIndustry(' . $industry->id . ')" class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="bi bi-trash mr-2"></i>Delete</a></div></div></div>'
             ];
         }
 

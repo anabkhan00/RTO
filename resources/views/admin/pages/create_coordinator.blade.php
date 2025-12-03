@@ -45,6 +45,17 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-code-square mr-1"></i> Code <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="code" value="{{ old('code') }}" placeholder="Enter Coordinator Code" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('code') border-red-500 @enderror" />
+                    @error('code')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-phone mr-1"></i> Phone
                     </label>
                     <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Enter Phone Number"
@@ -56,14 +67,14 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-phone mr-1"></i> Address
+                        <i class="bi bi-geo-alt mr-1"></i> Address
                     </label>
                     <input type="text" name="address" value="{{ old('address') }}" placeholder="Enter Address"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('address') border-red-500 @enderror" />
                     @error('address')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
-                </div>
+                </div> --}}
             </div>
 
             {{-- <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
