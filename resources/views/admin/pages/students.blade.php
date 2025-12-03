@@ -151,7 +151,7 @@
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
                         <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Actions</th>
                     </tr>
                 </thead>
@@ -414,6 +414,9 @@
             "lengthChange": false,
             "dom": 'rt<"flex justify-end mt-4"p>',
             "scrollX": true,
+            "language": {
+                "processing": "Processing..."
+            },
             "createdRow": function(row, data, dataIndex) {
                 $(row).addClass('hover:bg-gray-50 transition-colors cursor-pointer');
 
@@ -493,7 +496,7 @@
             e.preventDefault();
             e.stopPropagation();
 
-            // Extract ID from onclick attribute
+            const button = this;
             const onclickAttr = $(this).attr('onclick');
             const match = onclickAttr.match(/toggleDropdown\((\d+)\)/);
 
@@ -502,16 +505,71 @@
                 const dropdown = document.getElementById(`dropdown-${id}`);
                 const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
 
-                // Close all other dropdowns
+                // Close all other dropdowns and reset their styles
                 allDropdowns.forEach(dd => {
                     if (dd !== dropdown) {
                         dd.classList.add('hidden');
+                        dd.style.position = '';
+                        dd.style.top = '';
+                        dd.style.bottom = '';
+                        dd.style.left = '';
+                        dd.style.right = '';
+                        dd.style.marginTop = '';
+                        dd.style.marginBottom = '';
                     }
                 });
 
-                // Toggle current dropdown
                 if (dropdown) {
-                    dropdown.classList.toggle('hidden');
+                    // If dropdown is currently visible, just hide it
+                    if (!dropdown.classList.contains('hidden')) {
+                        dropdown.classList.add('hidden');
+                        dropdown.style.position = '';
+                        dropdown.style.top = '';
+                        dropdown.style.bottom = '';
+                        dropdown.style.left = '';
+                        dropdown.style.right = '';
+                        dropdown.style.marginTop = '';
+                        dropdown.style.marginBottom = '';
+                        return;
+                    }
+
+                    // Show dropdown
+                    dropdown.classList.remove('hidden');
+                    
+                    // Use fixed positioning to avoid affecting table layout
+                    setTimeout(() => {
+                        const buttonRect = button.getBoundingClientRect();
+                        const dropdownRect = dropdown.getBoundingClientRect();
+                        const viewportHeight = window.innerHeight;
+                        const viewportWidth = window.innerWidth;
+                        
+                        // Set to fixed positioning
+                        dropdown.style.position = 'fixed';
+                        
+                        // Calculate vertical position
+                        const spaceBelow = viewportHeight - buttonRect.bottom;
+                        const spaceAbove = buttonRect.top;
+                        
+                        if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
+                            // Position below button
+                            dropdown.style.top = (buttonRect.bottom + 4) + 'px';
+                            dropdown.style.bottom = 'auto';
+                        } else {
+                            // Position above button
+                            dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
+                            dropdown.style.top = 'auto';
+                        }
+                        
+                        // Calculate horizontal position (align to right edge of button)
+                        const rightEdge = buttonRect.right;
+                        if (rightEdge >= dropdownRect.width) {
+                            dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
+                            dropdown.style.right = 'auto';
+                        } else {
+                            dropdown.style.left = buttonRect.left + 'px';
+                            dropdown.style.right = 'auto';
+                        }
+                    }, 10);
                 }
             }
         });
@@ -531,16 +589,76 @@
         });
 
         function toggleDropdown(id) {
+            event.stopPropagation();
+            const button = event.currentTarget;
             const dropdown = document.getElementById(`dropdown-${id}`);
-            if (!dropdown) return;
 
-            // Close other dropdowns
-            document.querySelectorAll('[id^="dropdown-"]').forEach(dd => {
-                if (dd !== dropdown) dd.classList.add('hidden');
+            // Close all other dropdowns
+            document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
+                if (d.id !== `dropdown-${id}`) {
+                    d.classList.add('hidden');
+                    // Reset positioning
+                    d.style.position = '';
+                    d.style.top = '';
+                    d.style.bottom = '';
+                    d.style.left = '';
+                    d.style.right = '';
+                    d.style.marginTop = '';
+                    d.style.marginBottom = '';
+                }
             });
 
-            // Toggle this dropdown
-            dropdown.classList.toggle('hidden');
+            // If dropdown is currently visible, just hide it
+            if (!dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+                // Reset positioning
+                dropdown.style.position = '';
+                dropdown.style.top = '';
+                dropdown.style.bottom = '';
+                dropdown.style.left = '';
+                dropdown.style.right = '';
+                dropdown.style.marginTop = '';
+                dropdown.style.marginBottom = '';
+                return;
+            }
+
+            // Show dropdown first
+            dropdown.classList.remove('hidden');
+            
+            // Use fixed positioning to avoid affecting table layout
+            setTimeout(() => {
+                const buttonRect = button.getBoundingClientRect();
+                const dropdownRect = dropdown.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const viewportWidth = window.innerWidth;
+                
+                // Set to fixed positioning
+                dropdown.style.position = 'fixed';
+                
+                // Calculate vertical position
+                const spaceBelow = viewportHeight - buttonRect.bottom;
+                const spaceAbove = buttonRect.top;
+                
+                if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
+                    // Position below button
+                    dropdown.style.top = (buttonRect.bottom + 4) + 'px';
+                    dropdown.style.bottom = 'auto';
+                } else {
+                    // Position above button
+                    dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
+                    dropdown.style.top = 'auto';
+                }
+                
+                // Calculate horizontal position (align to right edge of button)
+                const rightEdge = buttonRect.right;
+                if (rightEdge >= dropdownRect.width) {
+                    dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
+                    dropdown.style.right = 'auto';
+                } else {
+                    dropdown.style.left = buttonRect.left + 'px';
+                    dropdown.style.right = 'auto';
+                }
+            }, 10);
         }
 
         // Edit student function
@@ -622,6 +740,32 @@
 
         .dataTables_wrapper .dataTables_paginate {
             text-align: right;
+        }
+
+        /* Dropdown menu styles */
+        .dropdown-container {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            min-width: 8rem;
+            white-space: nowrap;
+        }
+
+        /* Ensure table cells don't clip dropdowns */
+        table tbody tr td {
+            overflow: visible !important;
+        }
+
+        /* Ensure table wrapper allows overflow */
+        .dataTables_wrapper {
+            overflow: visible !important;
+        }
+
+        /* Ensure table container allows overflow for dropdowns */
+        .overflow-x-auto {
+            overflow-y: visible !important;
         }
     </style>
 @endsection

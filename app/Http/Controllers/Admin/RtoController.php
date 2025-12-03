@@ -134,6 +134,13 @@ class RtoController extends Controller
         return back()->with('success', 'RTO status updated successfully');
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $rto = User::findOrFail($id);
+        $rto->update(['status' => $request->status]);
+        return response()->json(['success' => true]);
+    }
+
     public function data(Request $request)
     {
         $query = User::where('role', 'rto'); // Only RTOs
@@ -193,9 +200,9 @@ class RtoController extends Controller
                 'contact_info' => '<div class="space-y-1"><div class="flex items-center text-xs"><i class="bi bi-envelope mr-1"></i>' . $rto->email . '</div><div class="flex items-center text-xs"><i class="bi bi-phone mr-1"></i>' . ($rto->phone ?? 'N/A') . '</div></div>',
                 'contact_person' => $rto->contact_person ?? '-----',
                 'website' => $rto->website ? '<a href="' . $rto->website . '" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center text-xs"><i class="bi bi-globe mr-1"></i>Visit</a>' : '<span class="text-gray-400 text-xs">N/A</span>',
-                'status' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $statusColor . ' border shadow-sm">' . ($rto->status ? 'Active' : 'Inactive') . '</span>',
+                'status' => '<select onchange="updateStatus(' . $rto->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($rto->status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value="1"' . ($rto->status ? ' selected' : '') . '>Active</option><option value="0"' . (!$rto->status ? ' selected' : '') . '>Inactive</option></select>',
                 'created_at' => $rto->created_at->format('j M Y'),
-                'actions' => '<div class="relative"><button onclick="toggleDropdown(' . $rto->id . ')" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"><i class="bi bi-three-dots-vertical"></i></button><div id="dropdown-' . $rto->id . '" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 border"><a href="' . route('admin.rtos.edit', $rto->id) . '" class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md"><i class="bi bi-pencil mr-2"></i>Edit</a><a href="#" onclick="toggleStatus(' . $rto->id . ')" class="block px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md"><i class="bi bi-toggle-on mr-2"></i>Toggle Status</a><a href="#" onclick="deleteRto(' . $rto->id . ')" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"><i class="bi bi-trash mr-2"></i>Delete</a></div></div>'
+                'actions' => '<div class="text-center"><div class="relative inline-block dropdown-container" onclick="event.stopPropagation()"><button onclick="toggleDropdown(' . $rto->id . ')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"><i class="bi bi-three-dots-vertical text-gray-700"></i></button><div id="dropdown-' . $rto->id . '" class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1"><a href="#" onclick="deleteRto(' . $rto->id . ')" class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="bi bi-trash mr-2"></i>Delete</a></div></div></div>'
             ];
         }
 

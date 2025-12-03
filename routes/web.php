@@ -158,6 +158,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::put('/rtos/{id}', 'update')->name('rtos.update');
             Route::delete('/rtos/{id}', 'destroy');
             Route::patch('/rtos/{id}/toggle-status', 'toggleStatus');
+            Route::post('/rtos/update-status/{id}', 'updateStatus');
         });
 
         // Students
@@ -187,6 +188,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::get('/courses/{id}/edit', 'edit')->name('courses.edit');
             Route::put('/courses/{id}', 'update')->name('courses.update');
             Route::delete('/courses/{id}', 'destroy');
+            Route::post('/courses/update-status/{id}', 'updateStatus');
         });
 
         // Industries
@@ -199,6 +201,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::put('/industries/{id}', 'update')->name('industries.update');
             Route::delete('/industries/{id}', 'destroy');
             Route::patch('/industries/{id}/toggle-status', 'toggleStatus');
+            Route::post('/industries/update-status/{id}', 'updateStatus');
         });
 
         // Coordinators
@@ -212,6 +215,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::delete('/coordinators/{id}', 'destroy');
             Route::patch('/coordinators/{id}/reset-password', 'resetPassword');
             Route::patch('/coordinators/{id}/toggle-status', 'toggleStatus');
+            Route::post('/coordinators/update-status/{id}', 'updateStatus');
         });
 
         // Role & Permissions

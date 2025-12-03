@@ -116,7 +116,7 @@
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
                         <th
-                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Actions</th>
                     </tr>
                 </thead>
@@ -219,17 +219,20 @@
             "lengthChange": false,
             "dom": 'rt<"flex justify-end mt-4"p>',
             "scrollX": true,
+            "language": {
+                "processing": "Processing..."
+            },
             "createdRow": function(row, data, dataIndex) {
                 $(row).addClass('hover:bg-gray-50 transition-colors cursor-pointer');
 
-                // Prevent row click on actions column
-                $(row).find('td:last-child').on('click', function(e) {
+                $(row).find('td:last-child, select').on('click', function(e) {
                     e.stopPropagation();
                 });
 
-                // Row click navigation
                 $(row).on('click', function(e) {
-                    window.location.href = data.row_url;
+                    if (!$(e.target).closest('select, button, a, [onclick]').length) {
+                        window.location.href = data.row_url;
+                    }
                 });
             }
         });
@@ -275,6 +278,7 @@
             e.preventDefault();
             e.stopPropagation();
 
+            const button = this;
             const onclickAttr = $(this).attr('onclick');
             const match = onclickAttr.match(/toggleDropdown\((\d+)\)/);
 
@@ -286,11 +290,54 @@
                 allDropdowns.forEach(dd => {
                     if (dd !== dropdown) {
                         dd.classList.add('hidden');
+                        dd.style.position = '';
+                        dd.style.top = '';
+                        dd.style.bottom = '';
+                        dd.style.left = '';
+                        dd.style.right = '';
                     }
                 });
 
                 if (dropdown) {
-                    dropdown.classList.toggle('hidden');
+                    if (!dropdown.classList.contains('hidden')) {
+                        dropdown.classList.add('hidden');
+                        dropdown.style.position = '';
+                        dropdown.style.top = '';
+                        dropdown.style.bottom = '';
+                        dropdown.style.left = '';
+                        dropdown.style.right = '';
+                        return;
+                    }
+
+                    dropdown.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        const buttonRect = button.getBoundingClientRect();
+                        const dropdownRect = dropdown.getBoundingClientRect();
+                        const viewportHeight = window.innerHeight;
+                        
+                        dropdown.style.position = 'fixed';
+                        
+                        const spaceBelow = viewportHeight - buttonRect.bottom;
+                        const spaceAbove = buttonRect.top;
+                        
+                        if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
+                            dropdown.style.top = (buttonRect.bottom + 4) + 'px';
+                            dropdown.style.bottom = 'auto';
+                        } else {
+                            dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
+                            dropdown.style.top = 'auto';
+                        }
+                        
+                        const rightEdge = buttonRect.right;
+                        if (rightEdge >= dropdownRect.width) {
+                            dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
+                            dropdown.style.right = 'auto';
+                        } else {
+                            dropdown.style.left = buttonRect.left + 'px';
+                            dropdown.style.right = 'auto';
+                        }
+                    }, 10);
                 }
             }
         });
@@ -311,16 +358,60 @@
 
         // Global function for onclick attributes
         function toggleDropdown(id) {
+            event.stopPropagation();
+            const button = event.currentTarget;
             const dropdown = document.getElementById(`dropdown-${id}`);
-            if (!dropdown) return;
 
-            // Close other dropdowns
-            document.querySelectorAll('[id^="dropdown-"]').forEach(dd => {
-                if (dd !== dropdown) dd.classList.add('hidden');
+            document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
+                if (d.id !== `dropdown-${id}`) {
+                    d.classList.add('hidden');
+                    d.style.position = '';
+                    d.style.top = '';
+                    d.style.bottom = '';
+                    d.style.left = '';
+                    d.style.right = '';
+                }
             });
 
-            // Toggle this dropdown
-            dropdown.classList.toggle('hidden');
+            if (!dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+                dropdown.style.position = '';
+                dropdown.style.top = '';
+                dropdown.style.bottom = '';
+                dropdown.style.left = '';
+                dropdown.style.right = '';
+                return;
+            }
+
+            dropdown.classList.remove('hidden');
+            
+            setTimeout(() => {
+                const buttonRect = button.getBoundingClientRect();
+                const dropdownRect = dropdown.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                dropdown.style.position = 'fixed';
+                
+                const spaceBelow = viewportHeight - buttonRect.bottom;
+                const spaceAbove = buttonRect.top;
+                
+                if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
+                    dropdown.style.top = (buttonRect.bottom + 4) + 'px';
+                    dropdown.style.bottom = 'auto';
+                } else {
+                    dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
+                    dropdown.style.top = 'auto';
+                }
+                
+                const rightEdge = buttonRect.right;
+                if (rightEdge >= dropdownRect.width) {
+                    dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
+                    dropdown.style.right = 'auto';
+                } else {
+                    dropdown.style.left = buttonRect.left + 'px';
+                    dropdown.style.right = 'auto';
+                }
+            }, 10);
         }
 
 
@@ -358,7 +449,16 @@
             });
         }
 
-        // Delete Industry function
+        function updateStatus(id, value) {
+            $.post(`/admin/industries/update-status/${id}`, { 
+                status: value,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            })
+            .done(function() {
+                industriesTable.ajax.reload(null, false);
+            });
+        }
+
         function deleteIndustry(id) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -370,16 +470,17 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Create and submit delete form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/industries/${id}`;
-                    form.innerHTML = `
-                        @csrf
-                        @method('DELETE')
-                    `;
-                    document.body.appendChild(form);
-                    form.submit();
+                    $.ajax({
+                        url: `/admin/industries/${id}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function() {
+                            industriesTable.ajax.reload();
+                            Swal.fire('Deleted!', 'Industry has been deleted.', 'success');
+                        }
+                    });
                 }
             });
         }
@@ -407,6 +508,28 @@
 
         .dataTables_wrapper .dataTables_paginate {
             text-align: right;
+        }
+
+        .dropdown-container {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            min-width: 8rem;
+            white-space: nowrap;
+        }
+
+        table tbody tr td {
+            overflow: visible !important;
+        }
+
+        .dataTables_wrapper {
+            overflow: visible !important;
+        }
+
+        .overflow-x-auto {
+            overflow-y: visible !important;
         }
     </style>
 @endsection

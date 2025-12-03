@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <!-- DataTables CSS -->
@@ -43,6 +44,9 @@
     </script>
 </head>
 
+
+
+
 <body class="bg-gray-100 font-[Poppins,sans-serif] relative">
     <!-- Sidebar -->
     @include('admin.layout.sidebar')
@@ -66,14 +70,14 @@
             "positionClass": "toast-top-right",
             "timeOut": "5000"
         };
-        @if(session('success'))
+        @if (session('success'))
             toastr.success('{{ session('success') }}');
         @endif
-        @if(session('error'))
+        @if (session('error'))
             toastr.error('{{ session('error') }}');
         @endif
-        @if($errors->any())
-            @foreach($errors->all() as $error)
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
                 toastr.error('{{ $error }}');
             @endforeach
         @endif
