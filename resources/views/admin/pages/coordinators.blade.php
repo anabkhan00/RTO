@@ -94,6 +94,9 @@
                             Code</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Type</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Email</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
@@ -174,6 +177,7 @@
             "columns": [
                 {"data": "name", "orderable": true},
                 {"data": "code", "orderable": true},
+                {"data": "coordinator_type", "orderable": true},
                 {"data": "email", "orderable": true},
                 {"data": "status", "orderable": false},
                 {"data": "created_at", "orderable": true},

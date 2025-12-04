@@ -55,6 +55,21 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-person-badge mr-1"></i> Type <span class="text-red-500">*</span>
+                    </label>
+                    <select name="coordinator_type" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white @error('coordinator_type') border-red-500 @enderror">
+                        <option value="">Select Coordinator Type</option>
+                        <option value="sourcing" {{ old('coordinator_type', $coordinator->coordinator_type) == 'sourcing' ? 'selected' : '' }}>Sourcing Coordinator</option>
+                        <option value="placement" {{ old('coordinator_type', $coordinator->coordinator_type) == 'placement' ? 'selected' : '' }}>Placement Coordinator</option>
+                    </select>
+                    @error('coordinator_type')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 {{-- <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-phone mr-1"></i> Phone

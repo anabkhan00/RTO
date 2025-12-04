@@ -27,16 +27,14 @@ class CoordinatorController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:users,code',
             'email' => 'required|email|unique:users',
-            // 'phone' => 'nullable|string|max:20',
-            // 'address' => 'nullable|string',
+            'coordinator_type' => 'required|in:sourcing,placement',
         ]);
 
         $coordinator = User::create([
             'name' => $request->name,
             'code' => $request->code,
             'email' => $request->email,
-            // 'phone' => $request->phone,
-            // 'address' => $request->address,
+            'coordinator_type' => $request->coordinator_type,
             'password' => Hash::make('password'),
             'role' => 'coordinator',
             'status' => true,
@@ -58,8 +56,7 @@ class CoordinatorController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:users,code,' . $id,
             'email' => 'required|email|unique:users,email,' . $id,
-            // 'phone' => 'nullable|string|max:20',
-            // 'address' => 'nullable|string',
+            'coordinator_type' => 'required|in:sourcing,placement',
         ]);
 
         $coordinator = User::findOrFail($id);
@@ -67,9 +64,11 @@ class CoordinatorController extends Controller
             'name' => $request->name,
             'code' => $request->code,
             'email' => $request->email,
-            // 'phone' => $request->phone,
-            // 'address' => $request->address,
+            'role' => 'coordinator',
+            'coordinator_type' => $request->coordinator_type,
         ]);
+
+        $coordinator->assignRole('coordinator');
 
         return redirect()->route('admin.coordinators')->with('success', 'Coordinator updated successfully');
     }
@@ -191,7 +190,7 @@ class CoordinatorController extends Controller
         $orderDir = $request->get('order.0.dir', 'desc');
 
         // Order mapping
-        $columns = ['name', 'code', 'email', 'status', 'created_at', 'actions'];
+        $columns = ['name', 'code', 'coordinator_type', 'email', 'status', 'created_at', 'actions'];
         $orderBy = $columns[$orderColumn] ?? 'created_at';
 
         if ($orderBy === 'created_at') {
@@ -200,6 +199,8 @@ class CoordinatorController extends Controller
             $query->orderBy('name', $orderDir);
         } elseif ($orderBy === 'code') {
             $query->orderBy('code', $orderDir);
+        } elseif ($orderBy === 'coordinator_type') {
+            $query->orderBy('coordinator_type', $orderDir);
         } elseif ($orderBy === 'email') {
             $query->orderBy('email', $orderDir);
         }
@@ -216,10 +217,14 @@ class CoordinatorController extends Controller
             $coordinatorColors = ['bg-blue-50 text-blue-700 border-blue-100', 'bg-purple-50 text-purple-700 border-purple-100', 'bg-emerald-50 text-emerald-700 border-emerald-100'];
             $coordinatorColor = $coordinatorColors[abs(crc32($coordinator->code)) % count($coordinatorColors)];
 
+            $typeColor = $coordinator->coordinator_type == 'sourcing' ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-indigo-50 text-indigo-700 border-indigo-100';
+            $typeText = $coordinator->coordinator_type == 'sourcing' ? 'Sourcing' : 'Placement';
+
             $data[] = [
                 'row_url' => route('admin.coordinators.edit', $coordinator->id),
                 'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($coordinator->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $coordinator->name . '</div></div>',
                 'code' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $coordinatorColor . ' border shadow-sm">' . $coordinator->code . '</span>',
+                'coordinator_type' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $typeColor . ' border shadow-sm">' . $typeText . '</span>',
                 'email' => $coordinator->email,
                 'status' => '<select onchange="updateStatus(' . $coordinator->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($coordinator->status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value="1"' . ($coordinator->status ? ' selected' : '') . '>Active</option><option value="0"' . (!$coordinator->status ? ' selected' : '') . '>Inactive</option></select>',
                 'created_at' => $coordinator->created_at->format('j M Y'),

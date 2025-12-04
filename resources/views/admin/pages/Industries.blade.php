@@ -239,13 +239,13 @@
 
         // Modal functionality
         const uploadModal = document.getElementById('uploadModal');
-        const openUploadBtn = document.getElementById('openUploadBtn');
+        // const openUploadBtn = document.getElementById('openUploadBtn');
         const closeUploadBtn = document.getElementById('closeUploadBtn');
         const cancelUploadBtn = document.getElementById('cancelUploadBtn');
 
-        openUploadBtn.addEventListener('click', () => {
-            uploadModal.classList.remove('hidden');
-        });
+        // openUploadBtn.addEventListener('click', () => {
+        //     uploadModal.classList.remove('hidden');
+        // });
 
         [closeUploadBtn, cancelUploadBtn].forEach(btn => {
             btn.addEventListener('click', () => {
@@ -310,17 +310,17 @@
                     }
 
                     dropdown.classList.remove('hidden');
-                    
+
                     setTimeout(() => {
                         const buttonRect = button.getBoundingClientRect();
                         const dropdownRect = dropdown.getBoundingClientRect();
                         const viewportHeight = window.innerHeight;
-                        
+
                         dropdown.style.position = 'fixed';
-                        
+
                         const spaceBelow = viewportHeight - buttonRect.bottom;
                         const spaceAbove = buttonRect.top;
-                        
+
                         if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                             dropdown.style.top = (buttonRect.bottom + 4) + 'px';
                             dropdown.style.bottom = 'auto';
@@ -328,7 +328,7 @@
                             dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                             dropdown.style.top = 'auto';
                         }
-                        
+
                         const rightEdge = buttonRect.right;
                         if (rightEdge >= dropdownRect.width) {
                             dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
@@ -384,17 +384,17 @@
             }
 
             dropdown.classList.remove('hidden');
-            
+
             setTimeout(() => {
                 const buttonRect = button.getBoundingClientRect();
                 const dropdownRect = dropdown.getBoundingClientRect();
                 const viewportHeight = window.innerHeight;
-                
+
                 dropdown.style.position = 'fixed';
-                
+
                 const spaceBelow = viewportHeight - buttonRect.bottom;
                 const spaceAbove = buttonRect.top;
-                
+
                 if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                     dropdown.style.top = (buttonRect.bottom + 4) + 'px';
                     dropdown.style.bottom = 'auto';
@@ -402,7 +402,7 @@
                     dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                     dropdown.style.top = 'auto';
                 }
-                
+
                 const rightEdge = buttonRect.right;
                 if (rightEdge >= dropdownRect.width) {
                     dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
@@ -450,7 +450,7 @@
         }
 
         function updateStatus(id, value) {
-            $.post(`/admin/industries/update-status/${id}`, { 
+            $.post(`/admin/industries/update-status/${id}`, {
                 status: value,
                 _token: $('meta[name="csrf-token"]').attr('content')
             })
