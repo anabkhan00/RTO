@@ -10,69 +10,70 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.rtos') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.rtos*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    RTOs
-                </a>
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.rtos') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.rtos*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        RTOs
+                    </a>
 
-                <a href="{{ route('admin.students') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*')
-            ? 'bg-brand rounded-lg text-white'
-            : '' }}">
-                    Students
-                </a>
-                <a href="{{ route('admin.courses') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.courses*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Courses
-                </a>
-                <a href="{{ route('admin.industries') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Industries
-                </a>
-                <a href="{{ route('admin.coordinators') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.coordinators*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Coordinators
-                </a>
+                    <a href="{{ route('admin.courses') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.courses*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Courses
+                    </a>
 
-                <!-- Create Users -->
-                {{-- <a href="{{ route('admin.create-users') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.create-users*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Create Users
-                </a> --}}
+                    <a href="{{ route('admin.coordinators') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.coordinators*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Coordinators
+                    </a>
 
-                <!-- Role & Permission Management -->
-                <a href="{{ route('admin.roles') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.roles*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Roles
-                </a>
-                <a href="{{ route('admin.permissions') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.permissions*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Permissions
-                </a>
-                <a href="{{ route('admin.assign-permissions') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-permissions*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Assign Permissions
-                </a>
+                    <a href="{{ route('admin.roles') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.roles*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Roles
+                    </a>
+                    <a href="{{ route('admin.permissions') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.permissions*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Permissions
+                    </a>
+                    <a href="{{ route('admin.assign-permissions') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-permissions*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Assign Permissions
+                    </a>
 
-                <a href="{{ route('admin.document-checklist') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.document-checklist*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Document Checklist
-                </a>
+                    <a href="{{ route('admin.document-checklist') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.document-checklist*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Document Checklist
+                    </a>
 
-                <a href="{{ route('admin.contracts') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.contracts*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Contracts
-                </a>
+                    <a href="{{ route('admin.contracts') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.contracts*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Contracts
+                    </a>
+                @endif
+
+                @if(auth()->user()->role === 'coordinator')
+                    @if(auth()->user()->coordinator_type === 'placement')
+                        <a href="{{ route('admin.students') }}"
+                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                            Students
+                        </a>
+                        <a href="{{ route('admin.assign-industry') }}"
+                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-industry*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                            Assign Industry
+                        </a>
+                    @endif
+
+                    @if(auth()->user()->coordinator_type === 'sourcing')
+                        <a href="{{ route('admin.industries') }}"
+                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                            Industries
+                        </a>
+                    @endif
+                @endif
 
                 <a href="/profile"
                     class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->is('profile') ? 'bg-brand rounded-lg text-white' : '' }}">
                     Profile
                 </a>
-
-                {{-- <a href="#"
-                    class="flex items-center px-6 py-2 font-medium text-sm hover:bg-brand/20 transition">
-                    Settings
-                </a> --}}
             </nav>
 
         </div>

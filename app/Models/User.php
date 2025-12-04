@@ -31,6 +31,7 @@ class User extends Authenticatable
         'contact_person',
         'status',
         'course_id',
+        'coordinator_type'
     ];
 
     /**
@@ -96,5 +97,11 @@ class User extends Authenticatable
     public function primaryRto()
     {
         return $this->rtos()->first();
+    }
+
+    // Industries assigned to this student
+    public function assignedIndustries()
+    {
+        return $this->belongsToMany(Industry::class, 'student_industries', 'student_id', 'industry_id');
     }
 }

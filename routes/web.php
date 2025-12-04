@@ -136,16 +136,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update']);
 });
 
-// Admin Routes
-Route::middleware(['auth', 'role:admin|coordinator'])
+// Admin Routes (Admin Only)
+Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard
-        // Route::get('/dashboard', fn() => view('admin.pages.dashboard'))->name('dashboard');
-
-        // Dashboard
         Route::get('dashboard', [AdminRtoController::class, 'dashboard'])->name('dashboard');
 
         // RTOs
@@ -161,24 +157,6 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::post('/rtos/update-status/{id}', 'updateStatus');
         });
 
-        // Students
-        Route::controller(StudentController::class)->group(function () {
-            Route::get('/students', 'index')->name('students');
-            Route::get('/students/create', 'create')->name('students.create');
-            Route::get('/students/data', 'data')->name('students.data');
-            Route::post('/students', 'store')->name('students.store');
-            Route::put('/students/{id}', 'update')->name('students.update');
-            Route::delete('/students/{id}', 'destroy');
-            Route::post('/students/upload', 'upload');
-            Route::get('/students/download', 'download')->name('students.download');
-            Route::get('/students/csv-format', 'csvFormat');
-        });
-
-        Route::controller(StudentNoteController::class)->prefix('students/{student}')->group(function () {
-            Route::get('/notes', 'index');
-            Route::post('/notes', 'store');
-        });
-
         // Courses
         Route::controller(CourseController::class)->group(function () {
             Route::get('/courses', 'index')->name('courses');
@@ -189,19 +167,6 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::put('/courses/{id}', 'update')->name('courses.update');
             Route::delete('/courses/{id}', 'destroy');
             Route::post('/courses/update-status/{id}', 'updateStatus');
-        });
-
-        // Industries
-        Route::controller(IndustryController::class)->group(function () {
-            Route::get('/industries', 'index')->name('industries');
-            Route::get('/industries/create', 'create')->name('industries.create');
-            Route::get('/industries/data', 'data')->name('industries.data');
-            Route::post('/industries', 'store')->name('industries.store');
-            Route::get('/industries/{id}/edit', 'edit')->name('industries.edit');
-            Route::put('/industries/{id}', 'update')->name('industries.update');
-            Route::delete('/industries/{id}', 'destroy');
-            Route::patch('/industries/{id}/toggle-status', 'toggleStatus');
-            Route::post('/industries/update-status/{id}', 'updateStatus');
         });
 
         // Coordinators
@@ -234,14 +199,6 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::post('/assign-permissions', 'updateRolePermissions');
         });
 
-        // Student Documents
-        Route::controller(StudentDocumentController::class)->group(function () {
-            Route::get('/student-documents/{student}', 'index')->name('student-documents.index');
-            Route::post('/student-documents/{student}', 'store')->name('student-documents.store');
-            Route::post('/student-documents/assign-types/{student}', 'assignTypes');
-            Route::delete('/student-documents/{document}', 'destroy');
-        });
-
         // Document Checklist
         Route::controller(DocumentChecklistController::class)->group(function () {
             Route::get('/document-checklist', 'index')->name('document-checklist');
@@ -257,5 +214,65 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::post('/contracts', 'store');
             Route::get('/contracts/{contract}/view', 'adminViewContract')->name('contracts.view');
             Route::delete('/contracts/{contract}', 'destroy');
+        });
+    });
+
+// Placement Coordinator Routes
+Route::middleware(['auth', 'role:coordinator'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        
+        Route::get('dashboard', [AdminRtoController::class, 'dashboard'])->name('dashboard');
+        
+        // Students (Placement Coordinators only)
+        Route::middleware(\App\Http\Middleware\CoordinatorAccess::class . ':placement')->group(function () {
+            Route::controller(StudentController::class)->group(function () {
+                Route::get('/students', 'index')->name('students');
+                Route::get('/students/create', 'create')->name('students.create');
+                Route::get('/students/data', 'data')->name('students.data');
+                Route::post('/students', 'store')->name('students.store');
+                Route::put('/students/{id}', 'update')->name('students.update');
+                Route::delete('/students/{id}', 'destroy');
+                Route::post('/students/upload', 'upload');
+                Route::get('/students/download', 'download')->name('students.download');
+                Route::get('/students/csv-format', 'csvFormat');
+            });
+
+            Route::controller(StudentNoteController::class)->prefix('students/{student}')->group(function () {
+                Route::get('/notes', 'index');
+                Route::post('/notes', 'store');
+            });
+
+            Route::controller(StudentDocumentController::class)->group(function () {
+                Route::get('/student-documents/{student}', 'index')->name('student-documents.index');
+                Route::post('/student-documents/{student}', 'store')->name('student-documents.store');
+                Route::post('/student-documents/assign-types/{student}', 'assignTypes');
+                Route::delete('/student-documents/{document}', 'destroy');
+            });
+        });
+
+        // Student Industry Assignment (Placement Coordinators only)
+        Route::middleware(\App\Http\Middleware\CoordinatorAccess::class . ':placement')->group(function () {
+            Route::controller(\App\Http\Controllers\Admin\StudentIndustryController::class)->group(function () {
+                Route::get('/assign-industry', 'index')->name('assign-industry');
+                Route::post('/assign-industry/bulk-assign', 'bulkAssign')->name('student-industry.bulk-assign');
+                Route::post('/assign-industry/remove', 'removeAssignment')->name('student-industry.remove');
+            });
+        });
+
+        // Industries (Sourcing Coordinators only)
+        Route::middleware(\App\Http\Middleware\CoordinatorAccess::class . ':sourcing')->group(function () {
+            Route::controller(IndustryController::class)->group(function () {
+                Route::get('/industries', 'index')->name('industries');
+                Route::get('/industries/create', 'create')->name('industries.create');
+                Route::get('/industries/data', 'data')->name('industries.data');
+                Route::post('/industries', 'store')->name('industries.store');
+                Route::get('/industries/{id}/edit', 'edit')->name('industries.edit');
+                Route::put('/industries/{id}', 'update')->name('industries.update');
+                Route::delete('/industries/{id}', 'destroy');
+                Route::patch('/industries/{id}/toggle-status', 'toggleStatus');
+                Route::post('/industries/update-status/{id}', 'updateStatus');
+            });
         });
     });
