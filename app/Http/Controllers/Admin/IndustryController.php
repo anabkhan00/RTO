@@ -17,7 +17,9 @@ class IndustryController extends Controller
 
     public function create()
     {
-        return view('admin.pages.create_industry');
+        $courses = \App\Models\Course::where('status', true)->get();
+        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
+        return view('admin.pages.edit_industry', compact('courses', 'checklists'));
     }
 
     public function store(Request $request)
@@ -30,6 +32,11 @@ class IndustryController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'website' => 'nullable|url',
+            'industry_status' => 'required|in:active,inactive,blocked',
+            'course_ids' => 'nullable|array',
+            'checklist_ids' => 'nullable|array',
+            'availability' => 'nullable|array',
+            'notes' => 'nullable|string',
         ]);
 
         Industry::create([
@@ -41,6 +48,11 @@ class IndustryController extends Controller
             'address' => $request->address,
             'website' => $request->website,
             'status' => true,
+            'industry_status' => $request->industry_status,
+            'course_ids' => $request->course_ids,
+            'checklist_ids' => $request->checklist_ids,
+            'availability' => $request->availability,
+            'notes' => $request->notes,
         ]);
 
         return redirect()->route('admin.industries')->with('success', 'Industry created successfully');
@@ -49,7 +61,9 @@ class IndustryController extends Controller
     public function edit($id)
     {
         $industry = Industry::findOrFail($id);
-        return view('admin.pages.edit_industry', compact('industry'));
+        $courses = \App\Models\Course::where('status', true)->get();
+        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
+        return view('admin.pages.edit_industry', compact('industry', 'courses', 'checklists'));
     }
 
     public function update(Request $request, $id)
@@ -62,6 +76,11 @@ class IndustryController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'website' => 'nullable|url',
+            'industry_status' => 'required|in:active,inactive,blocked',
+            'course_ids' => 'nullable|array',
+            'checklist_ids' => 'nullable|array',
+            'availability' => 'nullable|array',
+            'notes' => 'nullable|string',
         ]);
 
         $industry = Industry::findOrFail($id);
@@ -73,6 +92,11 @@ class IndustryController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'website' => $request->website,
+            'industry_status' => $request->industry_status,
+            'course_ids' => $request->course_ids,
+            'checklist_ids' => $request->checklist_ids,
+            'availability' => $request->availability,
+            'notes' => $request->notes,
         ]);
 
         return redirect()->route('admin.industries')->with('success', 'Industry updated successfully');
@@ -237,5 +261,72 @@ class IndustryController extends Controller
             'recordsFiltered' => $filteredRecords,
             'data' => $data
         ]);
+    }
+    public function getWeekAvailability(Request $request, $id)
+    {
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        // Extract dates
+        $startDate = substr($start, 0, 10);
+        $endDate = substr($end, 0, 10);
+
+        // Fetch ALL schedules that overlap with the requested range
+        $schedules = \App\Models\IndustryWeeklySchedule::where('industry_id', $id)
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('week_start_date', [$startDate, $endDate])
+                      ->orWhereBetween('week_end_date', [$startDate, $endDate])
+                      ->orWhere(function ($q) use ($startDate, $endDate) {
+                          $q->where('week_start_date', '<', $startDate)
+                            ->where('week_end_date', '>', $endDate);
+                      });
+            })
+            ->get();
+
+        $events = [];
+
+        foreach ($schedules as $schedule) {
+            if ($schedule->selected_time_slots) {
+                foreach ($schedule->selected_time_slots as $slot) {
+                    $slot = (array) $slot;
+                    $events[] = [
+                        'id' => uniqid(),
+                        'title' => 'Available',
+                        'start' => $slot['start'] ?? null,
+                        'end' => $slot['end'] ?? null,
+                        'color' => '#3788d8',
+                    ];
+                }
+            }
+        }
+
+        return response()->json($events);
+    }
+
+    public function saveWeekAvailability(Request $request, $id)
+    {
+        $request->validate([
+            'week_start' => 'required|date',
+            'events' => 'present|array',
+            'total_hours' => 'required|numeric'
+        ]);
+
+        // STRICTLY force Monday as start of week to normalize data
+        $weekStart = \Carbon\Carbon::parse($request->week_start)->startOfWeek(\Carbon\Carbon::MONDAY);
+        $weekEnd = $weekStart->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+
+        \App\Models\IndustryWeeklySchedule::updateOrCreate(
+            [
+                'industry_id' => $id,
+                'week_start_date' => $weekStart->toDateString()
+            ],
+            [
+                'week_end_date' => $weekEnd->toDateString(),
+                'selected_time_slots' => $request->events,
+                'total_hours' => $request->total_hours
+            ]
+        );
+
+        return response()->json(['success' => true, 'message' => 'Schedule saved successfully']);
     }
 }

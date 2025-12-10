@@ -1,66 +1,147 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#">RTO System</a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">Welcome, {{ auth()->user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+@extends('user.master_layout.index')
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h4 class="mb-0">User Dashboard</h4>
+@section('title', 'Student Dashboard')
+
+@section('content')
+<div class="p-4 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-medium text-gray-800 mb-1">Welcome, {{ auth()->user()->name }}</h1>
+            <p class="text-sm text-gray-500">Your placement dashboard</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-brand rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-briefcase text-white"></i>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-success">
-                            <h5>Welcome to User Dashboard!</h5>
-                            <p>This is the User Dashboard. You are logged in as a User.</p>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5>My Profile</h5>
-                                        <p>Manage your profile information</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5>My Courses</h5>
-                                        <p>View your enrolled courses</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5>Certificates</h5>
-                                        <p>View your certificates</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">{{ $placementCount }}</h3>
+                        <p class="text-sm text-gray-500">Placement{{ $placementCount != 1 ? 's' : '' }} Assigned</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-check-circle text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Active</h3>
+                        <p class="text-sm text-gray-500">Account Status</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-calendar text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">{{ now()->format('M Y') }}</h3>
+                        <p class="text-sm text-gray-500">Current Period</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Placement Assignments -->
+        <div class="bg-white rounded-lg shadow-sm border">
+            <div class="p-4 border-b">
+                <h2 class="text-base font-medium text-gray-700 flex items-center">
+                    <i class="fas fa-industry text-brand text-sm mr-2"></i>
+                    Your Placement Assignments
+                </h2>
+            </div>
+            <div class="p-4">
+                @if($assignments->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($assignments as $assignment)
+                    <div class="border rounded-lg p-4 hover:shadow-sm transition-shadow">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-medium text-gray-800 mb-1">{{ $assignment->opportunity->industry->name }}</h3>
+                                <p class="text-xs text-gray-500">Assigned by {{ $assignment->placementCoordinator->name }}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-md bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </div>
+
+                        @if($assignment->opportunity->requirements)
+                        <div class="mb-3">
+                            <p class="text-xs text-gray-600 mb-1">Requirements:</p>
+                            <p class="text-xs text-gray-800 bg-gray-50 p-2 rounded">{{ $assignment->opportunity->requirements }}</p>
+                        </div>
+                        @endif
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-600">Sourced by:</span>
+                                <span class="font-medium">{{ $assignment->opportunity->sourcingCoordinator->name }}</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-600">Total Slots:</span>
+                                <span class="font-medium">{{ $assignment->opportunity->total_slots }}</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-600">Assigned Date:</span>
+                                <span class="font-medium">{{ $assignment->created_at->format('M d, Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <div class="text-center py-8">
+                    <i class="fas fa-briefcase text-gray-300 text-4xl mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">No Placements Yet</h3>
+                    <p class="text-gray-500 mb-4">You haven't been assigned to any placement opportunities yet.</p>
+                    <p class="text-sm text-gray-400">Your placement coordinator will assign you to suitable opportunities soon.</p>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="mt-6 bg-white rounded-lg shadow-sm border">
+            <div class="p-4 border-b">
+                <h2 class="text-base font-medium text-gray-700 flex items-center">
+                    <i class="fas fa-user text-brand text-sm mr-2"></i>
+                    Profile Information
+                </h2>
+            </div>
+            <div class="p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <p class="text-sm text-gray-800">{{ auth()->user()->name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <p class="text-sm text-gray-800">{{ auth()->user()->email }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <p class="text-sm text-gray-800 capitalize">Student</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
+                        <p class="text-sm text-gray-800">{{ auth()->user()->created_at->format('M d, Y') }}</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="/profile" class="bg-brand text-white px-4 py-2 rounded-md hover:bg-gold transition-colors text-sm">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+</div>
+@endsection

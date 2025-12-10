@@ -50,22 +50,49 @@
                     </a>
                 @endif
 
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.students') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Students
+                    </a>
+                    <a href="{{ route('admin.assign-students') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-students*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Assign Students
+                    </a>
+                    <a href="{{ route('admin.industries') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Industries
+                    </a>
+                    <a href="{{ route('admin.industry-keywords') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industry-keywords*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Manage Industries
+                    </a>
+                @endif
+
                 @if(auth()->user()->role === 'coordinator')
                     @if(auth()->user()->coordinator_type === 'placement')
                         <a href="{{ route('admin.students') }}"
                             class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
                             Students
                         </a>
-                        <a href="{{ route('admin.assign-industry') }}"
-                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-industry*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                            Assign Industry
+                        <a href="{{ route('admin.assign-students') }}"
+                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-students*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                            Assign Students
                         </a>
                     @endif
 
                     @if(auth()->user()->coordinator_type === 'sourcing')
+                        <a href="{{ route('admin.students') }}"
+                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                            Students
+                        </a>
                         <a href="{{ route('admin.industries') }}"
                             class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
                             Industries
+                        </a>
+                        <a href="{{ route('admin.industry-keywords') }}"
+                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industry-keywords*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                            Manage Industries
                         </a>
                     @endif
                 @endif

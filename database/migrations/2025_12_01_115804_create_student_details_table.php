@@ -24,6 +24,9 @@ return new class extends Migration
             $table->integer('days_left')->default(0);
             $table->dateTime('placement_booked_at')->nullable();
 
+            $table->string('emergency_contact')->nullable();
+            $table->integer('placement_hours')->nullable();
+
             $table->timestamps();
         });
     }

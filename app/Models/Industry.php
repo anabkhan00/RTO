@@ -17,10 +17,23 @@ class Industry extends Model
         'phone',
         'address',
         'website',
-        'status'
+        'status',
+        'industry_status',
+        'course_ids',
+        'checklist_ids',
+        'availability',
+        'notes'
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'course_ids' => 'array',
+        'checklist_ids' => 'array',
+        'availability' => 'array',
     ];
+
+    public function weeklySchedules()
+    {
+        return $this->hasMany(IndustryWeeklySchedule::class);
+    }
 }

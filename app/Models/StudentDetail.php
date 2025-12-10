@@ -13,7 +13,9 @@ class StudentDetail extends Model
         'progress_status',
         'days_left',
         'placement_booked_at',
-        'industry_id'
+        'industry_id',
+        'emergency_contact',
+        'placement_hours'
     ];
 
     protected $casts = [

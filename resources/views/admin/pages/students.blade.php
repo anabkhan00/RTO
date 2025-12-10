@@ -21,27 +21,29 @@
                 <h1 class="text-2xl font-bold text-gray-800">Students Management</h1>
                 <p class="text-gray-600 mt-1">Manage and track your students</p>
             </div>
-            <div class="flex gap-3">
-                <!-- Small Action Button -->
-                <a href="{{ route('admin.students.create') }}"
-                    class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
-                    Add Student
-                </a>
+            @if (auth()->user()->role !== 'coordinator')
+                <div class="flex gap-3">
+                    <!-- Small Action Button -->
+                    <a href="{{ route('admin.students.create') }}"
+                        class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
+                        Add Student
+                    </a>
 
-                <!-- Upload Button (Keep Icon, Slightly Smaller) -->
-                <button
-                    class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
-                    id="openUploadBtn">
-                    <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
-                </button>
 
-                <!-- Download Button (Keep Icon, Slightly Smaller) -->
-                <a href="/admin/students/csv-format"
-                    class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
-                    <i class="bi bi-download mr-2 text-sm"></i> Download Format
-                </a>
-            </div>
+                    <!-- Upload Button (Keep Icon, Slightly Smaller) -->
+                    <button
+                        class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
+                        id="openUploadBtn">
+                        <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
+                    </button>
 
+                    <!-- Download Button (Keep Icon, Slightly Smaller) -->
+                    <a href="/admin/students/csv-format"
+                        class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
+                        <i class="bi bi-download mr-2 text-sm"></i> Download Format
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -146,13 +148,21 @@
                             Progress</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Status</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            Coordinator</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Address</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
-                        <th
-                            class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Actions</th>
+                        @if (auth()->user()->role === 'admin')
+                            <th
+                                class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -356,6 +366,39 @@
         </div>
     </div>
 
+    <!-- Assign Coordinator Modal -->
+    <div id="coordinatorModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative">
+            <button onclick="closeCoordinatorModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
+                &times;
+            </button>
+            <h3 class="text-xl font-semibold mb-4" style="color: #d4af37;">Assign Coordinator</h3>
+            <form id="coordinatorForm">
+                <input type="hidden" id="selectedStudentId">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Coordinator</label>
+                    <select id="coordinatorSelect" required
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">Unassign Coordinator</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button type="submit" class="px-4 py-2 rounded-lg text-white text-sm"
+                            style="background-color: #d4af37;"
+                            onmouseover="this.style.backgroundColor='#c19b2e'" 
+                            onmouseout="this.style.backgroundColor='#d4af37'">
+                        Assign
+                    </button>
+                    <button type="button" onclick="closeCoordinatorModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Initialize DataTables with server-side processing
         let studentsTable = $('#studentsTable').DataTable({
@@ -395,6 +438,14 @@
                     "orderable": false
                 },
                 {
+                    "data": "status",
+                    "orderable": false
+                },
+                {
+                    "data": "coordinator",
+                    "orderable": false
+                },
+                {
                     "data": "address",
                     "orderable": true
                 },
@@ -402,10 +453,12 @@
                     "data": "created_at",
                     "orderable": true
                 },
-                {
-                    "data": "actions",
-                    "orderable": false
-                }
+                @if (auth()->user()->role === 'admin')
+                    {
+                        "data": "actions",
+                        "orderable": false
+                    }
+                @endif
             ],
             "pageLength": 25,
             "searching": false,
@@ -449,9 +502,12 @@
         //     document.getElementById('studentForm').reset();
         // });
 
-        openUploadBtn.addEventListener('click', () => {
-            uploadModal.classList.remove('hidden');
-        });
+        if (openUploadBtn) {
+            openUploadBtn.addEventListener('click', () => {
+                uploadModal.classList.remove('hidden');
+            });
+        }
+
 
         // Close modals
         // [closeModalBtn, cancelBtn].forEach(btn => {
@@ -535,21 +591,21 @@
 
                     // Show dropdown
                     dropdown.classList.remove('hidden');
-                    
+
                     // Use fixed positioning to avoid affecting table layout
                     setTimeout(() => {
                         const buttonRect = button.getBoundingClientRect();
                         const dropdownRect = dropdown.getBoundingClientRect();
                         const viewportHeight = window.innerHeight;
                         const viewportWidth = window.innerWidth;
-                        
+
                         // Set to fixed positioning
                         dropdown.style.position = 'fixed';
-                        
+
                         // Calculate vertical position
                         const spaceBelow = viewportHeight - buttonRect.bottom;
                         const spaceAbove = buttonRect.top;
-                        
+
                         if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                             // Position below button
                             dropdown.style.top = (buttonRect.bottom + 4) + 'px';
@@ -559,7 +615,7 @@
                             dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                             dropdown.style.top = 'auto';
                         }
-                        
+
                         // Calculate horizontal position (align to right edge of button)
                         const rightEdge = buttonRect.right;
                         if (rightEdge >= dropdownRect.width) {
@@ -624,21 +680,21 @@
 
             // Show dropdown first
             dropdown.classList.remove('hidden');
-            
+
             // Use fixed positioning to avoid affecting table layout
             setTimeout(() => {
                 const buttonRect = button.getBoundingClientRect();
                 const dropdownRect = dropdown.getBoundingClientRect();
                 const viewportHeight = window.innerHeight;
                 const viewportWidth = window.innerWidth;
-                
+
                 // Set to fixed positioning
                 dropdown.style.position = 'fixed';
-                
+
                 // Calculate vertical position
                 const spaceBelow = viewportHeight - buttonRect.bottom;
                 const spaceAbove = buttonRect.top;
-                
+
                 if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                     // Position below button
                     dropdown.style.top = (buttonRect.bottom + 4) + 'px';
@@ -648,7 +704,7 @@
                     dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                     dropdown.style.top = 'auto';
                 }
-                
+
                 // Calculate horizontal position (align to right edge of button)
                 const rightEdge = buttonRect.right;
                 if (rightEdge >= dropdownRect.width) {
@@ -711,11 +767,118 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    console.log('Delete student with ID:', id);
-                    Swal.fire('Deleted!', 'Student has been deleted.', 'success');
+                    fetch(`/admin/students/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Deleted!', 'Student has been deleted.', 'success');
+                                studentsTable.ajax.reload();
+                            } else {
+                                Swal.fire('Error!', 'Failed to delete student.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error!', 'An error occurred.', 'error');
+                        });
                 }
             });
         }
+
+        // Update Student Status
+        function updateStudentStatus(id, newStatus) {
+            fetch(`/admin/students/update-status/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success('Status updated successfully');
+                    } else {
+                        toastr.error('Failed to update status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('An error occurred');
+                });
+        }
+
+        // Assign Coordinator Functions
+        function assignCoordinator(studentId) {
+            document.getElementById('selectedStudentId').value = studentId;
+            loadCoordinators();
+            document.getElementById('coordinatorModal').classList.remove('hidden');
+        }
+
+        function closeCoordinatorModal() {
+            document.getElementById('coordinatorModal').classList.add('hidden');
+        }
+
+        function loadCoordinators() {
+            fetch('/admin/students/coordinators')
+                .then(response => response.json())
+                .then(coordinators => {
+                    const select = document.getElementById('coordinatorSelect');
+                    select.innerHTML = '<option value="">Unassign Coordinator</option>';
+                    coordinators.forEach(coordinator => {
+                        select.innerHTML += `<option value="${coordinator.id}">${coordinator.name}</option>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading coordinators:', error);
+                    toastr.error('Failed to load coordinators');
+                });
+        }
+
+        document.getElementById('coordinatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('selectedStudentId').value;
+            const coordinatorId = document.getElementById('coordinatorSelect').value;
+            
+            fetch(`/admin/students/assign-coordinator/${studentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ coordinator_id: coordinatorId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success(data.message);
+                    closeCoordinatorModal();
+                    studentsTable.ajax.reload();
+                } else {
+                    toastr.error('Failed to assign coordinator');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error('An error occurred');
+            });
+        });
+
+        // Close modal on outside click
+        document.getElementById('coordinatorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCoordinatorModal();
+            }
+        });
     </script>
 
     <style>
