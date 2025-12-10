@@ -22,10 +22,12 @@
                 <p class="text-gray-600 mt-1">Manage and track industries</p>
             </div>
             <div class="flex gap-3">
+                @if(auth()->user()->role !== 'coordinator')
                 <a href="{{ route('admin.industries.create') }}"
                     class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                     Add Industry
                 </a>
+                @endif
 
                 {{-- <button
                     class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"

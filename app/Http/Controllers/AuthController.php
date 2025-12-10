@@ -24,7 +24,7 @@ class AuthController extends Controller
             } elseif ($user->hasRole('rto')) {
                 return redirect()->route('rto.dashboard');
             } elseif ($user->hasRole('user')) {
-                return redirect()->route('user.dashboard');
+                return redirect()->route('student.dashboard');
             }
         }
 
@@ -78,7 +78,7 @@ class AuthController extends Controller
             return redirect()->route('rto.dashboard');
         }
 
-        return redirect()->route('user.dashboard');
+        return redirect()->route('student.dashboard');
     }
 
     public function logout()

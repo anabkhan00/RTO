@@ -2,56 +2,64 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Industry;
-use Illuminate\Http\Request;
-use App\Models\StudentIndustry;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\PlacementOpportunity;
+use App\Models\PlacementAssignment;
 
 class StudentIndustryController extends Controller
 {
     public function index()
     {
-        $students = User::where('role', 'user')
-            ->with(['assignedIndustries' => function($q) {
-                $q->select('industries.id', 'industries.name');
-            }])
+        $opportunities = PlacementOpportunity::with(['industry', 'sourcingCoordinator', 'assignments.student'])
+            ->where('status', true)
             ->get();
-
-        $industries = Industry::where('status', true)->get();
-
-        return view('admin.pages.assign_industry', compact('students', 'industries'));
+        
+        $students = User::where('role', 'user')->get();
+        
+        return view('admin.pages.assign_students', compact('opportunities', 'students'));
     }
 
-    public function bulkAssign(Request $request)
+    public function assignStudents(Request $request)
     {
         $request->validate([
+            'opportunity_id' => 'required|exists:placement_opportunities,id',
             'student_ids' => 'required|array',
-            'student_ids.*' => 'exists:users,id',
-            'industry_id' => 'required|exists:industries,id'
+            'student_ids.*' => 'exists:users,id'
         ]);
 
-        foreach ($request->student_ids as $studentId) {
-
-            StudentIndustry::where('student_id', $studentId)
-            ->delete();
-
-            StudentIndustry::updateOrInsert(
-                    ['student_id' => $studentId, 'industry_id' => $request->industry_id],
-                    ['created_at' => now(), 'updated_at' => now()]
-                );
+        $opportunity = PlacementOpportunity::findOrFail($request->opportunity_id);
+        
+        if ($opportunity->available_slots < count($request->student_ids)) {
+            return response()->json(['error' => 'Not enough available slots'], 400);
         }
+
+        foreach ($request->student_ids as $studentId) {
+            PlacementAssignment::updateOrCreate(
+                [
+                    'placement_opportunity_id' => $request->opportunity_id,
+                    'student_id' => $studentId
+                ],
+                ['placement_coordinator_id' => auth()->id()]
+            );
+        }
+
+        $opportunity->increment('filled_slots', count($request->student_ids));
 
         return response()->json(['success' => true]);
     }
 
     public function removeAssignment(Request $request)
     {
-        DB::table('student_industries')
+        $assignment = PlacementAssignment::where('placement_opportunity_id', $request->opportunity_id)
             ->where('student_id', $request->student_id)
-            ->where('industry_id', $request->industry_id)
-            ->delete();
+            ->first();
+
+        if ($assignment) {
+            $assignment->delete();
+            $assignment->opportunity->decrement('filled_slots');
+        }
 
         return response()->json(['success' => true]);
     }

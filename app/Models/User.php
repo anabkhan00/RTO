@@ -22,6 +22,11 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'emergency_contact',
+        'placement_hours',
+        'student_status',
+        'student_availability',
+        'assigned_coordinator_id',
         'password',
         'role',
         'address',
@@ -31,6 +36,7 @@ class User extends Authenticatable
         'contact_person',
         'status',
         'course_id',
+        'profile_image',
         'coordinator_type'
     ];
 
@@ -54,6 +60,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'student_availability' => 'array',
         ];
     }
 
@@ -103,5 +110,20 @@ class User extends Authenticatable
     public function assignedIndustries()
     {
         return $this->belongsToMany(Industry::class, 'student_industries', 'student_id', 'industry_id');
+    }
+
+    public function weeklySchedules()
+    {
+        return $this->hasMany(StudentWeeklySchedule::class, 'student_id');
+    }
+
+    public function assignedCoordinator()
+    {
+        return $this->belongsTo(User::class, 'assigned_coordinator_id');
+    }
+
+    public function assignedStudents()
+    {
+        return $this->hasMany(User::class, 'assigned_coordinator_id');
     }
 }
