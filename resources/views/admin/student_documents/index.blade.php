@@ -7,11 +7,51 @@
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-2xl font-semibold text-brand mb-6">Documents for {{ $student->name }}</h2>
 
+        <!-- Coordinator Assignment Section -->
+        @if (auth()->user()->role === 'admin')
+            <div class="mb-8">
+                <h3 class="text-lg font-medium text-brand mb-4">Assigned Coordinator</h3>
+                <div class="bg-white rounded-lg border p-6 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Placement Coordinator</label>
+                            <select id="placementCoordinator"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <option value="">Select Placement Coordinator</option>
+                                @foreach ($placementCoordinators as $coordinator)
+                                    <option value="{{ $coordinator->id }}"
+                                        {{ $student->placement_coordinator_id == $coordinator->id ? 'selected' : '' }}>
+                                        {{ $coordinator->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sourcing Coordinator</label>
+                            <select id="sourcingCoordinator"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <option value="">Select Sourcing Coordinator</option>
+                                @foreach ($sourcingCoordinators as $coordinator)
+                                    <option value="{{ $coordinator->id }}"
+                                        {{ $student->sourcing_coordinator_id == $coordinator->id ? 'selected' : '' }}>
+                                        {{ $coordinator->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button onclick="assignCoordinators()"
+                            class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                            Update Assignments
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Student Update Section -->
         <div class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Student Information</h3>
-            <form action="{{ route('admin.students.update', $student->id) }}" method="POST"
-                enctype="multipart/form-data"
+            <form action="{{ route('admin.students.update', $student->id) }}" method="POST" enctype="multipart/form-data"
                 class="bg-white rounded-lg border p-6 shadow-sm">
                 @csrf
                 @method('PUT')
@@ -158,22 +198,62 @@
 
                             <!-- Student Status -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2"><i class="bi bi-person-check mr-1"></i> Student Status</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><i
+                                        class="bi bi-person-check mr-1"></i> Student Status</label>
                                 <select name="student_status"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white"
                                     {{ auth()->user()->role === 'coordinator' && auth()->user()->coordinator_type !== 'placement' ? 'disabled' : '' }}>
-                                    <option value="active" {{ old('student_status', $student->student_status ?? 'active') == 'active' ? 'selected' : '' }}>Active</option>
-                                    <option value="inactive" {{ old('student_status', $student->student_status ?? '') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                    <option value="blocked" {{ old('student_status', $student->student_status ?? '') == 'blocked' ? 'selected' : '' }}>Blocked</option>
+                                    <option value="active"
+                                        {{ old('student_status', $student->student_status ?? 'active') == 'active' ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="inactive"
+                                        {{ old('student_status', $student->student_status ?? '') == 'inactive' ? 'selected' : '' }}>
+                                        Inactive</option>
+                                    <option value="blocked"
+                                        {{ old('student_status', $student->student_status ?? '') == 'blocked' ? 'selected' : '' }}>
+                                        Blocked</option>
                                 </select>
                             </div>
 
                             <!-- Address -->
-                            <div class="md:col-span-2">
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                                 <input type="text" name="address" value="{{ old('address', $student->address) }}"
                                     required
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                            </div>
+
+                            <!-- Gender -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                                <select name="gender"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                    <option value="">Select Gender</option>
+                                    <option value="male" {{ old('gender', $student->gender) == 'male' ? 'selected' : '' }}>Male</option>
+                                    <option value="female" {{ old('gender', $student->gender) == 'female' ? 'selected' : '' }}>Female</option>
+                                    <option value="other" {{ old('gender', $student->gender) == 'other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Transport -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Transport</label>
+                                <input type="text" name="transport" value="{{ old('transport', $student->transport) }}"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                            </div>
+
+                            <!-- Medical Condition -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Medical Condition</label>
+                                <textarea name="medical_condition" rows="2"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('medical_condition', $student->medical_condition) }}</textarea>
+                            </div>
+
+                            <!-- Placement Data -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Placement Data</label>
+                                <textarea name="placement_data" rows="2"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('placement_data', $student->placement_data) }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -342,69 +422,80 @@
                         <h3 class="text-lg font-medium text-brand flex items-center">
                             <i class="bi bi-list-check mr-2"></i>Document Checklist
                         </h3>
-                        <p class="text-sm text-gray-600 mt-1">{{ $checklists->where('status', true)->count() }} required
-                            documents</p>
+                        <p class="text-sm text-gray-600 mt-1">
+                            {{ $checklists ? $checklists->count() : 0 }} required documents
+                        </p>
+
                     </div>
-                    <div class="p-4 max-h-96 overflow-y-auto">
-                        <div class="space-y-2">
-                            @foreach ($checklists as $checklist)
-                                @php
-                                    $documents = $student->studentDocuments->filter(function ($doc) use ($checklist) {
-                                        return $doc->checklist_ids && in_array($checklist->id, $doc->checklist_ids);
-                                    });
-                                    $hasDocument = $documents->count() > 0;
-                                @endphp
-                                <div class="rounded hover:bg-gray-50">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center gap-2">
+                    @if ($checklists)
+                        <div class="p-4 max-h-96 overflow-y-auto">
+                            <div class="space-y-2">
+                                @foreach ($checklists as $checklist)
+                                    @php
+                                        $documents = $student->studentDocuments->filter(function ($doc) use (
+                                            $checklist,
+                                        ) {
+                                            return $doc->checklist_ids && in_array($checklist->id, $doc->checklist_ids);
+                                        });
+                                        $hasDocument = $documents->count() > 0;
+                                    @endphp
+
+                                    <div class="rounded hover:bg-gray-50">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                @if ($hasDocument)
+                                                    <i class="bi bi-check-circle-fill text-green-500 text-sm"></i>
+                                                @else
+                                                    <i class="bi bi-circle text-gray-400 text-sm"></i>
+                                                @endif
+
+                                                <span
+                                                    class="text-sm {{ $hasDocument ? 'text-green-700 font-medium' : 'text-gray-700' }}">
+                                                    {{ $checklist->name }}
+                                                </span>
+                                            </div>
+
                                             @if ($hasDocument)
-                                                <i class="bi bi-check-circle-fill text-green-500 text-sm"></i>
-                                            @else
-                                                <i class="bi bi-circle text-gray-400 text-sm"></i>
+                                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                                    {{ $documents->count() }}
+                                                </span>
                                             @endif
-                                            <span
-                                                class="text-sm {{ $hasDocument ? 'text-green-700 font-medium' : 'text-gray-700' }}">
-                                                {{ $checklist->name }}
-                                            </span>
                                         </div>
+
                                         @if ($hasDocument)
-                                            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                                {{ $documents->count() }}
-                                            </span>
+                                            <div class="mt-2 ml-6 space-y-1">
+                                                @foreach ($documents as $document)
+                                                    <div
+                                                        class="flex items-center justify-between text-xs bg-gray-50 p-2 rounded">
+                                                        <span class="text-gray-600 truncate">{{ $document->label }}</span>
+                                                        <div class="flex gap-2">
+                                                            <a href="{{ asset('storage/' . $document->file_path) }}"
+                                                                target="_blank">
+                                                                <i class="bi bi-eye"></i>
+                                                            </a>
+                                                            <a href="{{ asset('storage/' . $document->file_path) }}"
+                                                                download>
+                                                                <i class="bi bi-download"></i>
+                                                            </a>
+                                                            @if (auth()->user()->role !== 'coordinator')
+                                                                <button class="delete-document"
+                                                                    data-id="{{ $document->id }}">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
-                                    @if ($hasDocument)
-                                        <div class="mt-2 ml-6 space-y-1">
-                                            @foreach ($documents as $document)
-                                                <div
-                                                    class="flex items-center justify-between text-xs bg-gray-50 p-2 rounded">
-                                                    <span class="text-gray-600 truncate">{{ $document->label }}</span>
-                                                    <div class="flex gap-2">
-                                                        <a href="{{ asset('storage/' . $document->file_path) }}"
-                                                            target="_blank" class="text-blue-500 hover:text-blue-700"
-                                                            title="View">
-                                                            <i class="bi bi-eye"></i>
-                                                        </a>
-                                                        <a href="{{ asset('storage/' . $document->file_path) }}"
-                                                            download="{{ $document->original_name }}"
-                                                            class="text-green-500 hover:text-green-700" title="Download">
-                                                            <i class="bi bi-download"></i>
-                                                        </a>
-                                                        @if (auth()->user()->role !== 'coordinator')
-                                                            <button class="text-red-500 hover:text-red-700 delete-document"
-                                                                data-id="{{ $document->id }}" title="Delete">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <p class="text-sm text-gray-500 p-4">No document checklist assigned to this course.</p>
+                    @endif
+
                 </div>
 
                 <!-- Upload Documents Card -->
@@ -435,7 +526,7 @@
                             </div>
 
                             <div class="pt-2 flex">
-                                @unless (auth()->user()->role === 'coordinator')
+                                @unless (auth()->user()->role === 'coordinator' && auth()->user()->coordinator_type === 'sourcing')
                                     <button type="submit" id="uploadBtn"
                                         class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                                         <span id="uploadText"><i class="bi bi-upload mr-2"></i>Upload Documents</span>
@@ -455,7 +546,7 @@
         {{-- <div class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Appointment Calendar</h3>
             <div class="bg-white rounded-lg border shadow-sm p-4">
-                @if(auth()->user()->role === 'admin' || auth()->user()->coordinator_type === 'placement')
+                @if (auth()->user()->role === 'admin' || auth()->user()->coordinator_type === 'placement')
                 <div class="mb-4">
                     <button onclick="openAppointmentModal()" class="bg-brand text-white px-4 py-2 rounded-md hover:bg-gold transition-colors text-sm">
                         <i class="fas fa-plus mr-2"></i>Add Appointment
@@ -486,7 +577,7 @@
         <!-- Student Availability Section (FullCalendar) -->
         <div class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Student Availability</h3>
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <!-- Calendar Area -->
                 <div class="lg:col-span-3">
@@ -499,7 +590,7 @@
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-lg border shadow-sm p-4 sticky top-6">
                         <h4 class="text-lg font-medium mb-4" style="color: #d4af37;">Week Summary</h4>
-                        
+
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Total Hours</label>
                             <div class="text-3xl font-bold text-gray-800" id="totalHoursDisplay">0</div>
@@ -507,10 +598,10 @@
                         </div>
 
                         <div class="space-y-3">
-                            <button id="saveBtn" class="w-full px-4 py-2 rounded-lg text-white font-medium flex justify-center items-center gap-2"
-                                    style="background-color: #d4af37;"
-                                    onmouseover="this.style.backgroundColor='#c19b2e'" 
-                                    onmouseout="this.style.backgroundColor='#d4af37'">
+                            <button id="saveBtn"
+                                class="w-full px-4 py-2 rounded-lg text-white font-medium flex justify-center items-center gap-2"
+                                style="background-color: #d4af37;" onmouseover="this.style.backgroundColor='#c19b2e'"
+                                onmouseout="this.style.backgroundColor='#d4af37'">
                                 <i class="fas fa-save"></i> Save Schedule
                             </button>
 
@@ -539,7 +630,8 @@
     <!-- Appointment Modal -->
     <div id="appointmentModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
         <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative">
-            <button onclick="closeAppointmentModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
+            <button onclick="closeAppointmentModal()"
+                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
                 &times;
             </button>
             <h3 class="text-xl font-semibold text-brand mb-4" id="appointmentModalTitle">Add Appointment</h3>
@@ -548,28 +640,30 @@
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
                     <input type="text" id="appointmentTitle" required
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand">
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
                     <input type="date" id="appointmentDate" required
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand">
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Time</label>
                     <input type="time" id="appointmentTime" required
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand">
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand">
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                     <textarea id="appointmentNotes" rows="3"
-                              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand"></textarea>
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-brand focus:border-brand"></textarea>
                 </div>
                 <div class="flex gap-3">
-                    <button type="submit" class="bg-brand text-white px-4 py-2 rounded-md hover:bg-gold transition-colors text-sm">
+                    <button type="submit"
+                        class="bg-brand text-white px-4 py-2 rounded-md hover:bg-gold transition-colors text-sm">
                         Save
                     </button>
-                    <button type="button" onclick="closeAppointmentModal()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">
+                    <button type="button" onclick="closeAppointmentModal()"
+                        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">
                         Cancel
                     </button>
                 </div>
@@ -593,12 +687,18 @@
                 <input type="hidden" id="uploadedDocuments" name="document_ids" value="">
 
                 <div class="space-y-3 mb-6">
-                    @foreach ($checklists as $checklist)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="checklist_ids[]" value="{{ $checklist->id }}" class="mr-3">
-                            <span class="text-sm">{{ $checklist->name }}</span>
-                        </label>
-                    @endforeach
+                    @if ($checklists)
+                        @foreach ($checklists as $checklist)
+                            <label class="flex items-center">
+                                <input type="checkbox" name="checklist_ids[]" value="{{ $checklist->id }}"
+                                    class="mr-3">
+                                <span class="text-sm">{{ $checklist->name }}</span>
+                            </label>
+                        @endforeach
+                    @else
+                        <p class="text-sm text-gray-500">No checklists available.</p>
+                    @endif
+
                 </div>
 
                 <div class="flex justify-end gap-3">
@@ -900,7 +1000,7 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            const url = id ? `/admin/appointments/${id}` : '{{ route("admin.appointments.store") }}';
+            const url = id ? `/admin/appointments/${id}` : '{{ route('admin.appointments.store') }}';
             const method = id ? 'PUT' : 'POST';
 
             $.ajax({
@@ -917,10 +1017,11 @@
 
         function loadAppointments() {
             $.ajax({
-                url: '{{ route("admin.appointments.by-student", $student->id) }}',
+                url: '{{ route('admin.appointments.by-student', $student->id) }}',
                 success: function(appointments) {
                     let html = '';
-                    const canEdit = {{ auth()->user()->role === 'admin' || auth()->user()->coordinator_type === 'placement' ? 'true' : 'false' }};
+                    const canEdit =
+                        {{ auth()->user()->role === 'admin' || auth()->user()->coordinator_type === 'placement' ? 'true' : 'false' }};
 
                     appointments.forEach(apt => {
                         html += `<div class="flex justify-between items-center p-3 border rounded">
@@ -931,18 +1032,19 @@
                                 <div class="text-xs text-gray-400 mt-1">By: ${apt.creator.name}</div>
                             </div>
                             ${canEdit ? `<div class="flex gap-2">
-                                <button onclick='openAppointmentModal(${JSON.stringify(apt)})'
-                                        class="text-blue-600 hover:text-blue-800 text-xs">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteAppointment(${apt.id})"
-                                        class="text-red-600 hover:text-red-800 text-xs">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>` : ''}
+                                        <button onclick='openAppointmentModal(${JSON.stringify(apt)})'
+                                                class="text-blue-600 hover:text-blue-800 text-xs">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteAppointment(${apt.id})"
+                                                class="text-red-600 hover:text-red-800 text-xs">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>` : ''}
                         </div>`;
                     });
-                    $('#appointmentsList').html(html || '<p class="text-gray-500 text-sm">No appointments scheduled</p>');
+                    $('#appointmentsList').html(html ||
+                        '<p class="text-gray-500 text-sm">No appointments scheduled</p>');
                 }
             });
         }
@@ -953,7 +1055,9 @@
             $.ajax({
                 url: `/admin/appointments/${id}`,
                 method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
                 success: function() {
                     toastr.success('Appointment deleted');
                     loadAppointments();
@@ -1022,27 +1126,29 @@
             });
 
             fetch(`/admin/students/{{ $student->id }}/availability`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ student_availability: availability })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    toastr.success('Availability updated successfully');
-                    closeAvailabilityModal();
-                    loadCalendlyCalendar();
-                } else {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_availability: availability
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success('Availability updated successfully');
+                        closeAvailabilityModal();
+                        loadCalendlyCalendar();
+                    } else {
+                        toastr.error('Failed to update availability');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
                     toastr.error('Failed to update availability');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                toastr.error('Failed to update availability');
-            });
+                });
         });
 
         function loadCalendlyCalendar() {
@@ -1081,20 +1187,20 @@
                             <div>
                                 <h4 class="font-medium text-gray-900">${dayLabels[index]}</h4>
                                 ${isAvailable ? `
-                                    <p class="text-sm text-gray-600">${formatTime(dayAvail.start)} - ${formatTime(dayAvail.end)}</p>
-                                ` : '<p class="text-sm text-gray-500">Unavailable</p>'}
+                                            <p class="text-sm text-gray-600">${formatTime(dayAvail.start)} - ${formatTime(dayAvail.end)}</p>
+                                        ` : '<p class="text-sm text-gray-500">Unavailable</p>'}
                             </div>
                         </div>
                         <div class="flex items-center">
                             ${isAvailable ? `
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <i class="bi bi-check-circle mr-1"></i>Available
-                                </span>
-                            ` : `
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    <i class="bi bi-x-circle mr-1"></i>Unavailable
-                                </span>
-                            `}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="bi bi-check-circle mr-1"></i>Available
+                                        </span>
+                                    ` : `
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            <i class="bi bi-x-circle mr-1"></i>Unavailable
+                                        </span>
+                                    `}
                         </div>
                     </div>
                 `;
@@ -1109,6 +1215,36 @@
             const ampm = hour >= 12 ? 'PM' : 'AM';
             const displayHour = hour % 12 || 12;
             return `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        // Coordinator Assignment Function
+        function assignCoordinators() {
+            const placementCoordinatorId = document.getElementById('placementCoordinator').value;
+            const sourcingCoordinatorId = document.getElementById('sourcingCoordinator').value;
+
+            fetch('{{ route('admin.student-documents.assign-coordinator', $student->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        placement_coordinator_id: placementCoordinatorId,
+                        sourcing_coordinator_id: sourcingCoordinatorId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success('Coordinators assigned successfully');
+                    } else {
+                        toastr.error('Failed to assign coordinators');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('An error occurred');
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1158,39 +1294,48 @@
             cursor: pointer;
             border: none !important;
         }
+
         .fc-timegrid-event {
             background-color: #d4af37 !important;
             border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .fc-timegrid-event:hover {
             background-color: #c19b2e !important;
         }
+
         .fc-header-toolbar {
             margin-bottom: 1.5rem !important;
         }
+
         .fc-button-primary {
             background-color: #ffffff !important;
             border-color: #e5e7eb !important;
             color: #374151 !important;
         }
+
         .fc-button-primary:hover {
             background-color: #f3f4f6 !important;
             border-color: #d1d5db !important;
         }
+
         .fc-button-active {
             background-color: #f3f4f6 !important;
             border-color: #d1d5db !important;
             color: #111827 !important;
         }
+
         .fc-day-today {
             background-color: transparent !important;
         }
+
         .fc-col-header-cell-cushion {
             color: #374151;
             font-weight: 600;
             text-decoration: none !important;
         }
+
         .fc-timegrid-slot-label {
             font-size: 12px;
             color: #6b7280;
@@ -1200,18 +1345,18 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            
+
             // Only initialize if calendar element exists (e.g. if student is active)
             if (calendarEl) {
                 var studentId = {{ $student->id }};
                 var saveBtn = document.getElementById('saveBtn');
-                
+
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'timeGridWeek',
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: '' 
+                        right: ''
                     },
                     slotMinTime: '06:00:00',
                     slotMaxTime: '22:00:00',
@@ -1220,10 +1365,12 @@
                     editable: true,
                     firstDay: 1, // Monday
                     height: '100%',
-                    
+
                     // Fetch events
                     events: function(info, successCallback, failureCallback) {
-                        fetch(`{{ route('admin.weekly-schedules.availability', $student->id) }}?start=${info.startStr}&end=${info.endStr}`)
+                        fetch(
+                                `{{ route('admin.weekly-schedules.availability', $student->id) }}?start=${info.startStr}&end=${info.endStr}`
+                                )
                             .then(response => response.json())
                             .then(data => successCallback(data))
                             .catch(error => failureCallback(error));
@@ -1248,11 +1395,16 @@
                         }
                     },
 
-                    eventDrop: function(info) { updateSummary(); },
-                    eventResize: function(info) { updateSummary(); }
-                    
-                    // On initial load, calculate summary
-                    ,eventsSet: function() {
+                    eventDrop: function(info) {
+                        updateSummary();
+                    },
+                    eventResize: function(info) {
+                            updateSummary();
+                        }
+
+                        // On initial load, calculate summary
+                        ,
+                    eventsSet: function() {
                         updateSummary();
                     }
                 });
@@ -1275,10 +1427,18 @@
                         var diffHrs = diffMs / (1000 * 60 * 60);
                         totalHours += diffHrs;
 
-                        var dayName = start.toLocaleDateString('en-US', { weekday: 'short' });
-                        var timeStr = start.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'}) + 
-                                      ' - ' + 
-                                      end.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+                        var dayName = start.toLocaleDateString('en-US', {
+                            weekday: 'short'
+                        });
+                        var timeStr = start.toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) +
+                            ' - ' +
+                            end.toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
 
                         listHtml += `<div class="p-2 bg-gray-50 rounded border border-gray-100 flex justify-between">
                                         <span><strong>${dayName}</strong> ${timeStr}</span>
@@ -1288,7 +1448,8 @@
 
                     document.getElementById('totalHoursDisplay').innerText = totalHours.toFixed(1);
                     document.getElementById('totalHoursInput').value = totalHours.toFixed(2);
-                    document.getElementById('eventList').innerHTML = listHtml || '<span class="text-gray-400 italic">No availability set</span>';
+                    document.getElementById('eventList').innerHTML = listHtml ||
+                        '<span class="text-gray-400 italic">No availability set</span>';
                 }
 
                 // Save Functionality
@@ -1317,30 +1478,30 @@
                     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
                     saveBtn.disabled = true;
 
-                    fetch('{{ route("admin.weekly-schedules.save", $student->id) }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            toastr.success('Schedule saved successfully');
-                        } else {
-                            toastr.error('Failed to save schedule');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        toastr.error('An error occurred');
-                    })
-                    .finally(() => {
-                        saveBtn.innerHTML = originalText;
-                        saveBtn.disabled = false;
-                    });
+                    fetch('{{ route('admin.weekly-schedules.save', $student->id) }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                toastr.success('Schedule saved successfully');
+                            } else {
+                                toastr.error('Failed to save schedule');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            toastr.error('An error occurred');
+                        })
+                        .finally(() => {
+                            saveBtn.innerHTML = originalText;
+                            saveBtn.disabled = false;
+                        });
                 });
             }
         });

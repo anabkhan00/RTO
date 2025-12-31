@@ -20,4 +20,9 @@ class Course extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+    
+    public function courseChecklist()
+    {
+        return $this->hasOne(CourseChecklist::class);
+    }
 }

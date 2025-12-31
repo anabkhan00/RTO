@@ -1,5 +1,30 @@
 @extends('admin.master_layout.index')
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+}
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    min-height: 38px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+    padding-left: 12px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #d4af37;
+    border: 1px solid #c19b2e;
+    color: white;
+}
+</style>
+@endpush
+
 @section('content')
     <div class="p-6">
         <!-- Header -->
@@ -84,38 +109,21 @@
                 </div>
             </div>
 
-            <!-- Courses & Checklists -->
+            <!-- Course Selection -->
             <div class="bg-white rounded-lg border shadow-sm">
                 <div class="p-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium" style="color: #5A5A5A;">Courses & Document Requirements</h3>
+                    <h3 class="text-lg font-medium" style="color: #5A5A5A;">Accepted Courses</h3>
                 </div>
                 <div class="p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Associated Courses</label>
-                            <select name="course_ids[]" multiple class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white" style="height: 120px;">
-                                @foreach($courses as $course)
-                                    <option value="{{ $course->id }}"
-                                        {{ in_array($course->id, old('course_ids', $industry->course_ids ?? [])) ? 'selected' : '' }}>
-                                        {{ $course->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple courses</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Document Checklists</label>
-                            <select name="checklist_ids[]" multiple class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white" style="height: 120px;">
-                                @foreach($checklists as $checklist)
-                                    <option value="{{ $checklist->id }}"
-                                        {{ in_array($checklist->id, old('checklist_ids', $industry->checklist_ids ?? [])) ? 'selected' : '' }}>
-                                        {{ $checklist->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 mt-1">Select required document types</p>
-                        </div>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Courses</label>
+                    <select name="course_ids[]" id="courseSelect" multiple class="w-full">
+                        @foreach($courses as $course)
+                            <option value="{{ $course->id }}"
+                                {{ isset($industry) && $industry->courses && in_array($course->id, $industry->courses->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                {{ $course->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -125,61 +133,66 @@
                     <h3 class="text-lg font-medium" style="color: #5A5A5A;">Availability Schedule</h3>
                 </div>
                 <div class="p-4">
-                    @if(isset($industry))
-                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            <!-- Calendar Area -->
-                            <div class="lg:col-span-3">
-                                <div class="bg-white rounded-lg border shadow-sm p-1 h-[600px]">
-                                    <div id="calendar" class="h-full"></div>
-                                </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <!-- Calendar Area -->
+                        <div class="lg:col-span-3">
+                            <div class="bg-white rounded-lg border shadow-sm p-1 h-[600px]">
+                                <div id="calendar" class="h-full"></div>
                             </div>
+                        </div>
 
-                            <!-- Sidebar -->
-                            <div class="lg:col-span-1">
-                                <div class="bg-white rounded-lg border shadow-sm p-4 sticky top-6">
-                                    <h4 class="text-lg font-medium mb-4" style="color: #d4af37;">Week Summary</h4>
+                        <!-- Sidebar -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-white rounded-lg border shadow-sm p-4 sticky top-6">
+                                <h4 class="text-lg font-medium mb-4" style="color: #d4af37;">Week Summary</h4>
 
-                                    <div class="mb-4">
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Hours</label>
-                                        <div class="text-3xl font-bold text-gray-800" id="totalHoursDisplay">0</div>
-                                        <input type="hidden" id="totalHoursInput">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Total Hours</label>
+                                    <div class="text-3xl font-bold text-gray-800" id="totalHoursDisplay">0</div>
+                                    <input type="hidden" id="totalHoursInput">
+                                </div>
+
+                                <div class="space-y-3">
+                                    <button type="button" id="saveScheduleBtn" class="w-full px-4 py-2 rounded-lg text-white font-medium flex justify-center items-center gap-2"
+                                            style="background-color: #d4af37;"
+                                            onmouseover="this.style.backgroundColor='#c19b2e'"
+                                            onmouseout="this.style.backgroundColor='#d4af37'">
+                                        <i class="fas fa-save"></i> Save Schedule
+                                    </button>
+
+                                    <div class="p-3 bg-blue-50 text-blue-800 rounded-lg text-xs leading-relaxed">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        <strong>Instructions:</strong><br>
+                                        Click & Drag to create a slot.<br>
+                                        Click a slot to delete it.<br>
+                                        Resize/Move slots freely.<br>
+                                        Don't forget to Save!
                                     </div>
+                                </div>
 
-                                    <div class="space-y-3">
-                                        <button type="button" id="saveScheduleBtn" class="w-full px-4 py-2 rounded-lg text-white font-medium flex justify-center items-center gap-2"
-                                                style="background-color: #d4af37;"
-                                                onmouseover="this.style.backgroundColor='#c19b2e'"
-                                                onmouseout="this.style.backgroundColor='#d4af37'">
-                                            <i class="fas fa-save"></i> Save Schedule
-                                        </button>
-
-                                        <div class="p-3 bg-blue-50 text-blue-800 rounded-lg text-xs leading-relaxed">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            <strong>Instructions:</strong><br>
-                                            Click & Drag to create a slot.<br>
-                                            Click a slot to delete it.<br>
-                                            Resize/Move slots freely.<br>
-                                            Don't forget to Save!
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-6 border-t pt-4">
-                                        <h5 class="text-sm font-medium text-gray-700 mb-2">Selected Ranges</h5>
-                                        <div id="eventList" class="text-xs text-gray-600 space-y-1 max-h-60 overflow-y-auto">
-                                            <!-- Dynamic list -->
-                                        </div>
+                                <div class="mt-6 border-t pt-4">
+                                    <h5 class="text-sm font-medium text-gray-700 mb-2">Selected Ranges</h5>
+                                    <div id="eventList" class="text-xs text-gray-600 space-y-1 max-h-60 overflow-y-auto">
+                                        <!-- Dynamic list -->
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @else
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="bi bi-info-circle mb-2 text-2xl"></i>
-                            <p>Please save the industry first to enable availability scheduling.</p>
-                        </div>
-                    @endif
+                    </div>
                 </div>
             </div>
+
+            <script>
+                let courseChecklistIndex = 0;
+
+                function addCourseChecklist() {
+                    // This function is no longer used
+                }
+
+                function removeCourseChecklist(button) {
+                    // This function is no longer used
+                }
+            </script>
 
             <!-- Notes -->
             <div class="bg-white rounded-lg border shadow-sm">
@@ -401,6 +414,34 @@ document.addEventListener('DOMContentLoaded', function() {
 @endif
 @endsection
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    min-height: 38px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #d4af37;
+    border: 1px solid #c19b2e;
+    color: white;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#courseSelect').select2({
+        placeholder: 'Select courses for this industry',
+        allowClear: true
+    });
+});
+</script>
+@endpush
+
 @section('scripts')
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
@@ -439,37 +480,41 @@ document.addEventListener('DOMContentLoaded', function() {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-
-            // Only initialize if calendar element exists (e.g. if industry is active)
+            
             if (calendarEl) {
                 @if(isset($industry))
                 var industryId = {{ $industry->id }};
+                @else
+                var industryId = null;
+                @endif
                 var saveBtn = document.getElementById('saveScheduleBtn');
-
+                
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'timeGridWeek',
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: ''
+                        right: '' 
                     },
                     slotMinTime: '06:00:00',
                     slotMaxTime: '22:00:00',
                     allDaySlot: false,
                     selectable: true,
                     editable: true,
-                    firstDay: 1, // Monday
+                    firstDay: 1,
                     height: '100%',
-
-                    // Fetch events
+                    
                     events: function(info, successCallback, failureCallback) {
-                        fetch(`{{ route('admin.industries.availability.week', $industry->id) }}?start=${info.startStr}&end=${info.endStr}`)
-                            .then(response => response.json())
-                            .then(data => successCallback(data))
-                            .catch(error => failureCallback(error));
+                        if (industryId) {
+                            fetch(`/admin/industries/${industryId}/availability/week?start=${info.startStr}&end=${info.endStr}`)
+                                .then(response => response.json())
+                                .then(data => successCallback(data))
+                                .catch(error => failureCallback(error));
+                        } else {
+                            successCallback([]);
+                        }
                     },
 
-                    // Interaction Handlers
                     select: function(info) {
                         calendar.addEvent({
                             title: 'Available',
@@ -490,24 +535,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
 
                     eventDrop: function(info) { updateSummary(); },
-                    eventResize: function(info) { updateSummary(); }
-
-                    // On initial load, calculate summary
-                    ,eventsSet: function() {
-                        updateSummary();
-                    }
+                    eventResize: function(info) { updateSummary(); },
+                    eventsSet: function() { updateSummary(); }
                 });
 
                 calendar.render();
 
-                // Summary Calculation
                 function updateSummary() {
                     var events = calendar.getEvents();
                     var totalHours = 0;
                     var listHtml = '';
-                    var eventsForPayload = [];
 
-                    // Sort events by start time
                     events.sort((a, b) => a.start - b.start);
 
                     events.forEach(event => {
@@ -518,8 +556,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         totalHours += diffHrs;
 
                         var dayName = start.toLocaleDateString('en-US', { weekday: 'short' });
-                        var timeStr = start.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'}) +
-                                      ' - ' +
+                        var timeStr = start.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'}) + 
+                                      ' - ' + 
                                       end.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
 
                         listHtml += `<div class="p-2 bg-gray-50 rounded border border-gray-100 flex justify-between">
@@ -533,10 +571,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('eventList').innerHTML = listHtml || '<span class="text-gray-400 italic">No availability set</span>';
                 }
 
-                // Save Functionality
                 saveBtn.addEventListener('click', function() {
+                    if (!industryId) {
+                        alert('Please save the industry first before setting availability.');
+                        return;
+                    }
+                    
                     var viewStart = calendar.view.activeStart;
-                    // Format as YYYY-MM-DD in local time to avoid timezone shifts
                     var offset = viewStart.getTimezoneOffset() * 60000;
                     var localDate = new Date(viewStart.getTime() - offset);
                     var weekStartStr = localDate.toISOString().split('T')[0];
@@ -559,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
                     saveBtn.disabled = true;
 
-                    fetch('{{ route("admin.industries.availability.save", $industry->id) }}', {
+                    fetch(`/admin/industries/${industryId}/availability/week`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -584,7 +625,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         saveBtn.disabled = false;
                     });
                 });
-                @endif
             }
         });
     </script>

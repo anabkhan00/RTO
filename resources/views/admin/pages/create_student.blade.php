@@ -157,6 +157,55 @@
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-person mr-1"></i> Gender
+                    </label>
+                    <select name="gender"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
+                        <option value="">Select Gender</option>
+                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                        <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                    @error('gender')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-car-front mr-1"></i> Transport
+                    </label>
+                    <input type="text" name="transport" value="{{ old('transport') }}" placeholder="Enter Transport Details"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
+                    @error('transport')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-heart-pulse mr-1"></i> Medical Condition
+                    </label>
+                    <textarea name="medical_condition" rows="3" placeholder="Enter any medical conditions or allergies"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all">{{ old('medical_condition') }}</textarea>
+                    @error('medical_condition')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-clipboard-data mr-1"></i> Placement Data
+                    </label>
+                    <textarea name="placement_data" rows="3" placeholder="Enter placement-related information"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all">{{ old('placement_data') }}</textarea>
+                    @error('placement_data')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div class="flex gap-3 pt-4 border-t">
