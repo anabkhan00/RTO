@@ -27,6 +27,8 @@ class User extends Authenticatable
         'student_status',
         'student_availability',
         'assigned_coordinator_id',
+        'placement_coordinator_id',
+        'sourcing_coordinator_id',
         'password',
         'role',
         'address',
@@ -37,7 +39,11 @@ class User extends Authenticatable
         'status',
         'course_id',
         'profile_image',
-        'coordinator_type'
+        'coordinator_type',
+        'medical_condition',
+        'transport',
+        'placement_data',
+        'gender',
     ];
 
     /**
@@ -125,5 +131,25 @@ class User extends Authenticatable
     public function assignedStudents()
     {
         return $this->hasMany(User::class, 'assigned_coordinator_id');
+    }
+
+    public function placementCoordinator()
+    {
+        return $this->belongsTo(User::class, 'placement_coordinator_id');
+    }
+
+    public function sourcingCoordinator()
+    {
+        return $this->belongsTo(User::class, 'sourcing_coordinator_id');
+    }
+
+    public function placementStudents()
+    {
+        return $this->hasMany(User::class, 'placement_coordinator_id');
+    }
+
+    public function sourcingStudents()
+    {
+        return $this->hasMany(User::class, 'sourcing_coordinator_id');
     }
 }

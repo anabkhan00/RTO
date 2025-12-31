@@ -227,9 +227,6 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::get('/students/data', 'data')->name('students.data');
             Route::post('/students', 'store')->name('students.store');
             Route::put('/students/{id}', 'update')->name('students.update');
-            Route::post('/students/update-status/{id}', 'updateStatus');
-            Route::post('/students/assign-coordinator/{id}', 'assignCoordinator');
-            Route::get('/students/coordinators', 'getCoordinators');
             Route::post('/students/{id}/availability', 'updateAvailability')->name('students.availability.update');
             Route::delete('/students/{id}', 'destroy');
             Route::post('/students/upload', 'upload');
@@ -250,6 +247,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::post('/student-documents/{student}', 'store')->name('student-documents.store');
             Route::post('/student-documents/assign-types/{student}', 'assignTypes');
             Route::delete('/student-documents/{document}', 'destroy');
+            Route::post('/student-documents/assign-coordinator/{student}', 'assignCoordinator')->name('student-documents.assign-coordinator');
         });
 
         // Student Assignment (Placement Coordinators & Admin)
@@ -281,7 +279,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
             Route::delete('/industries/{id}', 'destroy');
             Route::patch('/industries/{id}/toggle-status', 'toggleStatus');
             Route::post('/industries/update-status/{id}', 'updateStatus');
-            
+
             Route::get('/industries/{id}/availability/week', 'getWeekAvailability')->name('industries.availability.week');
             Route::post('/industries/{id}/availability/week', 'saveWeekAvailability')->name('industries.availability.save');
         });
@@ -305,7 +303,7 @@ Route::middleware(['auth', 'role:admin|coordinator'])
         });
 
         // Weekly Schedules
-    Route::controller(\App\Http\Controllers\Admin\WeeklyScheduleController::class)->group(function () {
+        Route::controller(\App\Http\Controllers\Admin\WeeklyScheduleController::class)->group(function () {
 
             Route::get('/weekly-schedules/{studentId}/availability', 'getWeekAvailability')->name('weekly-schedules.availability');
             Route::post('/weekly-schedules/{studentId}/availability', 'saveWeekAvailability')->name('weekly-schedules.save');

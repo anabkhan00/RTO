@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Dashboard</title>
+    <title>PlaceBridge - @yield('page-title', 'Dashboard')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
@@ -42,6 +42,7 @@
             },
         }
     </script>
+    @stack('styles')
 </head>
 
 
@@ -82,6 +83,8 @@
             @endforeach
         @endif
     </script>
+    @stack('scripts')
+    @yield('scripts')
 </body>
 
 </html>

@@ -17,7 +17,8 @@ class CourseController extends Controller
 
     public function create()
     {
-        return view('admin.pages.create_course');
+        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
+        return view('admin.pages.create_course', compact('checklists'));
     }
 
     public function store(Request $request)
@@ -27,23 +28,34 @@ class CourseController extends Controller
             'code' => 'required|string|unique:courses',
             'credit_hours' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'checklist_ids' => 'nullable|array',
+            'checklist_ids.*' => 'exists:document_checklists,id',
         ]);
 
-        Course::create([
+        $course = Course::create([
             'name' => $request->name,
             'code' => $request->code,
             'credit_hours' => $request->credit_hours,
             'description' => $request->description,
             'status' => true,
         ]);
+        
+        // Create course checklist if provided
+        if ($request->checklist_ids) {
+            \App\Models\CourseChecklist::create([
+                'course_id' => $course->id,
+                'checklist_ids' => $request->checklist_ids
+            ]);
+        }
 
         return redirect()->route('admin.courses')->with('success', 'Course created successfully');
     }
 
     public function edit($id)
     {
-        $course = Course::findOrFail($id);
-        return view('admin.pages.edit_course', compact('course'));
+        $course = Course::with('courseChecklist')->findOrFail($id);
+        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
+        return view('admin.pages.edit_course', compact('course', 'checklists'));
     }
 
     public function update(Request $request, $id)
@@ -53,6 +65,8 @@ class CourseController extends Controller
             'code' => 'required|string|unique:courses,code,' . $id,
             'credit_hours' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'checklist_ids' => 'nullable|array',
+            'checklist_ids.*' => 'exists:document_checklists,id',
         ]);
 
         $course = Course::findOrFail($id);
@@ -62,6 +76,16 @@ class CourseController extends Controller
             'credit_hours' => $request->credit_hours,
             'description' => $request->description,
         ]);
+        
+        // Update course checklist
+        if ($request->checklist_ids) {
+            \App\Models\CourseChecklist::updateOrCreate(
+                ['course_id' => $course->id],
+                ['checklist_ids' => $request->checklist_ids]
+            );
+        } else {
+            \App\Models\CourseChecklist::where('course_id', $course->id)->delete();
+        }
 
         return redirect()->route('admin.courses')->with('success', 'Course updated successfully');
     }

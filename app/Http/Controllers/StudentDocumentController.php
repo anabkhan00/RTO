@@ -19,7 +19,16 @@ class StudentDocumentController extends Controller
     {
         $student = User::with('rtos')->findOrFail($studentId); // eager load RTOs
         $courses = Course::all();
-        $checklists = DocumentChecklist::where('status', true)->get();
+
+        // Get checklists based on student's course
+        if ($student->course_id && $student->course->courseChecklist) {
+            $checklists = DocumentChecklist::whereIn('id', $student->course->courseChecklist->checklist_ids)
+                ->where('status', true)
+                ->get();
+        } else {
+            $checklists = null;
+        }
+
         $industries = Industry::all();
         $rtos = User::where('role', 'rto')->latest()->get();
         $notes = StudentNote::where('student_id', $studentId)
@@ -28,6 +37,14 @@ class StudentDocumentController extends Controller
             ->get();
 
         $studentRtoId = $student->rtos->first()?->id ?? null;
+
+        // Get coordinators for assignment
+        $placementCoordinators = User::where('role', 'coordinator')
+            ->where('coordinator_type', 'placement')
+            ->get();
+        $sourcingCoordinators = User::where('role', 'coordinator')
+            ->where('coordinator_type', 'sourcing')
+            ->get();
 
         if (Auth::user()->hasRole('rto')) {
             $rtoStudentExists = RtoStudent::where('rto_id', Auth::id())
@@ -39,7 +56,7 @@ class StudentDocumentController extends Controller
             return view('rto.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries'));
         }
 
-        return view('admin.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries', 'rtos','studentRtoId'));
+        return view('admin.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries', 'rtos','studentRtoId', 'placementCoordinators', 'sourcingCoordinators'));
     }
 
     public function store(Request $request, $studentId)
@@ -109,6 +126,22 @@ class StudentDocumentController extends Controller
             ->toArray();
 
         return response()->json(['existing_checklist_ids' => $existingChecklistIds]);
+    }
+
+    public function assignCoordinator(Request $request, $studentId)
+    {
+        $request->validate([
+            'placement_coordinator_id' => 'nullable|exists:users,id',
+            'sourcing_coordinator_id' => 'nullable|exists:users,id',
+        ]);
+
+        $student = User::findOrFail($studentId);
+        $student->update([
+            'placement_coordinator_id' => $request->placement_coordinator_id,
+            'sourcing_coordinator_id' => $request->sourcing_coordinator_id,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     public function destroy($id)

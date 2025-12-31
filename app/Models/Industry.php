@@ -36,4 +36,14 @@ class Industry extends Model
     {
         return $this->hasMany(IndustryWeeklySchedule::class);
     }
+
+    public function courseChecklists()
+    {
+        return $this->hasMany(IndustryCourseChecklist::class);
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'industry_courses');
+    }
 }

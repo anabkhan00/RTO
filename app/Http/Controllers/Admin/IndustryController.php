@@ -18,8 +18,7 @@ class IndustryController extends Controller
     public function create()
     {
         $courses = \App\Models\Course::where('status', true)->get();
-        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
-        return view('admin.pages.edit_industry', compact('courses', 'checklists'));
+        return view('admin.pages.edit_industry', compact('courses'));
     }
 
     public function store(Request $request)
@@ -34,12 +33,11 @@ class IndustryController extends Controller
             'website' => 'nullable|url',
             'industry_status' => 'required|in:active,inactive,blocked',
             'course_ids' => 'nullable|array',
-            'checklist_ids' => 'nullable|array',
-            'availability' => 'nullable|array',
+            'course_ids.*' => 'exists:courses,id',
             'notes' => 'nullable|string',
         ]);
 
-        Industry::create([
+        $industry = Industry::create([
             'name' => $request->name,
             'description' => $request->description,
             'contact_person' => $request->contact_person,
@@ -49,21 +47,22 @@ class IndustryController extends Controller
             'website' => $request->website,
             'status' => true,
             'industry_status' => $request->industry_status,
-            'course_ids' => $request->course_ids,
-            'checklist_ids' => $request->checklist_ids,
-            'availability' => $request->availability,
             'notes' => $request->notes,
         ]);
+
+        // Attach courses
+        if ($request->course_ids) {
+            $industry->courses()->attach($request->course_ids);
+        }
 
         return redirect()->route('admin.industries')->with('success', 'Industry created successfully');
     }
 
     public function edit($id)
     {
-        $industry = Industry::findOrFail($id);
+        $industry = Industry::with('courses')->findOrFail($id);
         $courses = \App\Models\Course::where('status', true)->get();
-        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
-        return view('admin.pages.edit_industry', compact('industry', 'courses', 'checklists'));
+        return view('admin.pages.edit_industry', compact('industry', 'courses'));
     }
 
     public function update(Request $request, $id)
@@ -78,8 +77,7 @@ class IndustryController extends Controller
             'website' => 'nullable|url',
             'industry_status' => 'required|in:active,inactive,blocked',
             'course_ids' => 'nullable|array',
-            'checklist_ids' => 'nullable|array',
-            'availability' => 'nullable|array',
+            'course_ids.*' => 'exists:courses,id',
             'notes' => 'nullable|string',
         ]);
 
@@ -93,11 +91,15 @@ class IndustryController extends Controller
             'address' => $request->address,
             'website' => $request->website,
             'industry_status' => $request->industry_status,
-            'course_ids' => $request->course_ids,
-            'checklist_ids' => $request->checklist_ids,
-            'availability' => $request->availability,
             'notes' => $request->notes,
         ]);
+
+        // Sync courses
+        if ($request->course_ids) {
+            $industry->courses()->sync($request->course_ids);
+        } else {
+            $industry->courses()->detach();
+        }
 
         return redirect()->route('admin.industries')->with('success', 'Industry updated successfully');
     }

@@ -45,6 +45,10 @@ class StudentController extends Controller
             'priority' => 'nullable|string',
             'progress_status' => 'nullable|string',
             'industry_id' => 'nullable|exists:industries,id',
+            'medical_condition' => 'nullable|string',
+            'transport' => 'nullable|string|max:255',
+            'placement_data' => 'nullable|string',
+            'gender' => 'nullable|in:male,female,other',
         ]);
 
         $daysLeft = null;
@@ -61,6 +65,10 @@ class StudentController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'course_id' => $request->course_id,
+            'medical_condition' => $request->medical_condition,
+            'transport' => $request->transport,
+            'placement_data' => $request->placement_data,
+            'gender' => $request->gender,
             'password' => Hash::make('password'),
             'role' => 'user',
         ]);
@@ -99,6 +107,10 @@ class StudentController extends Controller
             'placement_hours'   => 'nullable|numeric|min:0',
             'student_status' => 'nullable|in:active,inactive,blocked',
             'profile_image' => 'nullable',
+            'medical_condition' => 'nullable|string',
+            'transport' => 'nullable|string|max:255',
+            'placement_data' => 'nullable|string',
+            'gender' => 'nullable|in:male,female,other',
         ]);
 
         $student = User::findOrFail($id);
@@ -126,6 +138,10 @@ class StudentController extends Controller
             'address' => $request->address,
             'course_id' => $request->course_id,
             'profile_image' => $profileImagePath,
+            'medical_condition' => $request->medical_condition,
+            'transport' => $request->transport,
+            'placement_data' => $request->placement_data,
+            'gender' => $request->gender,
         ]);
 
         // Update or create student RTO assignment
@@ -236,11 +252,15 @@ class StudentController extends Controller
 
     public function data(Request $request)
     {
-        $query = User::with(['course', 'studentDetail.industry', 'assignedCoordinator'])->where('role', 'user');
+        $query = User::with(['course', 'studentDetail.industry', 'placementCoordinator', 'sourcingCoordinator'])->where('role', 'user');
         
-        // Filter by coordinator assignment
+        // Filter students based on coordinator role
         if (auth()->user()->role === 'coordinator') {
-            $query->where('assigned_coordinator_id', auth()->id());
+            if (auth()->user()->coordinator_type === 'placement') {
+                $query->where('placement_coordinator_id', auth()->id());
+            } elseif (auth()->user()->coordinator_type === 'sourcing') {
+                $query->where('sourcing_coordinator_id', auth()->id());
+            }
         }
 
         // Apply filters
@@ -325,37 +345,30 @@ class StudentController extends Controller
 
             $actionsHtml = '';
 
-            $statusColor = $student->student_status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
-                          ($student->student_status === 'inactive' ? 'bg-gray-50 text-gray-700 border-gray-200' : 'bg-red-50 text-red-700 border-red-200');
 
-            $statusHtml = '<select onchange="updateStudentStatus(' . $student->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . $statusColor . ' focus:ring-brand focus:border-brand">
-                <option value="active"' . ($student->student_status === 'active' ? ' selected' : '') . '>Active</option>
-                <option value="inactive"' . ($student->student_status === 'inactive' ? ' selected' : '') . '>Inactive</option>
-                <option value="blocked"' . ($student->student_status === 'blocked' ? ' selected' : '') . '>Blocked</option>
-            </select>';
-
-            $actionsHtml = '';
 
             if (auth()->user()->role === 'admin') {
-                // Admin: Assign Coordinator + Delete buttons
+                // Admin: Delete only
                 $actionsHtml = '
-                <div class="flex justify-center gap-2">
-                    <button onclick="assignCoordinator(' . $student->id . ')" 
-                            class="text-blue-600 hover:text-blue-800 transition-colors p-1 rounded-full hover:bg-blue-50" 
-                            title="Assign Coordinator">
-                        <i class="bi bi-person-plus"></i>
-                    </button>
-                    <button onclick="deleteStudent(' . $student->id . ')"
-                            class="text-red-600 hover:text-red-800 transition-colors p-1 rounded-full hover:bg-red-50"
-                            title="Delete Student">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>';
+        <div class="text-center flex justify-center gap-2">
+
+            <div class="relative inline-block dropdown-container" onclick="event.stopPropagation()">
+                <button onclick="toggleDropdown(' . $student->id . ')"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200">
+                    <i class="bi bi-three-dots-vertical text-gray-700"></i>
+                </button>
+
+                <div id="dropdown-' . $student->id . '"
+                     class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1">
+                    <a href="#" onclick="deleteStudent(' . $student->id . ')"
+                       class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                       <i class="bi bi-trash mr-2"></i>Delete
+                    </a>
+                </div>
+            </div>
+        </div>';
             }
 
-            $coordinatorName = $student->assignedCoordinator ? $student->assignedCoordinator->name : 'Unassigned';
-            $coordinatorColor = $student->assignedCoordinator ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-gray-50 text-gray-700 border-gray-100';
-            
             $data[] = [
                 'row_url' => route('admin.student-documents.index', $student->id),
                 'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($student->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $student->name . '</div></div>',
@@ -363,8 +376,8 @@ class StudentController extends Controller
                 'course' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $courseColor . ' border shadow-sm">' . $courseName . '</span>',
                 'days_left' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $daysColor . ' border shadow-sm">' . $daysLeft . ' Days left</span>',
                 'progress' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-700 border-indigo-100 border shadow-sm"><i class="bi bi-person mr-1"></i>' . $progress . '</span>',
-                'status' => $statusHtml,
-                'coordinator' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $coordinatorColor . ' border shadow-sm">' . $coordinatorName . '</span>',
+                'status' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700 border-green-100 border shadow-sm">Active</span>',
+                'coordinator' => $student->placementCoordinator ? '<span class="text-sm text-green-600">' . $student->placementCoordinator->name . '</span>' : '<span class="text-sm text-gray-600">Not Assigned</span>',
                 'address' => $student->address ?? '-----',
                 'created_at' => $student->created_at->format('j M Y'),
                 'actions' => $actionsHtml,
@@ -392,13 +405,6 @@ class StudentController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Availability updated successfully']);
     }
-
-    // public function updateStatus(Request $request, $id)
-    // {
-    //     $student = User::findOrFail($id);
-    //     $student->update(['student_status' => $request->status]);
-    //     return response()->json(['success' => true]);
-    // }
 
     public function getWeekAvailability(Request $request, $id)
     {
@@ -441,34 +447,5 @@ class StudentController extends Controller
         );
 
         return response()->json(['success' => true]);
-    }
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:active,inactive,blocked'
-        ]);
-
-        $student = User::findOrFail($id);
-        $student->update(['student_status' => $request->status]);
-
-        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
-    }
-
-    public function assignCoordinator(Request $request, $id)
-    {
-        $request->validate([
-            'coordinator_id' => 'nullable|exists:users,id'
-        ]);
-
-        $student = User::findOrFail($id);
-        $student->update(['assigned_coordinator_id' => $request->coordinator_id]);
-
-        return response()->json(['success' => true, 'message' => 'Coordinator assigned successfully']);
-    }
-
-    public function getCoordinators()
-    {
-        $coordinators = User::where('role', 'coordinator')->select('id', 'name')->get();
-        return response()->json($coordinators);
     }
 }
