@@ -21,7 +21,7 @@ return new class extends Migration
             // Other fields
             $table->string('priority')->nullable();
             $table->string('progress_status')->nullable();
-            $table->integer('days_left')->default(0);
+            $table->integer('days_left')->default(0)->nullable();
             $table->dateTime('placement_booked_at')->nullable();
 
             $table->string('emergency_contact')->nullable();

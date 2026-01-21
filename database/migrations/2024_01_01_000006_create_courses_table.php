@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('credit_hours')->nullable();
             $table->text('description')->nullable();
             $table->boolean('status')->default(true);
+            $table->integer('placement_hours')->nullable();
+            $table->integer('no_of_students')->default(0);
             $table->timestamps();
         });
     }

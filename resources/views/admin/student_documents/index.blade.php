@@ -7,47 +7,6 @@
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-2xl font-semibold text-brand mb-6">Documents for {{ $student->name }}</h2>
 
-        <!-- Coordinator Assignment Section -->
-        @if (auth()->user()->role === 'admin')
-            <div class="mb-8">
-                <h3 class="text-lg font-medium text-brand mb-4">Assigned Coordinator</h3>
-                <div class="bg-white rounded-lg border p-6 shadow-sm">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Placement Coordinator</label>
-                            <select id="placementCoordinator"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                                <option value="">Select Placement Coordinator</option>
-                                @foreach ($placementCoordinators as $coordinator)
-                                    <option value="{{ $coordinator->id }}"
-                                        {{ $student->placement_coordinator_id == $coordinator->id ? 'selected' : '' }}>
-                                        {{ $coordinator->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Sourcing Coordinator</label>
-                            <select id="sourcingCoordinator"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                                <option value="">Select Sourcing Coordinator</option>
-                                @foreach ($sourcingCoordinators as $coordinator)
-                                    <option value="{{ $coordinator->id }}"
-                                        {{ $student->sourcing_coordinator_id == $coordinator->id ? 'selected' : '' }}>
-                                        {{ $coordinator->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <button onclick="assignCoordinators()"
-                            class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
-                            Update Assignments
-                        </button>
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <!-- Student Update Section -->
         <div class="mb-8">
             <h3 class="text-lg font-medium text-brand mb-4">Student Information</h3>
@@ -57,9 +16,10 @@
                 @method('PUT')
 
                 <div class="grid grid-cols-12 gap-6">
+
                     <!-- Student Info -->
-                    <div class="col-span-12 lg:col-span-7">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-12 lg:col-span-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- Name -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -201,16 +161,15 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2"><i
                                         class="bi bi-person-check mr-1"></i> Student Status</label>
                                 <select name="student_status"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white"
-                                    {{ auth()->user()->role === 'coordinator' && auth()->user()->coordinator_type !== 'placement' ? 'disabled' : '' }}>
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                                     <option value="active"
-                                        {{ old('student_status', $student->student_status ?? 'active') == 'active' ? 'selected' : '' }}>
+                                        {{ old('student_status', $student->studentDetail->student_status ?? 'active') == 'active' ? 'selected' : '' }}>
                                         Active</option>
                                     <option value="inactive"
-                                        {{ old('student_status', $student->student_status ?? '') == 'inactive' ? 'selected' : '' }}>
+                                        {{ old('student_status', $student->studentDetail->student_status ?? '') == 'inactive' ? 'selected' : '' }}>
                                         Inactive</option>
                                     <option value="blocked"
-                                        {{ old('student_status', $student->student_status ?? '') == 'blocked' ? 'selected' : '' }}>
+                                        {{ old('student_status', $student->studentDetail->student_status ?? '') == 'blocked' ? 'selected' : '' }}>
                                         Blocked</option>
                                 </select>
                             </div>
@@ -229,60 +188,64 @@
                                 <select name="gender"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                                     <option value="">Select Gender</option>
-                                    <option value="male" {{ old('gender', $student->gender) == 'male' ? 'selected' : '' }}>Male</option>
-                                    <option value="female" {{ old('gender', $student->gender) == 'female' ? 'selected' : '' }}>Female</option>
-                                    <option value="other" {{ old('gender', $student->gender) == 'other' ? 'selected' : '' }}>Other</option>
+                                    <option value="male"
+                                        {{ old('gender', $student->studentDetail->gender ?? '') == 'male' ? 'selected' : '' }}>
+                                        Male</option>
+                                    <option value="female"
+                                        {{ old('gender', $student->studentDetail->gender ?? '') == 'female' ? 'selected' : '' }}>
+                                        Female</option>
+                                    <option value="other"
+                                        {{ old('gender', $student->studentDetail->gender ?? '') == 'other' ? 'selected' : '' }}>
+                                        Other</option>
                                 </select>
                             </div>
 
                             <!-- Transport -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Transport</label>
-                                <input type="text" name="transport" value="{{ old('transport', $student->transport) }}"
+                                <input type="text" name="transport"
+                                    value="{{ old('transport', $student->studentDetail->transport ?? '') }}"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
                             </div>
 
                             <!-- Medical Condition -->
-                            <div class="md:col-span-2">
+                            <div class="md:col-span-3">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Medical Condition</label>
                                 <textarea name="medical_condition" rows="2"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('medical_condition', $student->medical_condition) }}</textarea>
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('medical_condition', $student->studentDetail->medical_condition ?? '') }}</textarea>
                             </div>
 
                             <!-- Placement Data -->
-                            <div class="md:col-span-2">
+                            <div class="md:col-span-3">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Placement Data</label>
                                 <textarea name="placement_data" rows="2"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('placement_data', $student->placement_data) }}</textarea>
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('placement_data', $student->studentDetail->placement_data ?? '') }}</textarea>
                             </div>
                         </div>
                     </div>
-
                     <!-- Profile Image -->
-                    <div class="col-span-12 lg:col-span-5">
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-700 mb-3">Profile Image</h4>
-                                <div id="profileDropzone"
-                                    class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-brand transition-colors cursor-pointer bg-gray-50 hover:bg-blue-50">
-                                    <div id="dropzoneContent">
-                                        <i class="bi bi-cloud-upload text-5xl text-gray-300 mb-3"></i>
-                                        <p class="text-sm text-gray-600 font-medium">Drop image here or click to upload</p>
-                                        <p class="text-xs text-gray-500 mt-2">PNG, JPG, GIF up to 5MB</p>
-                                    </div>
-                                    <div id="imagePreview" class="{{ $student->profile_image ? '' : 'hidden' }}">
-                                        <img id="previewImg" src="{{ $student->profile_image_url ?? '' }}"
-                                            class="max-w-full h-48 mx-auto rounded-lg object-cover shadow-sm" />
-                                        <button type="button" id="removeImage"
-                                            class="mt-3 px-3 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition-colors">
-                                            <i class="bi bi-trash mr-1"></i>Remove Image
-                                        </button>
-                                    </div>
+                    <div class="col-span-12 lg:col-span-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-700 mb-3">Profile Image</h4>
+                            <div id="profileDropzone"
+                                class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-brand transition-colors cursor-pointer bg-gray-50 hover:bg-blue-50">
+                                <div id="dropzoneContent">
+                                    <i class="bi bi-cloud-upload text-5xl text-gray-300 mb-3"></i>
+                                    <p class="text-sm text-gray-600 font-medium">Drop image here or click to upload</p>
+                                    <p class="text-xs text-gray-500 mt-2">PNG, JPG, GIF up to 5MB</p>
                                 </div>
-                                <input type="file" id="profileImageInput" name="profile_image" accept="image/*"
-                                    class="hidden" />
-                                <p class="text-xs text-gray-400 mt-2">Use high-quality portrait images for best results</p>
+                                <div id="imagePreview" class="{{ $student->profile_image ? '' : 'hidden' }}">
+                                    <img id="previewImg" src="{{ $student->profile_image_url ?? '' }}"
+                                        class="max-w-full h-48 mx-auto rounded-lg object-cover shadow-sm" />
+                                    <button type="button" id="removeImage"
+                                        class="mt-3 px-3 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition-colors">
+                                        <i class="bi bi-trash mr-1"></i>Remove Image
+                                    </button>
+                                </div>
                             </div>
+                            <input type="file" id="profileImageInput" name="profile_image" accept="image/*"
+                                class="hidden" />
+                            <p class="text-xs text-gray-400 mt-2">Use high-quality portrait images for best results</p>
                         </div>
                     </div>
                 </div>
@@ -311,12 +274,12 @@
                 @endphp <span
                         class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full {{ $colors['bg'] }} {{ $colors['text'] }} {{ $colors['border'] }} border shadow">
                         {{ $status }} </span>
-                    @unless (auth()->user()->role === 'coordinator')
+                    @can('students.edit')
                         <button type="submit"
                             class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                             Update
                         </button>
-                    @endunless
+                    @endcan
                 </div>
             </form>
 
@@ -372,11 +335,12 @@
                             <textarea name="content" placeholder="Add a note about this student..."
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                                 rows="4" required></textarea>
-
-                            <button type="submit"
-                                class="bg-brand text-white text-xs px-3 py-1.5 mt-3 rounded-md hover:bg-gold transition-colors font-medium">
-                                Save Note
-                            </button>
+                            @can('students.edit')
+                                <button type="submit"
+                                    class="bg-brand text-white text-xs px-3 py-1.5 mt-3 rounded-md hover:bg-gold transition-colors font-medium">
+                                    Save Note
+                                </button>
+                            @endcan
                         </form>
 
                         <!-- Role Legend -->
@@ -477,12 +441,12 @@
                                                                 download>
                                                                 <i class="bi bi-download"></i>
                                                             </a>
-                                                            @if (auth()->user()->role !== 'coordinator')
+                                                            @can('documents.delete')
                                                                 <button class="delete-document"
                                                                     data-id="{{ $document->id }}">
                                                                     <i class="bi bi-trash"></i>
                                                                 </button>
-                                                            @endif
+                                                            @endcan
                                                         </div>
                                                     </div>
                                                 @endforeach
@@ -507,26 +471,26 @@
                         <p class="text-sm text-gray-600 mt-1">Upload multiple files (Max 50MB each)</p>
                     </div>
                     <div class="p-4">
-                        <form action="{{ route('admin.student-documents.store', $student->id) }}" method="POST"
-                            enctype="multipart/form-data" class="space-y-4">
-                            @csrf
+                        @can('documents.upload')
+                            <form action="{{ route('admin.student-documents.store', $student->id) }}" method="POST"
+                                enctype="multipart/form-data" class="space-y-4">
+                                @csrf
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Document Label</label>
-                                <input type="text" name="label" placeholder="Enter document label" required
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
-                            </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Document Label</label>
+                                    <input type="text" name="label" placeholder="Enter document label" required
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Files</label>
-                                <input type="file" name="files[]" multiple
-                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip" required
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
-                                <p class="text-xs text-gray-500 mt-1">Supported: PDF, DOC, DOCX, JPG, PNG, ZIP</p>
-                            </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Files</label>
+                                    <input type="file" name="files[]" multiple
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip" required
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                    <p class="text-xs text-gray-500 mt-1">Supported: PDF, DOC, DOCX, JPG, PNG, ZIP</p>
+                                </div>
 
-                            <div class="pt-2 flex">
-                                @unless (auth()->user()->role === 'coordinator' && auth()->user()->coordinator_type === 'sourcing')
+                                <div class="pt-2 flex">
                                     <button type="submit" id="uploadBtn"
                                         class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
                                         <span id="uploadText"><i class="bi bi-upload mr-2"></i>Upload Documents</span>
@@ -534,9 +498,9 @@
                                             <i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Uploading...
                                         </span>
                                     </button>
-                                @endunless
-                            </div>
-                        </form>
+                                </div>
+                            </form>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -1032,15 +996,15 @@
                                 <div class="text-xs text-gray-400 mt-1">By: ${apt.creator.name}</div>
                             </div>
                             ${canEdit ? `<div class="flex gap-2">
-                                        <button onclick='openAppointmentModal(${JSON.stringify(apt)})'
-                                                class="text-blue-600 hover:text-blue-800 text-xs">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button onclick="deleteAppointment(${apt.id})"
-                                                class="text-red-600 hover:text-red-800 text-xs">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>` : ''}
+                                            <button onclick='openAppointmentModal(${JSON.stringify(apt)})'
+                                                    class="text-blue-600 hover:text-blue-800 text-xs">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteAppointment(${apt.id})"
+                                                    class="text-red-600 hover:text-red-800 text-xs">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>` : ''}
                         </div>`;
                     });
                     $('#appointmentsList').html(html ||
@@ -1187,20 +1151,20 @@
                             <div>
                                 <h4 class="font-medium text-gray-900">${dayLabels[index]}</h4>
                                 ${isAvailable ? `
-                                            <p class="text-sm text-gray-600">${formatTime(dayAvail.start)} - ${formatTime(dayAvail.end)}</p>
-                                        ` : '<p class="text-sm text-gray-500">Unavailable</p>'}
+                                                <p class="text-sm text-gray-600">${formatTime(dayAvail.start)} - ${formatTime(dayAvail.end)}</p>
+                                            ` : '<p class="text-sm text-gray-500">Unavailable</p>'}
                             </div>
                         </div>
                         <div class="flex items-center">
                             ${isAvailable ? `
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <i class="bi bi-check-circle mr-1"></i>Available
-                                        </span>
-                                    ` : `
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                            <i class="bi bi-x-circle mr-1"></i>Unavailable
-                                        </span>
-                                    `}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="bi bi-check-circle mr-1"></i>Available
+                                            </span>
+                                        ` : `
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                <i class="bi bi-x-circle mr-1"></i>Unavailable
+                                            </span>
+                                        `}
                         </div>
                     </div>
                 `;
@@ -1370,7 +1334,7 @@
                     events: function(info, successCallback, failureCallback) {
                         fetch(
                                 `{{ route('admin.weekly-schedules.availability', $student->id) }}?start=${info.startStr}&end=${info.endStr}`
-                                )
+                            )
                             .then(response => response.json())
                             .then(data => successCallback(data))
                             .catch(error => failureCallback(error));

@@ -18,32 +18,36 @@
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Students Management</h1>
-                <p class="text-gray-600 mt-1">Manage and track your students</p>
+                <h1 class="text-2xl font-bold text-gray-800">Students Management{{ isset($rto) ? ' - ' . $rto->name : '' }}
+                </h1>
+                <p class="text-gray-600 mt-1">
+                    {{ isset($rto) ? 'Students enrolled under this RTO' : 'Manage and track your students' }}</p>
             </div>
-            @if (auth()->user()->role !== 'coordinator')
-                <div class="flex gap-3">
-                    <!-- Small Action Button -->
+            @can('students.create')
+            <div class="flex gap-3">
+                @if (isset($rto))
+                    <a href="{{ route('admin.students') }}"
+                        class="bg-gray-500 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors">
+                        <i class="bi bi-arrow-left mr-1"></i> All Students
+                    </a>
+                @endif
+                @if (auth()->user()->role !== 'coordinator')
                     <a href="{{ route('admin.students.create') }}"
                         class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                         Add Student
                     </a>
-
-
-                    <!-- Upload Button (Keep Icon, Slightly Smaller) -->
                     <button
                         class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
                         id="openUploadBtn">
                         <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
                     </button>
-
-                    <!-- Download Button (Keep Icon, Slightly Smaller) -->
                     <a href="/admin/students/csv-format"
                         class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
                         <i class="bi bi-download mr-2 text-sm"></i> Download Format
                     </a>
-                </div>
-            @endif
+                @endif
+            </div>
+            @endcan
         </div>
     </div>
 
@@ -369,29 +373,30 @@
     <!-- Assign Coordinator Modal -->
     <div id="coordinatorModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
         <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative">
-            <button onclick="closeCoordinatorModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
+            <button onclick="closeCoordinatorModal()"
+                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
                 &times;
             </button>
             <h3 class="text-xl font-semibold mb-4" style="color: #d4af37;">Assign Coordinator</h3>
             <form id="coordinatorForm">
                 <input type="hidden" id="selectedStudentId">
-                
+
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Select Coordinator</label>
                     <select id="coordinatorSelect" required
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                         <option value="">Unassign Coordinator</option>
                     </select>
                 </div>
-                
+
                 <div class="flex gap-3">
                     <button type="submit" class="px-4 py-2 rounded-lg text-white text-sm"
-                            style="background-color: #d4af37;"
-                            onmouseover="this.style.backgroundColor='#c19b2e'" 
-                            onmouseout="this.style.backgroundColor='#d4af37'">
+                        style="background-color: #d4af37;" onmouseover="this.style.backgroundColor='#c19b2e'"
+                        onmouseout="this.style.backgroundColor='#d4af37'">
                         Assign
                     </button>
-                    <button type="button" onclick="closeCoordinatorModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600">
+                    <button type="button" onclick="closeCoordinatorModal()"
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600">
                         Cancel
                     </button>
                 </div>
@@ -415,6 +420,9 @@
                     d.progress = $('#progressFilter').val();
                     d.from_date = $('#fromDate').val();
                     d.to_date = $('#toDate').val();
+                    @if (!empty($rtoId))
+                        d.rto_id = '{{ $rtoId }}';
+                    @endif
                 }
             },
             "columns": [{
@@ -845,32 +853,34 @@
 
         document.getElementById('coordinatorForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const studentId = document.getElementById('selectedStudentId').value;
             const coordinatorId = document.getElementById('coordinatorSelect').value;
-            
+
             fetch(`/admin/students/assign-coordinator/${studentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ coordinator_id: coordinatorId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    toastr.success(data.message);
-                    closeCoordinatorModal();
-                    studentsTable.ajax.reload();
-                } else {
-                    toastr.error('Failed to assign coordinator');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error('An error occurred');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        coordinator_id: coordinatorId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        closeCoordinatorModal();
+                        studentsTable.ajax.reload();
+                    } else {
+                        toastr.error('Failed to assign coordinator');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('An error occurred');
+                });
         });
 
         // Close modal on outside click

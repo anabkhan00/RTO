@@ -21,23 +21,14 @@
                 <h1 class="text-2xl font-bold text-gray-800">RTO Management</h1>
                 <p class="text-gray-600 mt-1">Manage and track registered training organizations</p>
             </div>
+            @can('rtos.create')
             <div class="flex gap-3">
                 <a href="{{ route('admin.rtos.create') }}"
                     class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                     Add RTO
                 </a>
-
-                {{-- <button
-                    class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
-                    id="openUploadBtn">
-                    <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
-                </button>
-
-                <a href="/admin/rtos/csv-format"
-                    class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
-                    <i class="bi bi-download mr-2 text-sm"></i> Download Format
-                </a> --}}
             </div>
+            @endcan
         </div>
     </div>
 
@@ -228,21 +219,21 @@
 
             // Show dropdown first
             dropdown.classList.remove('hidden');
-            
+
             // Use fixed positioning to avoid affecting table layout
             setTimeout(() => {
                 const buttonRect = button.getBoundingClientRect();
                 const dropdownRect = dropdown.getBoundingClientRect();
                 const viewportHeight = window.innerHeight;
                 const viewportWidth = window.innerWidth;
-                
+
                 // Set to fixed positioning
                 dropdown.style.position = 'fixed';
-                
+
                 // Calculate vertical position
                 const spaceBelow = viewportHeight - buttonRect.bottom;
                 const spaceAbove = buttonRect.top;
-                
+
                 if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                     // Position below button
                     dropdown.style.top = (buttonRect.bottom + 4) + 'px';
@@ -252,7 +243,7 @@
                     dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                     dropdown.style.top = 'auto';
                 }
-                
+
                 // Calculate horizontal position (align to right edge of button)
                 const rightEdge = buttonRect.right;
                 if (rightEdge >= dropdownRect.width) {
@@ -445,21 +436,21 @@
 
                     // Show dropdown
                     dropdown.classList.remove('hidden');
-                    
+
                     // Use fixed positioning to avoid affecting table layout
                     setTimeout(() => {
                         const buttonRect = button.getBoundingClientRect();
                         const dropdownRect = dropdown.getBoundingClientRect();
                         const viewportHeight = window.innerHeight;
                         const viewportWidth = window.innerWidth;
-                        
+
                         // Set to fixed positioning
                         dropdown.style.position = 'fixed';
-                        
+
                         // Calculate vertical position
                         const spaceBelow = viewportHeight - buttonRect.bottom;
                         const spaceAbove = buttonRect.top;
-                        
+
                         if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                             // Position below button
                             dropdown.style.top = (buttonRect.bottom + 4) + 'px';
@@ -469,7 +460,7 @@
                             dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                             dropdown.style.top = 'auto';
                         }
-                        
+
                         // Calculate horizontal position (align to right edge of button)
                         const rightEdge = buttonRect.right;
                         if (rightEdge >= dropdownRect.width) {

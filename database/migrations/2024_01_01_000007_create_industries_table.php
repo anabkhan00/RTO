@@ -18,6 +18,11 @@ return new class extends Migration
             $table->text('address');
             $table->string('website')->nullable();
             $table->boolean('status')->default(true);
+            $table->enum('industry_status', ['active', 'inactive', 'blocked'])->default('active');
+            $table->json('course_ids')->nullable();
+            $table->json('checklist_ids')->nullable();
+            $table->json('availability')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

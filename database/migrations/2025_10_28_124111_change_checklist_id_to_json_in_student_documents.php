@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('student_documents', function (Blueprint $table) {
-            $table->dropForeign(['checklist_id']);
             $table->dropColumn('checklist_id');
             $table->json('checklist_ids')->nullable();
         });

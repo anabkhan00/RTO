@@ -9,15 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('student_status', ['active', 'inactive', 'blocked'])->default('active')->after('placement_hours');
-            $table->json('student_availability')->nullable()->after('student_status');
+            $table->foreign('course_id')->references('id')->on('courses')->onDelete('set null');
         });
     }
 
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['student_status', 'student_availability']);
+            $table->dropForeign(['course_id']);
         });
     }
 };

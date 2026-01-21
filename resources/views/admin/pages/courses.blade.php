@@ -21,23 +21,14 @@
                 <h1 class="text-2xl font-bold text-gray-800">Course Management</h1>
                 <p class="text-gray-600 mt-1">Manage and track courses</p>
             </div>
+            @can('courses.create')
             <div class="flex gap-3">
                 <a href="{{ route('admin.courses.create') }}"
                     class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                     Add Course
                 </a>
-
-                {{-- <button
-                    class="bg-green-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
-                    id="openUploadBtn">
-                    <i class="bi bi-upload mr-2 text-sm"></i> Upload CSV
-                </button>
-
-                <a href="/admin/courses/csv-format"
-                    class="bg-gray-600 text-white flex items-center font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-700 transition-colors">
-                    <i class="bi bi-download mr-2 text-sm"></i> Download Format
-                </a> --}}
             </div>
+            @endcan
         </div>
     </div>
 
@@ -110,9 +101,11 @@
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Created At</th>
-                        <th
-                            class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Actions</th>
+                        @can('courses.delete')
+                            <th
+                                class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                                Actions</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -201,10 +194,12 @@
                     "data": "created_at",
                     "orderable": true
                 },
-                {
-                    "data": "actions",
-                    "orderable": false
-                }
+                @can('courses.delete')
+                    {
+                        data: "actions",
+                        orderable: false
+                    }
+                @endcan
             ],
             "pageLength": 25,
             "searching": false,
@@ -303,17 +298,17 @@
                     }
 
                     dropdown.classList.remove('hidden');
-                    
+
                     setTimeout(() => {
                         const buttonRect = button.getBoundingClientRect();
                         const dropdownRect = dropdown.getBoundingClientRect();
                         const viewportHeight = window.innerHeight;
-                        
+
                         dropdown.style.position = 'fixed';
-                        
+
                         const spaceBelow = viewportHeight - buttonRect.bottom;
                         const spaceAbove = buttonRect.top;
-                        
+
                         if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                             dropdown.style.top = (buttonRect.bottom + 4) + 'px';
                             dropdown.style.bottom = 'auto';
@@ -321,7 +316,7 @@
                             dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                             dropdown.style.top = 'auto';
                         }
-                        
+
                         const rightEdge = buttonRect.right;
                         if (rightEdge >= dropdownRect.width) {
                             dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
@@ -377,17 +372,17 @@
             }
 
             dropdown.classList.remove('hidden');
-            
+
             setTimeout(() => {
                 const buttonRect = button.getBoundingClientRect();
                 const dropdownRect = dropdown.getBoundingClientRect();
                 const viewportHeight = window.innerHeight;
-                
+
                 dropdown.style.position = 'fixed';
-                
+
                 const spaceBelow = viewportHeight - buttonRect.bottom;
                 const spaceAbove = buttonRect.top;
-                
+
                 if (spaceBelow >= dropdownRect.height || spaceBelow > spaceAbove) {
                     dropdown.style.top = (buttonRect.bottom + 4) + 'px';
                     dropdown.style.bottom = 'auto';
@@ -395,7 +390,7 @@
                     dropdown.style.bottom = (viewportHeight - buttonRect.top + 4) + 'px';
                     dropdown.style.top = 'auto';
                 }
-                
+
                 const rightEdge = buttonRect.right;
                 if (rightEdge >= dropdownRect.width) {
                     dropdown.style.left = (rightEdge - dropdownRect.width) + 'px';
@@ -418,13 +413,13 @@
         });
 
         function updateStatus(id, value) {
-            $.post(`/admin/courses/update-status/${id}`, { 
-                status: value,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            })
-            .done(function() {
-                coursesTable.ajax.reload(null, false);
-            });
+            $.post(`/admin/courses/update-status/${id}`, {
+                    status: value,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                })
+                .done(function() {
+                    coursesTable.ajax.reload(null, false);
+                });
         }
 
         function deleteCourse(id) {

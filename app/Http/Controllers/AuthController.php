@@ -19,7 +19,9 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
 
-            if ($user->hasRole('admin') || $user->hasRole('coordinator')) {
+            if ($user->hasRole('admin')) {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->hasRole('placement_coordinator') || $user->hasRole('sourcing_coordinator')) {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->hasRole('rto')) {
                 return redirect()->route('rto.dashboard');
