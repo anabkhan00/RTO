@@ -1,5 +1,10 @@
 @extends('admin.master_layout.index')
 @section('page-title', 'Create Coordinator')
+<style>
+.select2-container {
+        width: 100% !important;
+    }
+</style>
 @section('content')
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -56,15 +61,15 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-person-badge mr-1"></i> Type <span class="text-red-500">*</span>
+                        <i class="bi bi-person-badge mr-1"></i> Role <span class="text-red-500">*</span>
                     </label>
-                    <select name="coordinator_type" required
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white @error('coordinator_type') border-red-500 @enderror">
-                        <option value="">Select Coordinator Type</option>
-                        <option value="sourcing" {{ old('coordinator_type') == 'sourcing' ? 'selected' : '' }}>Sourcing Coordinator</option>
-                        <option value="placement" {{ old('coordinator_type') == 'placement' ? 'selected' : '' }}>Placement Coordinator</option>
+                    <select name="role_type" id="role_type" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white @error('role_type') border-red-500 @enderror">
+                        <option value="">Select Coordinator Role</option>
+                        <option value="sourcing_coordinator" {{ old('role_type') == 'sourcing_coordinator' ? 'selected' : '' }}>Sourcing Coordinator</option>
+                        <option value="placement_coordinator" {{ old('role_type') == 'placement_coordinator' ? 'selected' : '' }}>Placement Coordinator</option>
                     </select>
-                    @error('coordinator_type')
+                    @error('role_type')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -92,12 +97,28 @@
                 </div> --}}
             </div>
 
-            {{-- <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p class="font-medium text-blue-800 mb-2 flex items-center">
-                    <i class="bi bi-info-circle mr-1"></i> Default Password:
-                </p>
-                <p class="text-blue-700 text-sm">The coordinator will be created with default password: <strong>password</strong></p>
-            </div> --}}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    {{-- existing fields --}}
+
+    <div id="rto-assignment-section" class="hidden col-span-1 md:col-span-2 w-full">
+
+        <div class="border-t pt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-building mr-1"></i> Assign RTOs
+            </label>
+
+            <select name="rto_ids[]" id="rto_select" multiple
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                @foreach($rtos as $rto)
+                    <option value="{{ $rto->id }}">{{ $rto->name }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+</div>
+
 
             <div class="flex gap-3 pt-4 border-t">
                 <button type="submit"
@@ -111,4 +132,25 @@
             </div>
         </form>
     </div>
+
+<script>
+    $(document).ready(function() {
+
+        $('#rto_select').select2({
+            placeholder: 'Select RTOs',
+            allowClear: true,
+            width: '100%'   // 🔥 THIS IS REQUIRED
+        });
+
+        $('#role_type').on('change', function() {
+            if ($(this).val() === 'placement_coordinator') {
+                $('#rto-assignment-section').removeClass('hidden');
+            } else {
+                $('#rto-assignment-section').addClass('hidden');
+            }
+        });
+
+    });
+</script>
+
 @endsection

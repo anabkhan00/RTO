@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Course;
+use Illuminate\Http\Request;
+use App\Models\CourseChecklist;
+use App\Models\DocumentChecklist;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
 
 class CourseController extends Controller
@@ -17,7 +19,7 @@ class CourseController extends Controller
 
     public function create()
     {
-        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
+        $checklists = DocumentChecklist::where('status', true)->get();
         return view('admin.pages.create_course', compact('checklists'));
     }
 
@@ -39,10 +41,10 @@ class CourseController extends Controller
             'description' => $request->description,
             'status' => true,
         ]);
-        
+
         // Create course checklist if provided
         if ($request->checklist_ids) {
-            \App\Models\CourseChecklist::create([
+            CourseChecklist::create([
                 'course_id' => $course->id,
                 'checklist_ids' => $request->checklist_ids
             ]);
@@ -54,7 +56,7 @@ class CourseController extends Controller
     public function edit($id)
     {
         $course = Course::with('courseChecklist')->findOrFail($id);
-        $checklists = \App\Models\DocumentChecklist::where('status', true)->get();
+        $checklists = DocumentChecklist::where('status', true)->get();
         return view('admin.pages.edit_course', compact('course', 'checklists'));
     }
 
@@ -76,7 +78,7 @@ class CourseController extends Controller
             'credit_hours' => $request->credit_hours,
             'description' => $request->description,
         ]);
-        
+
         // Update course checklist
         if ($request->checklist_ids) {
             \App\Models\CourseChecklist::updateOrCreate(
@@ -217,6 +219,26 @@ class CourseController extends Controller
             $courseColors = ['bg-blue-50 text-blue-700 border-blue-100', 'bg-purple-50 text-purple-700 border-purple-100', 'bg-emerald-50 text-emerald-700 border-emerald-100'];
             $courseColor = $courseColors[abs(crc32($course->code)) % count($courseColors)];
             $statusColor = $course->status ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100';
+            
+            $actions = '';
+            if (auth()->user()->can('courses.delete')) {
+                $actions = '
+        <div class="text-center flex justify-center gap-2">
+            <div class="relative inline-block dropdown-container" onclick="event.stopPropagation()">
+                <button onclick="toggleDropdown(' . $course->id . ')"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200">
+                    <i class="bi bi-three-dots-vertical text-gray-700"></i>
+                </button>
+                <div id="dropdown-' . $course->id . '"
+                     class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1">
+                    <a href="#" onclick="deleteCourse(' . $course->id . ')"
+                       class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                       <i class="bi bi-trash mr-2"></i>Delete
+                    </a>
+                </div>
+            </div>
+        </div>';
+            }
 
             $data[] = [
                 'row_url' => route('admin.courses.edit', $course->id),
@@ -225,7 +247,7 @@ class CourseController extends Controller
                 'credit_hours' => $course->credit_hours ?? '-----',
                 'status' => '<select onchange="updateStatus(' . $course->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($course->status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value="1"' . ($course->status ? ' selected' : '') . '>Active</option><option value="0"' . (!$course->status ? ' selected' : '') . '>Inactive</option></select>',
                 'created_at' => $course->created_at->format('j M Y'),
-                'actions' => '<div class="text-center"><div class="relative inline-block dropdown-container" onclick="event.stopPropagation()"><button onclick="toggleDropdown(' . $course->id . ')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"><i class="bi bi-three-dots-vertical text-gray-700"></i></button><div id="dropdown-' . $course->id . '" class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1"><a href="#" onclick="deleteCourse(' . $course->id . ')" class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="bi bi-trash mr-2"></i>Delete</a></div></div></div>'
+                'actions' => $actions
             ];
         }
 

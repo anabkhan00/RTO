@@ -5,112 +5,102 @@
                 <img src="{{ asset('assets/images/whitelogo.svg') }}" class="w-32">
             </div>
             <nav class="mt-2 space-y-1 px-6">
-                <a href="{{ route('admin.dashboard') }}"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.dashboard') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Dashboard
-                </a>
+                @can('dashboard.view')
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.dashboard') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Dashboard
+                    </a>
+                @endcan
 
-                @if(auth()->user()->role === 'admin')
+                @can('rtos.view')
                     <a href="{{ route('admin.rtos') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.rtos*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         RTOs
                     </a>
+                @endcan
 
+                @can('courses.view')
                     <a href="{{ route('admin.courses') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.courses*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Courses
                     </a>
+                @endcan
 
+                @can('coordinators.view')
                     <a href="{{ route('admin.coordinators') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.coordinators*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Coordinators
                     </a>
+                @endcan
 
+                @can('roles.view')
                     <a href="{{ route('admin.roles') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.roles*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Roles
                     </a>
+                @endcan
+
+                @can('permissions.view')
                     <a href="{{ route('admin.permissions') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.permissions*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Permissions
                     </a>
+                @endcan
+
+                @can('permissions.assign')
                     <a href="{{ route('admin.assign-permissions') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-permissions*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Assign Permissions
                     </a>
+                @endcan
 
+                @can('documents.checklists')
                     <a href="{{ route('admin.document-checklist') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.document-checklist*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Document Checklist
                     </a>
+                @endcan
 
+                @can('contracts.view')
                     <a href="{{ route('admin.contracts') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.contracts*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Contracts
                     </a>
-                @endif
+                @endcan
 
-                @if(auth()->user()->role === 'admin')
+                @can('students.view')
                     <a href="{{ route('admin.students') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Students
                     </a>
+                @endcan
+
+                @can('students.assign_industry')
                     <a href="{{ route('admin.assign-students') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-students*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Assign Students
                     </a>
+                @endcan
+
+                @can('industries.view')
                     <a href="{{ route('admin.industries') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Industries
                     </a>
-                    <a href="{{ route('admin.industry-keywords') }}"
-                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industry-keywords*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                        Manage Industries
+                @endcan
+
+                @can('audit_history.view')
+                    <a href="{{ route('admin.audits') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.audits*') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Audit History
                     </a>
-                @endif
+                @endcan
 
-                @if(auth()->user()->role === 'coordinator')
-                    @if(auth()->user()->coordinator_type === 'placement')
-                        <a href="{{ route('admin.students') }}"
-                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                            Students
-                        </a>
-                        <a href="{{ route('admin.assign-students') }}"
-                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-students*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                            Assign Students
-                        </a>
-                    @endif
-
-                    @if(auth()->user()->coordinator_type === 'sourcing')
-                        <a href="{{ route('admin.students') }}"
-                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.students*') || request()->routeIs('admin.student-documents*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                            Students
-                        </a>
-                        <a href="{{ route('admin.industries') }}"
-                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industries*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                            Industries
-                        </a>
-                        <a href="{{ route('admin.industry-keywords') }}"
-                            class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.industry-keywords*') ? 'bg-brand rounded-lg text-white' : '' }}">
-                            Manage Industries
-                        </a>
-                    @endif
-                @endif
-
-                <a href="/profile"
-                    class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->is('profile') ? 'bg-brand rounded-lg text-white' : '' }}">
-                    Profile
-                </a>
             </nav>
 
         </div>
         <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">
             @csrf
         </form>
-
-        {{-- <button onclick="event.preventDefault(); document.getElementById('logoutForm').submit();"
-            class="m-6 py-2 border border-brand text-brand rounded-md hover:bg-brand hover:text-white transition">
-            Logout
-        </button> --}}
 
     </aside>

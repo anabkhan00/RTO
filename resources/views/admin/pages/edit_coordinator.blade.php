@@ -48,7 +48,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-code-square mr-1"></i> Code <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="code" value="{{ old('code', $coordinator->code) }}" placeholder="Enter Coordinator Code" required
+                    <input type="text" name="code" value="{{ old('code', $coordinator->coordinatorDetail->code ?? '') }}" placeholder="Enter Coordinator Code" required
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('code') border-red-500 @enderror" />
                     @error('code')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -57,15 +57,15 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-person-badge mr-1"></i> Type <span class="text-red-500">*</span>
+                        <i class="bi bi-person-badge mr-1"></i> Role <span class="text-red-500">*</span>
                     </label>
-                    <select name="coordinator_type" required
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white @error('coordinator_type') border-red-500 @enderror">
-                        <option value="">Select Coordinator Type</option>
-                        <option value="sourcing" {{ old('coordinator_type', $coordinator->coordinator_type) == 'sourcing' ? 'selected' : '' }}>Sourcing Coordinator</option>
-                        <option value="placement" {{ old('coordinator_type', $coordinator->coordinator_type) == 'placement' ? 'selected' : '' }}>Placement Coordinator</option>
+                    <select name="role_type" id="role_type" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white @error('role_type') border-red-500 @enderror">
+                        <option value="">Select Coordinator Role</option>
+                        <option value="sourcing_coordinator" {{ old('role_type', $coordinator->getRoleNames()->first()) == 'sourcing_coordinator' ? 'selected' : '' }}>Sourcing Coordinator</option>
+                        <option value="placement_coordinator" {{ old('role_type', $coordinator->getRoleNames()->first()) == 'placement_coordinator' ? 'selected' : '' }}>Placement Coordinator</option>
                     </select>
-                    @error('coordinator_type')
+                    @error('role_type')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -93,6 +93,22 @@
                 </div> --}}
             </div>
 
+            <!-- RTO Assignment Section (Only for Placement Coordinators) -->
+            <div id="rto-assignment-section" class="{{ old('role_type', $coordinator->getRoleNames()->first()) == 'placement_coordinator' ? '' : 'hidden' }}">
+                <div class="border-t pt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-building mr-1"></i> Assign RTOs
+                    </label>
+                    <select name="rto_ids[]" id="rto_select" multiple class="w-full">
+                        @foreach($rtos as $rto)
+                            <option value="{{ $rto->id }}" {{ $coordinator->assignedRtos->contains($rto->id) ? 'selected' : '' }}>
+                                {{ $rto->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             <div class="flex gap-3 pt-4 border-t">
                 <button type="submit"
                     class="bg-brand text-white text-sm px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium">
@@ -105,4 +121,21 @@
             </div>
         </form>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#rto_select').select2({
+                placeholder: 'Select RTOs',
+                allowClear: true
+            });
+
+            $('#role_type').on('change', function() {
+                if ($(this).val() === 'placement_coordinator') {
+                    $('#rto-assignment-section').removeClass('hidden');
+                } else {
+                    $('#rto-assignment-section').addClass('hidden');
+                }
+            });
+        });
+    </script>
 @endsection

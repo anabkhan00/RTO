@@ -38,7 +38,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-hash mr-1"></i> RTO Number
                     </label>
-                    <input type="text" name="rto_number" value="{{ old('rto_number', $rto->rto_number) }}"
+                    <input type="text" name="rto_number" value="{{ old('rto_number', $rto->rtoDetail?->rto_number) }}"
                         placeholder="Enter RTO Number"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('rto_number') border-red-500 @enderror" />
                     @error('rto_number')
@@ -50,8 +50,8 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-hash mr-1"></i> Code <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="code" value="{{ old('code', $rto->code) }}"
-                        placeholder="Enter RTO Number" required
+                    <input type="text" name="code" value="{{ old('code', $rto->rtoDetail?->code) }}"
+                        placeholder="Enter RTO Code" required
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('code') border-red-500 @enderror" />
                     @error('code')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -86,7 +86,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-person mr-1"></i> Contact Person
                     </label>
-                    <input type="numbre" name="contact_person" value="{{ old('contact_person', $rto->contact_person) }}"
+                    <input type="text" name="contact_person" value="{{ old('contact_person', $rto->rtoDetail?->contact_person) }}"
                         placeholder="Enter Contact Person Name"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('contact_person') border-red-500 @enderror" />
                     @error('contact_person')
@@ -98,7 +98,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-globe mr-1"></i> Website
                     </label>
-                    <input type="url" name="website" value="{{ old('website', $rto->website) }}"
+                    <input type="url" name="website" value="{{ old('website', $rto->rtoDetail?->website) }}"
                         placeholder="https://example.com"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('website') border-red-500 @enderror" />
                     @error('website')
@@ -108,7 +108,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-globe mr-1"></i> Website
+                        <i class="bi bi-geo-alt mr-1"></i> Address
                     </label>
                     <input type="text" name="address" value="{{ old('address', $rto->address) }}"
                         placeholder="Enter Address"

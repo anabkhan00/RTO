@@ -87,38 +87,66 @@
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-book mr-1"></i> Course
                     </label>
-                    <select name="course_id"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
-                        <option value="">Select Course</option>
-                        @foreach ($courses as $course)
-                            <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                                {{ $course->name }}
-                            </option>
-                        @endforeach
-                    </select>
+
+                    @if ($courses->isEmpty())
+                        <div class="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                            No courses found.
+                            <a href="{{ route('admin.courses') }}" class="text-blue-600 font-medium underline ml-1">
+                                Click here to add courses
+                            </a>
+                        </div>
+                    @else
+                        <select name="course_id"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
+                            <option value="">Select Course</option>
+
+                            @foreach ($courses as $course)
+                                <option value="{{ $course->id }}"
+                                    {{ old('course_id') == $course->id ? 'selected' : '' }}>
+                                    {{ $course->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+
                     @error('course_id')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-book mr-1"></i> Industry
+                        <i class="bi bi-building mr-1"></i> Industry
                     </label>
-                    <select name="industry_id" id="studentIndustry"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
-                        <option value="">Select Industry</option>
-                        @foreach ($industries as $industry)
-                            <option value="{{ $industry->id }}">{{ $industry->name }}
-                            </option>
-                        @endforeach
-                    </select>
+
+                    @if ($industries->isEmpty())
+                        <div class="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                            No industries found.
+                            <a href="{{ route('admin.industries.create') }}"
+                                class="text-blue-600 font-medium underline ml-1">
+                                Click here to add industry
+                            </a>
+                        </div>
+                    @else
+                        <select name="industry_id" id="studentIndustry"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
+                            <option value="">Select Industry</option>
+
+                            @foreach ($industries as $industry)
+                                <option value="{{ $industry->id }}"
+                                    {{ old('industry_id') == $industry->id ? 'selected' : '' }}>
+                                    {{ $industry->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
+
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -149,6 +177,43 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-phone mr-1"></i> Emergency Contact
+                    </label>
+                    <input type="text" name="emergency_contact" value="{{ old('emergency_contact') }}" placeholder="Emergency Contact Number"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
+                    @error('emergency_contact')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-clock mr-1"></i> Placement Hours
+                    </label>
+                    <input type="number" name="placement_hours" value="{{ old('placement_hours') }}" placeholder="Enter placement hours"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
+                    @error('placement_hours')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-person-check mr-1"></i> Student Status
+                    </label>
+                    <select name="student_status"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
+                        <option value="active" {{ old('student_status') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('student_status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        <option value="blocked" {{ old('student_status') == 'blocked' ? 'selected' : '' }}>Blocked</option>
+                    </select>
+                    @error('student_status')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-geo-alt mr-1"></i> Address <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="address" value="{{ old('address') }}" placeholder="Enter Address" required
@@ -160,25 +225,10 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-person mr-1"></i> Gender
-                    </label>
-                    <select name="gender"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all bg-white">
-                        <option value="">Select Gender</option>
-                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
-                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                        <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
-                    </select>
-                    @error('gender')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-car-front mr-1"></i> Transport
                     </label>
-                    <input type="text" name="transport" value="{{ old('transport') }}" placeholder="Enter Transport Details"
+                    <input type="text" name="transport" value="{{ old('transport') }}"
+                        placeholder="Enter Transport Details"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" />
                     @error('transport')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

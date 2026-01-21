@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('uploaded_by')->constrained('users')->onDelete('cascade');
             $table->string('label');
+            $table->unsignedBigInteger('checklist_id')->nullable();
             $table->string('file_path');
             $table->string('original_name');
             $table->timestamps();

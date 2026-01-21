@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('week_start_date');
             $table->date('week_end_date');
             $table->integer('hours_assigned');
+            $table->json('selected_time_slots')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

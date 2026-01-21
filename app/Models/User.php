@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, \OwenIt\Auditing\Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -22,28 +21,12 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
-        'emergency_contact',
-        'placement_hours',
-        'student_status',
-        'student_availability',
-        'assigned_coordinator_id',
-        'placement_coordinator_id',
-        'sourcing_coordinator_id',
         'password',
         'role',
         'address',
-        'rto_number',
-        'code',
-        'website',
-        'contact_person',
-        'status',
         'course_id',
+        'status',
         'profile_image',
-        'coordinator_type',
-        'medical_condition',
-        'transport',
-        'placement_data',
-        'gender',
     ];
 
     /**
@@ -66,8 +49,17 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'student_availability' => 'array',
         ];
+    }
+
+    public function rtoDetail()
+    {
+        return $this->hasOne(RtoDetail::class);
+    }
+
+    public function coordinatorDetail()
+    {
+        return $this->hasOne(CoordinatorDetail::class);
     }
 
     public function rtoDocuments()
@@ -123,33 +115,15 @@ class User extends Authenticatable
         return $this->hasMany(StudentWeeklySchedule::class, 'student_id');
     }
 
-    public function assignedCoordinator()
+    // RTOs assigned to this coordinator (for placement coordinators)
+    public function assignedRtos()
     {
-        return $this->belongsTo(User::class, 'assigned_coordinator_id');
+        return $this->belongsToMany(User::class, 'coordinator_rto', 'coordinator_id', 'rto_id');
     }
 
-    public function assignedStudents()
+    // Coordinators assigned to this RTO (inverse relationship)
+    public function coordinatorAssignments()
     {
-        return $this->hasMany(User::class, 'assigned_coordinator_id');
-    }
-
-    public function placementCoordinator()
-    {
-        return $this->belongsTo(User::class, 'placement_coordinator_id');
-    }
-
-    public function sourcingCoordinator()
-    {
-        return $this->belongsTo(User::class, 'sourcing_coordinator_id');
-    }
-
-    public function placementStudents()
-    {
-        return $this->hasMany(User::class, 'placement_coordinator_id');
-    }
-
-    public function sourcingStudents()
-    {
-        return $this->hasMany(User::class, 'sourcing_coordinator_id');
+        return $this->belongsToMany(User::class, 'coordinator_rto', 'rto_id', 'coordinator_id');
     }
 }

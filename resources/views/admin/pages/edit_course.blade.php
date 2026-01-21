@@ -62,7 +62,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-file-text mr-1"></i> Description
                     </label>
-                    <textarea name="description" rows="4" placeholder="Enter Course Description"
+                    <textarea name="description" placeholder="Enter Course Description"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('description') border-red-500 @enderror">{{ old('description', $course->description) }}</textarea>
                     @error('description')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -76,7 +76,7 @@
                     <i class="bi bi-list-check mr-2"></i>Document Checklist
                 </h3>
                 <p class="text-sm text-gray-600 mb-4">Select documents required for this course</p>
-                
+
                 <label class="block text-sm font-medium text-gray-700 mb-2">Required Documents</label>
                 <select name="checklist_ids[]" id="checklistSelect" multiple class="w-full">
                     @foreach($checklists as $checklist)

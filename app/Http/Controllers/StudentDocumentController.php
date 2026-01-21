@@ -39,12 +39,12 @@ class StudentDocumentController extends Controller
         $studentRtoId = $student->rtos->first()?->id ?? null;
 
         // Get coordinators for assignment
-        $placementCoordinators = User::where('role', 'coordinator')
-            ->where('coordinator_type', 'placement')
-            ->get();
-        $sourcingCoordinators = User::where('role', 'coordinator')
-            ->where('coordinator_type', 'sourcing')
-            ->get();
+        $placementCoordinators = User::whereHas('roles', function($q) {
+            $q->where('name', 'placement_coordinator');
+        })->get();
+        $sourcingCoordinators = User::whereHas('roles', function($q) {
+            $q->where('name', 'sourcing_coordinator');
+        })->get();
 
         if (Auth::user()->hasRole('rto')) {
             $rtoStudentExists = RtoStudent::where('rto_id', Auth::id())
@@ -136,10 +136,13 @@ class StudentDocumentController extends Controller
         ]);
 
         $student = User::findOrFail($studentId);
-        $student->update([
-            'placement_coordinator_id' => $request->placement_coordinator_id,
-            'sourcing_coordinator_id' => $request->sourcing_coordinator_id,
-        ]);
+        $student->studentDetail()->updateOrCreate(
+            ['user_id' => $student->id],
+            [
+                'placement_coordinator_id' => $request->placement_coordinator_id,
+                'sourcing_coordinator_id' => $request->sourcing_coordinator_id,
+            ]
+        );
 
         return response()->json(['success' => true]);
     }

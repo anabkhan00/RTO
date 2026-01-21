@@ -81,7 +81,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="bi bi-person mr-1"></i> Contact Person
                     </label>
-                    <input type="number" name="contact_person" value="{{ old('contact_person') }}"
+                    <input type="text" name="contact_person" value="{{ old('contact_person') }}"
                         placeholder="Enter Contact Person Name"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('contact_person') border-red-500 @enderror" />
                     @error('contact_person')
