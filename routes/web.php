@@ -342,4 +342,9 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
                 Route::get('/audits/student/{studentId}', 'studentHistory')->name('audits.student');
             });
         });
+
+        // Live Appointments
+        Route::get('/live-appointments', function () {
+            return view('admin.pages.live_appointments');
+        })->name('live-appointments');
     });

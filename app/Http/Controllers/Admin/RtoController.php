@@ -17,6 +17,30 @@ class RtoController extends Controller
     public function dashboard()
     {
         $data = [];
+        $user = auth()->user();
+        $userRole = $user->getRoleNames()->first();
+
+        if ($userRole === 'sourcing_coordinator') {
+            // Sourcing Coordinator Dashboard Data
+            $data['totalOpportunities'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)->count();
+            $data['activeOpportunities'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'active')->count();
+            $data['filledOpportunities'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'filled')->count();
+            $data['totalSlots'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->sum('total_slots');
+            $data['filledSlots'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->sum('filled_slots');
+            
+            // Recent placement opportunities with applications
+            $data['recentOpportunities'] = \App\Models\PlacementOpportunity::with(['industry', 'assignments.student'])
+                ->where('sourcing_coordinator_id', $user->id)
+                ->latest()
+                ->take(10)
+                ->get();
+                
+            return view('admin.pages.sourcing_dashboard', $data);
+        }
 
         if (auth()->user()->can('students.view')) {
             $studentIds = RtoStudent::pluck('student_id');
