@@ -17,6 +17,8 @@ class Industry extends Model implements Auditable
         'email',
         'phone',
         'address',
+        'latitude',
+        'longitude',
         'website',
         'status',
         'industry_status',

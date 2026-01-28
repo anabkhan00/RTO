@@ -307,8 +307,6 @@
               </div>
           @endcan
 
-
-
           @can('students.view')
               <!-- Students Table Section -->
               <div class="w-full mt-6">

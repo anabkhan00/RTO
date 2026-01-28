@@ -137,6 +137,8 @@ class StudentController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'course_id' => 'nullable|exists:courses,id',
             'rto_id' => 'nullable|exists:users,id',
             'priority' => 'nullable|string',
@@ -168,6 +170,8 @@ class StudentController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'course_id' => $request->course_id,
             'profile_image' => $profileImagePath,
         ]);
@@ -302,7 +306,7 @@ class StudentController extends Controller
 
     public function data(Request $request)
     {
-        $query = User::with(['course', 'studentDetail.industry', 'studentDetail.placementCoordinator', 'studentDetail.sourcingCoordinator'])->where('role', 'user');
+        $query = User::with(['course', 'studentDetail.industry', 'assignmentRequests.sourcingCoordinator'])->where('role', 'user');
 
         $user = auth()->user();
         $userRole = $user->getRoleNames()->first();
@@ -317,7 +321,7 @@ class StudentController extends Controller
                     'data' => []
                 ]);
             }
-            
+
             if ($request->filled('rto_id')) {
                 $rtoId = $request->rto_id;
                 if (!$assignedRtoIds->contains($rtoId)) {
@@ -417,6 +421,12 @@ class StudentController extends Controller
 
             $actionsHtml = '';
 
+            // Get assigned sourcing coordinator
+            $assignedCoordinator = $student->assignmentRequests()->whereIn('status', ['pending', 'in_progress'])->with('sourcingCoordinator')->first();
+            $coordinatorDisplay = $assignedCoordinator && $assignedCoordinator->sourcingCoordinator
+                ? '<span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border-blue-100 border shadow-sm">' . $assignedCoordinator->sourcingCoordinator->name . '</span>'
+                : '<span class="text-sm text-gray-600">Not Assigned</span>';
+
             if (auth()->user()->hasRole('admin')) {
                 $actionsHtml = '
         <div class="text-center flex justify-center gap-2">
@@ -434,17 +444,35 @@ class StudentController extends Controller
                 </div>
             </div>
         </div>';
+            } elseif (auth()->user()->hasRole('placement_coordinator')) {
+                $actionsHtml = '
+        <div class="text-center flex justify-center gap-2">
+            <div class="relative inline-block dropdown-container" onclick="event.stopPropagation()">
+                <button onclick="toggleDropdown(' . $student->id . ')"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200">
+                    <i class="bi bi-three-dots-vertical text-gray-700"></i>
+                </button>
+                <div id="dropdown-' . $student->id . '"
+                     class="dropdown-menu hidden absolute right-0 mt-2 w-48 z-[9999] bg-white shadow-lg rounded-md border py-1">
+                    <a href="#" onclick="assignSourcingCoordinator(' . $student->id . ')"
+                       class="block px-3 py-2 text-sm text-blue-600 hover:bg-blue-50">
+                       <i class="bi bi-person-plus mr-2"></i>Assign to Sourcing
+                    </a>
+                </div>
+            </div>
+        </div>';
             }
 
             $data[] = [
                 'row_url' => route('admin.student-documents.index', $student->id),
+                'checkbox' => auth()->user()->hasRole('placement_coordinator') ? '<input type="checkbox" class="student-checkbox rounded border-gray-300" value="' . $student->id . '">' : '',
                 'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($student->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $student->name . '</div></div>',
                 'industry' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $industryColor . ' border shadow-sm">' . $industry . '</span>',
                 'course' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $courseColor . ' border shadow-sm">' . $courseName . '</span>',
                 'days_left' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $daysColor . ' border shadow-sm">' . $daysLeft . ' Days left</span>',
                 'progress' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-700 border-indigo-100 border shadow-sm"><i class="bi bi-person mr-1"></i>' . $progress . '</span>',
                 'status' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700 border-green-100 border shadow-sm">Active</span>',
-                'coordinator' => $detail && $detail->placementCoordinator ? '<span class="text-sm text-green-600">' . $detail->placementCoordinator->name . '</span>' : '<span class="text-sm text-gray-600">Not Assigned</span>',
+                'coordinator' => $coordinatorDisplay,
                 'address' => $student->address ?? '-----',
                 'created_at' => $student->created_at->format('j M Y'),
                 'actions' => $actionsHtml,
@@ -515,5 +543,14 @@ class StudentController extends Controller
         );
 
         return response()->json(['success' => true]);
+    }
+
+    public function getSourcingCoordinators()
+    {
+        $coordinators = User::role('sourcing_coordinator')
+            ->select('id', 'name')
+            ->get();
+
+        return response()->json($coordinators);
     }
 }

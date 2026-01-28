@@ -103,7 +103,10 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <textarea name="address" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('address', $industry->address ?? '') }}</textarea>
+                            <input type="text" name="address" id="addressInput" value="{{ old('address', $industry->address ?? '') }}" placeholder="Start typing address..."
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                            <input type="hidden" name="latitude" id="latitudeInput" value="{{ old('latitude', $industry->latitude ?? '') }}">
+                            <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude', $industry->longitude ?? '') }}">
                         </div>
                     </div>
                 </div>
@@ -413,6 +416,34 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endif
 @endsection
+
+<!-- Google Maps API -->
+<script>
+    function initAutocomplete() {
+        if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+            return;
+        }
+
+        const addressInput = document.getElementById('addressInput');
+        const latInput = document.getElementById('latitudeInput');
+        const lngInput = document.getElementById('longitudeInput');
+
+        if (addressInput && latInput && lngInput) {
+            const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                componentRestrictions: { country: 'au' }
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    latInput.value = place.geometry.location.lat();
+                    lngInput.value = place.geometry.location.lng();
+                }
+            });
+        }
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB92zhVRCzKP_yXXFAko45mb6y1OAH_qgs&libraries=places&callback=initAutocomplete" async defer></script>
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

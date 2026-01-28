@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Course;
 use App\Models\Industry;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
 
 class IndustryController extends Controller
@@ -17,7 +18,7 @@ class IndustryController extends Controller
 
     public function create()
     {
-        $courses = \App\Models\Course::where('status', true)->get();
+        $courses = Course::where('status', true)->get();
         return view('admin.pages.edit_industry', compact('courses'));
     }
 
@@ -30,6 +31,8 @@ class IndustryController extends Controller
             'email' => 'nullable|email|unique:industries',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'website' => 'nullable|url',
             'industry_status' => 'required|in:active,inactive,blocked',
             'course_ids' => 'nullable|array',
@@ -44,6 +47,8 @@ class IndustryController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'website' => $request->website,
             'status' => true,
             'industry_status' => $request->industry_status,
@@ -74,6 +79,8 @@ class IndustryController extends Controller
             'email' => 'nullable|email|unique:industries,email,' . $id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'website' => 'nullable|url',
             'industry_status' => 'required|in:active,inactive,blocked',
             'course_ids' => 'nullable|array',
@@ -89,6 +96,8 @@ class IndustryController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'website' => $request->website,
             'industry_status' => $request->industry_status,
             'notes' => $request->notes,

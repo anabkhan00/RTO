@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\{
     DocumentChecklistController,
     RtoController as AdminRtoController,
     AuditController,
+    StudentAssignmentController
 };
 
 
@@ -244,6 +245,7 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
                 Route::get('/students', 'index')->name('students');
                 Route::get('/students/data', 'data')->name('students.data');
                 Route::get('/students/download', 'download')->name('students.download');
+                Route::get('/students/sourcing-coordinators', 'getSourcingCoordinators')->name('students.sourcing-coordinators');
                 Route::middleware('permission:students.create')->group(function () {
                     Route::get('/students/create', 'create')->name('students.create');
                     Route::post('/students', 'store')->name('students.store');
@@ -343,8 +345,26 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
             });
         });
 
+        // Student Assignments
+        Route::controller(StudentAssignmentController::class)->group(function () {
+            Route::get('/student-assignments', 'index')->name('student-assignments');
+            Route::post('/student-assignments', 'store')->name('student-assignments.store');
+            Route::post('/student-assignments/bulk', 'bulkAssign')->name('student-assignments.bulk');
+            Route::get('/student-assignments/{id}', 'show')->name('student-assignments.show');
+            Route::post('/student-assignments/{id}/status', 'updateStatus')->name('student-assignments.status');
+            Route::get('/student-assignments/data', 'getRequestsData')->name('student-assignments.data');
+        });
+
         // Live Appointments
         Route::get('/live-appointments', function () {
             return view('admin.pages.live_appointments');
         })->name('live-appointments');
+
+        // Assigned Requests
+        Route::get('/assigned-requests', [StudentAssignmentController::class, 'index'])->name('assigned-requests');
+
+        // Map View
+        Route::get('/map-view', function () {
+            return view('admin.pages.map_view');
+        })->name('map-view');
     });

@@ -177,9 +177,11 @@
                             <!-- Address -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                                <input type="text" name="address" value="{{ old('address', $student->address) }}"
-                                    required
+                                <input type="text" name="address" id="addressInput" value="{{ old('address', $student->address) }}"
+                                    required placeholder="Start typing address..."
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                <input type="hidden" name="latitude" id="latitudeInput" value="{{ old('latitude', $student->latitude) }}">
+                                <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude', $student->longitude) }}">
                             </div>
 
                             <!-- Gender -->
@@ -369,10 +371,16 @@
 
         <!-- Map & Notes Section -->
         <div class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Location</h3>
+            <h3 class="text-lg font-medium text-brand mb-4">Industries Within 20km Radius</h3>
             <div class="location-tab-content block bg-white rounded-lg border shadow-sm p-4">
-                <div id="studentMap" class="w-full h-64 rounded-lg border border-gray-300"></div>
-                <p class="text-xs text-gray-500 mt-3">Student location marker displayed on map</p>
+                <div id="industryMap" class="w-full h-[420px] rounded-xl shadow-lg border border-gray-200"></div>
+                {{-- <div class="mt-3 flex items-center justify-between">
+                    <p class="text-xs text-gray-500">Industries available within 20 km radius of student location</p>
+                    <div class="flex items-center text-xs text-gray-600">
+                        <div class="w-3 h-3 bg-blue-200 border border-blue-400 rounded-full mr-2"></div>
+                        <span>20km Coverage Area</span>
+                    </div>
+                </div> --}}
             </div>
         </div>
 
@@ -802,30 +810,8 @@
                 });
             }
 
-            // Map initialization
-            const leafletCSSLink = document.createElement('link');
-            leafletCSSLink.rel = 'stylesheet';
-            leafletCSSLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
-            document.head.appendChild(leafletCSSLink);
-
-            const leafletScript = document.createElement('script');
-            leafletScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
-            leafletScript.onload = function() {
-                const studentLat = {{ $student->latitude ?? 34.0522 }};
-                const studentLng = {{ $student->longitude ?? -118.2437 }};
-                const studentName = '{{ $student->name }}';
-
-                const map = L.map('studentMap').setView([studentLat, studentLng], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 19
-                }).addTo(map);
-
-                const marker = L.marker([studentLat, studentLng]).addTo(map);
-                marker.bindPopup(`<strong>${studentName}</strong><br>Student Location`);
-                marker.openPopup();
-            };
-            document.head.appendChild(leafletScript);
+            // Modern Google Maps initialization
+            initIndustryMap();
 
             // Document upload functionality
             $('form[enctype="multipart/form-data"]').on('submit', function(e) {
@@ -1471,3 +1457,167 @@
         });
     </script>
 @endsection
+
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB92zhVRCzKP_yXXFAko45mb6y1OAH_qgs&libraries=places,geometry&callback=initIndustryMap" async defer></script>
+
+<script>
+// Professional Industry Proximity Map
+function initIndustryMap() {
+    const centerLat = {{ $student->latitude ?? -33.8688 }};
+    const centerLng = {{ $student->longitude ?? 151.2093 }};
+    const studentName = '{{ $student->name }}';
+    const hasCoordinates = {{ $student->latitude ? 'true' : 'false' }};
+
+    const mapOptions = {
+        center: { lat: centerLat, lng: centerLng },
+        zoom: 11,
+        gestureHandling: 'greedy',
+        disableDefaultUI: true,
+        zoomControl: true,
+        fullscreenControl: true,
+        styles: [
+            {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+            },
+            {
+                featureType: 'transit',
+                stylers: [{ visibility: 'off' }]
+            },
+            {
+                featureType: 'road',
+                elementType: 'geometry',
+                stylers: [{ color: '#f8f9fa' }]
+            },
+            {
+                featureType: 'water',
+                elementType: 'geometry',
+                stylers: [{ color: '#c9d6e8' }]
+            },
+            {
+                featureType: 'landscape',
+                elementType: 'geometry',
+                stylers: [{ color: '#f5f5f5' }]
+            }
+        ]
+    };
+
+    const map = new google.maps.Map(document.getElementById('industryMap'), mapOptions);
+
+    // 20km radius circle
+    const radiusCircle = new google.maps.Circle({
+        strokeColor: '#3b82f6',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#3b82f6',
+        fillOpacity: 0.15,
+        map: map,
+        center: { lat: centerLat, lng: centerLng },
+        radius: 20000 // 20km in meters
+    });
+
+    map.fitBounds(radiusCircle.getBounds());
+
+    // Student location marker
+    if (hasCoordinates) {
+        const studentMarker = new google.maps.Marker({
+            position: { lat: centerLat, lng: centerLng },
+            map: map,
+            title: studentName,
+            animation: google.maps.Animation.DROP,
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444"/>
+                        <circle cx="12" cy="9" r="2.5" fill="white"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(24, 24),
+                anchor: new google.maps.Point(12, 24)
+            }
+        });
+
+        const studentInfo = new google.maps.InfoWindow({
+            content: `<div style="font-family: system-ui, sans-serif; padding: 8px;"><strong>${studentName}</strong><br><span style="color: #666; font-size: 13px;">Student Location</span><br><small style="color: #3b82f6;">Industries within 20km radius</small></div>`
+        });
+
+        studentMarker.addListener('click', () => {
+            studentInfo.open(map, studentMarker);
+        });
+    }
+
+    // Sample industry locations within 20km radius
+    const industries = [
+        { name: 'Healthcare Services', lat: centerLat + 0.05, lng: centerLng + 0.03, type: 'Healthcare' },
+        { name: 'Tech Solutions', lat: centerLat - 0.03, lng: centerLng + 0.08, type: 'Technology' },
+        { name: 'Manufacturing Co', lat: centerLat + 0.08, lng: centerLng - 0.05, type: 'Manufacturing' },
+        { name: 'Retail Group', lat: centerLat - 0.06, lng: centerLng - 0.04, type: 'Retail' },
+        { name: 'Construction Ltd', lat: centerLat + 0.02, lng: centerLng + 0.09, type: 'Construction' }
+    ];
+
+    // Add industry markers
+    industries.forEach((industry, index) => {
+        // Verify industry is within 20km radius
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(centerLat, centerLng),
+            new google.maps.LatLng(industry.lat, industry.lng)
+        );
+
+        if (distance <= 20000) {
+            setTimeout(() => {
+                const marker = new google.maps.Marker({
+                    position: { lat: industry.lat, lng: industry.lng },
+                    map: map,
+                    title: industry.name,
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#059669"/>
+                                <circle cx="12" cy="9" r="2.5" fill="white"/>
+                            </svg>
+                        `),
+                        scaledSize: new google.maps.Size(20, 20),
+                        anchor: new google.maps.Point(10, 20)
+                    }
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div style="font-family: system-ui, sans-serif; padding: 6px;"><strong>${industry.name}</strong><br><span style="color: #666; font-size: 12px;">${industry.type}</span><br><small style="color: #059669;">${Math.round(distance/1000)}km from student</small></div>`
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+            }, index * 200);
+        }
+    });
+
+    // Initialize autocomplete after map is ready
+    initAutocomplete();
+}
+
+// Google Places Autocomplete
+function initAutocomplete() {
+    const addressInput = document.getElementById('addressInput');
+    const latInput = document.getElementById('latitudeInput');
+    const lngInput = document.getElementById('longitudeInput');
+
+    if (addressInput) {
+        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+            componentRestrictions: { country: 'au' }
+        });
+
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+
+            if (place.geometry) {
+                latInput.value = place.geometry.location.lat();
+                lngInput.value = place.geometry.location.lng();
+            }
+        });
+    }
+}
+</script>

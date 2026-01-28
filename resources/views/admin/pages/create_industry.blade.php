@@ -78,10 +78,12 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-globe mr-1"></i> Address
+                        <i class="bi bi-geo-alt mr-1"></i> Address
                     </label>
-                    <input type="url" name="address" value="{{ old('address') }}" placeholder="Enter Address"
+                    <input type="text" name="address" id="addressInput" value="{{ old('address') }}" placeholder="Start typing address..."
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('address') border-red-500 @enderror" />
+                    <input type="hidden" name="latitude" id="latitudeInput" value="{{ old('latitude') }}">
+                    <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude') }}">
                     @error('address')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -112,3 +114,31 @@
         </form>
     </div>
 @endsection
+
+<!-- Google Maps API -->
+<script>
+    function initAutocomplete() {
+        if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+            return;
+        }
+
+        const addressInput = document.getElementById('addressInput');
+        const latInput = document.getElementById('latitudeInput');
+        const lngInput = document.getElementById('longitudeInput');
+
+        if (addressInput && latInput && lngInput) {
+            const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                componentRestrictions: { country: 'au' }
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    latInput.value = place.geometry.location.lat();
+                    lngInput.value = place.geometry.location.lng();
+                }
+            });
+        }
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB92zhVRCzKP_yXXFAko45mb6y1OAH_qgs&libraries=places&callback=initAutocomplete" async defer></script>
