@@ -131,10 +131,26 @@
 
     <!-- Students Table -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        @if(auth()->user()->hasRole('placement_coordinator'))
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                </div>
+                <button id="bulkAssignBtn" class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium" disabled>
+                    <i class="bi bi-person-plus mr-1"></i>Assign Selected to Sourcing Coordinator
+                </button>
+            </div>
+        </div>
+        @endif
         <div class="overflow-x-auto">
             <table id="studentsTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
+                        @if(auth()->user()->hasRole('placement_coordinator'))
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
+                            <input type="checkbox" id="headerSelectAll" class="rounded border-gray-300">
+                        </th>
+                        @endif
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Name</th>
@@ -404,6 +420,38 @@
         </div>
     </div>
 
+    <!-- Assign Sourcing Coordinator Modal -->
+    <div id="sourcingCoordinatorModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative">
+            <button onclick="closeSourcingCoordinatorModal()"
+                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
+                &times;
+            </button>
+            <h3 class="text-xl font-semibold mb-4" style="color: #d4af37;">Assign to Sourcing Coordinator</h3>
+            <form id="sourcingCoordinatorForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Sourcing Coordinator</label>
+                    <select id="sourcingCoordinatorSelect" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                        <option value="">Select Coordinator</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="submit" class="px-4 py-2 rounded-lg text-white text-sm"
+                        style="background-color: #d4af37;" onmouseover="this.style.backgroundColor='#c19b2e'"
+                        onmouseout="this.style.backgroundColor='#d4af37'">
+                        Assign Students
+                    </button>
+                    <button type="button" onclick="closeSourcingCoordinatorModal()"
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Initialize DataTables with server-side processing
         let studentsTable = $('#studentsTable').DataTable({
@@ -425,7 +473,14 @@
                     @endif
                 }
             },
-            "columns": [{
+            "columns": [
+                @if(auth()->user()->hasRole('placement_coordinator'))
+                {
+                    "data": "checkbox",
+                    "orderable": false
+                },
+                @endif
+                {
                     "data": "name",
                     "orderable": true
                 },
@@ -481,8 +536,8 @@
             "createdRow": function(row, data, dataIndex) {
                 $(row).addClass('hover:bg-gray-50 transition-colors cursor-pointer');
 
-                // Prevent row click on actions column
-                $(row).find('td:last-child').on('click', function(e) {
+                // Prevent row click on actions column and checkbox column
+                $(row).find('td:last-child, td:first-child').on('click', function(e) {
                     e.stopPropagation();
                 });
 
@@ -887,6 +942,130 @@
         document.getElementById('coordinatorModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeCoordinatorModal();
+            }
+        });
+
+        // Sourcing Coordinator Assignment Functions
+        let selectedStudents = [];
+
+        // Multi-select functionality
+        $(document).on('change', '.student-checkbox', function() {
+            const studentId = $(this).val();
+            if ($(this).is(':checked')) {
+                selectedStudents.push(studentId);
+            } else {
+                selectedStudents = selectedStudents.filter(id => id !== studentId);
+            }
+            updateBulkAssignButton();
+        });
+
+        $('#selectAll, #headerSelectAll').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            $('.student-checkbox').prop('checked', isChecked);
+
+            if (isChecked) {
+                selectedStudents = [];
+                $('.student-checkbox').each(function() {
+                    selectedStudents.push($(this).val());
+                });
+            } else {
+                selectedStudents = [];
+            }
+            updateBulkAssignButton();
+        });
+
+        function updateBulkAssignButton() {
+            const bulkBtn = $('#bulkAssignBtn');
+            if (selectedStudents.length > 0) {
+                bulkBtn.prop('disabled', false).text(`Assign ${selectedStudents.length} Selected`);
+            } else {
+                bulkBtn.prop('disabled', true).text('Assign Selected to Sourcing Coordinator');
+            }
+        }
+
+        $('#bulkAssignBtn').on('click', function() {
+            if (selectedStudents.length > 0) {
+                loadSourcingCoordinators();
+                document.getElementById('sourcingCoordinatorModal').classList.remove('hidden');
+            }
+        });
+
+        function assignSourcingCoordinator(studentId) {
+            selectedStudents = [studentId];
+            loadSourcingCoordinators();
+            document.getElementById('sourcingCoordinatorModal').classList.remove('hidden');
+        }
+
+        function closeSourcingCoordinatorModal() {
+            document.getElementById('sourcingCoordinatorModal').classList.add('hidden');
+        }
+
+        function loadSourcingCoordinators() {
+            fetch('/admin/students/sourcing-coordinators')
+                .then(response => response.json())
+                .then(coordinators => {
+                    const select = document.getElementById('sourcingCoordinatorSelect');
+                    select.innerHTML = '<option value="">Select Coordinator</option>';
+                    coordinators.forEach(coordinator => {
+                        select.innerHTML += `<option value="${coordinator.id}">${coordinator.name}</option>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading sourcing coordinators:', error);
+                    toastr.error('Failed to load sourcing coordinators');
+                });
+        }
+
+        document.getElementById('sourcingCoordinatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const sourcingCoordinatorId = document.getElementById('sourcingCoordinatorSelect').value;
+
+            if (!sourcingCoordinatorId) {
+                toastr.error('Please select a sourcing coordinator');
+                return;
+            }
+
+            if (selectedStudents.length === 0) {
+                toastr.error('No students selected');
+                return;
+            }
+
+            fetch('/admin/student-assignments/bulk', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_ids: selectedStudents,
+                        sourcing_coordinator_id: sourcingCoordinatorId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success(data.success);
+                        closeSourcingCoordinatorModal();
+                        studentsTable.ajax.reload();
+                        selectedStudents = [];
+                        $('.student-checkbox').prop('checked', false);
+                        $('#selectAll, #headerSelectAll').prop('checked', false);
+                        updateBulkAssignButton();
+                    } else {
+                        toastr.error(data.error || 'Failed to assign students');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('An error occurred');
+                });
+        });
+
+        // Close sourcing coordinator modal on outside click
+        document.getElementById('sourcingCoordinatorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSourcingCoordinatorModal();
             }
         });
     </script>

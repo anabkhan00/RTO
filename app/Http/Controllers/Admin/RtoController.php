@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Rto;
 use App\Models\User;
 use App\Models\Course;
-use App\Models\RtoStudent;
+use App\Models\Industry;
 use App\Models\RtoDetail;
+use App\Models\RtoStudent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\PlacementOpportunity;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
@@ -22,23 +24,38 @@ class RtoController extends Controller
 
         if ($userRole === 'sourcing_coordinator') {
             // Sourcing Coordinator Dashboard Data
-            $data['totalOpportunities'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)->count();
-            $data['activeOpportunities'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+            $data['totalOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)->count();
+            $data['activeOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
                 ->where('status', 'active')->count();
-            $data['filledOpportunities'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+            $data['filledOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
                 ->where('status', 'filled')->count();
-            $data['totalSlots'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+            $data['totalSlots'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
                 ->sum('total_slots');
-            $data['filledSlots'] = \App\Models\PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+            $data['filledSlots'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
                 ->sum('filled_slots');
-            
+
+            // Get students with coordinates for map
+            $data['students'] = User::where('role', 'user')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->with(['course', 'studentDetail'])
+                ->get();
+
+            // Get industries with coordinates for map
+            $data['industries'] = Industry::whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->get();
+
+            $data['totalStudents'] = $data['students']->count();
+            $data['totalIndustries'] = $data['industries']->count();
+
             // Recent placement opportunities with applications
-            $data['recentOpportunities'] = \App\Models\PlacementOpportunity::with(['industry', 'assignments.student'])
+            $data['recentOpportunities'] = PlacementOpportunity::with(['industry', 'assignments.student'])
                 ->where('sourcing_coordinator_id', $user->id)
                 ->latest()
                 ->take(10)
                 ->get();
-                
+
             return view('admin.pages.sourcing_dashboard', $data);
         }
 

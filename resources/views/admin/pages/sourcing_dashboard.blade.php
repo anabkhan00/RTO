@@ -16,74 +16,32 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="w-full flex flex-wrap">
-        <!-- Total Opportunities -->
-        <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-            <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-center w-full">
-                    <img src="{{ asset('assets/images/stucomp.svg') }}" class="w-10">
-                </div>
-                <div class="flex items-center mt-3 justify-center w-full">
-                    <p class="font-semibold text-brand text-xs">Total Opportunities</p>
-                </div>
-                <div class="w-full max-w-md mt-2">
-                    <div class="flex justify-center text-sm font-medium text-gray-700 mb-1">
-                        <span class="font-bold text-brand text-2xl">{{ $totalOpportunities ?? 12 }}</span>
-                    </div>
-                </div>
+    <!-- Map Section -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-brand">Students & Industries Map</h2>
+            <div class="flex gap-2">
+                <button id="toggleStudents" class="bg-blue-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-600 transition-colors">
+                    <i class="bi bi-people mr-1"></i>Students
+                </button>
+                <button id="toggleIndustries" class="bg-green-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-600 transition-colors">
+                    <i class="bi bi-building mr-1"></i>Industries
+                </button>
             </div>
         </div>
-
-        <!-- Active Opportunities -->
-        <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-            <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-center w-full">
-                    <img src="{{ asset('assets/images/Started.svg') }}" class="w-10">
+        <div id="sourcingMap" class="w-full h-[500px] rounded-xl shadow-lg border border-gray-200"></div>
+        <div class="mt-3 flex items-center justify-between">
+            <div class="flex gap-4 text-xs text-gray-600">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                    <span>Students ({{ $totalStudents ?? 0 }})</span>
                 </div>
-                <div class="flex items-center mt-3 justify-center w-full">
-                    <p class="font-semibold text-brand text-xs">Active Opportunities</p>
-                </div>
-                <div class="w-full max-w-md mt-2">
-                    <div class="flex justify-center text-sm font-medium text-gray-700 mb-1">
-                        <span class="font-bold text-brand text-2xl">{{ $activeOpportunities ?? 8 }}</span>
-                    </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                    <span>Industries ({{ $totalIndustries ?? 0 }})</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Total Slots -->
-        <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-            <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-center w-full">
-                    <img src="{{ asset('assets/images/Placement.svg') }}" class="w-10">
-                </div>
-                <div class="flex items-center mt-3 justify-center w-full">
-                    <p class="font-semibold text-brand text-xs">Total Slots</p>
-                </div>
-                <div class="w-full max-w-md mt-2">
-                    <div class="flex justify-center text-sm font-medium text-gray-700 mb-1">
-                        <span class="font-bold text-brand text-2xl">{{ $totalSlots ?? 156 }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filled Slots -->
-        <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-            <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-center w-full">
-                    <img src="{{ asset('assets/images/booked.svg') }}" class="w-10">
-                </div>
-                <div class="flex items-center mt-3 justify-center w-full">
-                    <p class="font-semibold text-brand text-xs">Filled Slots</p>
-                </div>
-                <div class="w-full max-w-md mt-2">
-                    <div class="flex justify-center text-sm font-medium text-gray-700 mb-1">
-                        <span class="font-bold text-brand text-2xl">{{ $filledSlots ?? 89 }}</span>
-                    </div>
-                </div>
-            </div>
+            <p class="text-xs text-gray-500">Click markers for details</p>
         </div>
     </div>
 
@@ -144,9 +102,17 @@
             <div class="flex justify-between items-center">
                 <h2 class="text-lg font-semibold text-brand">Placement Opportunities</h2>
                 <div class="flex gap-3">
+                    @if(auth()->user()->hasRole('sourcing_coordinator'))
                     <a href="{{ route('admin.live-appointments') }}" class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                         <i class="bi bi-calendar-check mr-1"></i>Live Appointments
                     </a>
+                    <a href="{{ route('admin.assigned-requests') }}" class="bg-emerald-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors">
+                        <i class="bi bi-clipboard-check mr-1"></i>Assigned Requests
+                    </a>
+                    <a href="{{ route('admin.map-view') }}" class="bg-purple-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-purple-700 transition-colors">
+                        <i class="bi bi-geo-alt mr-1"></i>Map View
+                    </a>
+                    @endif
                     <button class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                         <i class="bi bi-plus mr-1"></i>New Opportunity
                     </button>
@@ -292,12 +258,136 @@
         </div>
     </div>
 
+    <!-- Google Maps API -->
     <script>
+        function initSourcingMap() {
+            if (typeof google === 'undefined' || !google.maps) {
+                console.warn('Google Maps API not loaded');
+                return;
+            }
+
+            const mapElement = document.getElementById('sourcingMap');
+            if (!mapElement) return;
+
+            const mapOptions = {
+                center: { lat: -33.8688, lng: 151.2093 },
+                zoom: 11,
+                gestureHandling: 'greedy',
+                disableDefaultUI: true,
+                zoomControl: true,
+                fullscreenControl: true,
+                styles: [{
+                    featureType: 'poi',
+                    elementType: 'labels',
+                    stylers: [{ visibility: 'off' }]
+                }, {
+                    featureType: 'transit',
+                    stylers: [{ visibility: 'off' }]
+                }, {
+                    featureType: 'road',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#f8f9fa' }]
+                }, {
+                    featureType: 'water',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#c9d6e8' }]
+                }, {
+                    featureType: 'landscape',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#f5f5f5' }]
+                }]
+            };
+
+            const map = new google.maps.Map(mapElement, mapOptions);
+
+            // Dynamic students data from database
+            const students = @json($students ?? []);
+            // Dynamic industries data from database
+            const industries = @json($industries ?? []);
+
+            let studentMarkers = [];
+            let industryMarkers = [];
+
+            // Add student markers
+            students.forEach((student, index) => {
+                setTimeout(() => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: parseFloat(student.latitude), lng: parseFloat(student.longitude) },
+                        map: map,
+                        title: student.name,
+                        animation: google.maps.Animation.DROP,
+                        icon: {
+                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#3b82f6"/>
+                                    <circle cx="12" cy="9" r="2.5" fill="white"/>
+                                </svg>
+                            `),
+                            scaledSize: new google.maps.Size(24, 24),
+                            anchor: new google.maps.Point(12, 24)
+                        }
+                    });
+
+                    const course = student.course ? student.course.name : 'No Course';
+                    const status = student.student_detail ? student.student_detail.progress_status : 'Active';
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="font-family: system-ui, sans-serif; padding: 8px;"><strong>${student.name}</strong><br><span style="color: #666; font-size: 13px;">${course}</span><br><small style="color: #3b82f6;">Status: ${status}</small></div>`
+                    });
+
+                    marker.addListener('click', () => infoWindow.open(map, marker));
+                    studentMarkers.push(marker);
+                }, index * 200);
+            });
+
+            // Add industry markers
+            industries.forEach((industry, index) => {
+                setTimeout(() => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: parseFloat(industry.latitude), lng: parseFloat(industry.longitude) },
+                        map: map,
+                        title: industry.name,
+                        animation: google.maps.Animation.DROP,
+                        icon: {
+                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#059669"/>
+                                    <circle cx="12" cy="9" r="2.5" fill="white"/>
+                                </svg>
+                            `),
+                            scaledSize: new google.maps.Size(24, 24),
+                            anchor: new google.maps.Point(12, 24)
+                        }
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="font-family: system-ui, sans-serif; padding: 8px;"><strong>${industry.name}</strong><br><span style="color: #666; font-size: 13px;">${industry.contact_person || 'No Contact'}</span><br><small style="color: #059669;">Industry Partner</small></div>`
+                    });
+
+                    marker.addListener('click', () => infoWindow.open(map, marker));
+                    industryMarkers.push(marker);
+                }, (students.length + index) * 200);
+            });
+
+            // Toggle buttons functionality
+            document.getElementById('toggleStudents').addEventListener('click', function() {
+                const visible = studentMarkers.length > 0 ? studentMarkers[0].getVisible() : false;
+                studentMarkers.forEach(marker => marker.setVisible(!visible));
+                this.classList.toggle('bg-blue-300', !visible);
+                this.classList.toggle('bg-blue-500', visible);
+            });
+
+            document.getElementById('toggleIndustries').addEventListener('click', function() {
+                const visible = industryMarkers.length > 0 ? industryMarkers[0].getVisible() : false;
+                industryMarkers.forEach(marker => marker.setVisible(!visible));
+                this.classList.toggle('bg-green-300', !visible);
+                this.classList.toggle('bg-green-500', visible);
+            });
+        }
+
         // Filter toggle functionality
         document.getElementById('toggleFilters').addEventListener('click', function() {
             const filterContent = document.getElementById('filterContent');
             const filterIcon = document.getElementById('filterIcon');
-
             filterContent.classList.toggle('hidden');
             filterIcon.classList.toggle('rotate-180');
         });
@@ -310,5 +400,13 @@
             document.getElementById('fromDate').value = '';
             document.getElementById('toDate').value = '';
         });
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof google !== 'undefined' && google.maps) {
+                initSourcingMap();
+            }
+        });
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB92zhVRCzKP_yXXFAko45mb6y1OAH_qgs&libraries=places,geometry&callback=initSourcingMap" async defer></script>
 @endsection

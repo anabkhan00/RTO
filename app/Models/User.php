@@ -24,6 +24,8 @@ class User extends Authenticatable implements Auditable
         'password',
         'role',
         'address',
+        'latitude',
+        'longitude',
         'course_id',
         'status',
         'profile_image',
@@ -125,5 +127,15 @@ class User extends Authenticatable implements Auditable
     public function coordinatorAssignments()
     {
         return $this->belongsToMany(User::class, 'coordinator_rto', 'rto_id', 'coordinator_id');
+    }
+
+    public function assignmentRequests()
+    {
+        return $this->hasMany(StudentAssignmentRequest::class, 'student_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(StudentDocument::class, 'student_id');
     }
 }
