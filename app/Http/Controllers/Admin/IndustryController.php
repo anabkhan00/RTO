@@ -16,10 +16,16 @@ class IndustryController extends Controller
         return view('admin.pages.industries', compact('industries'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $courses = Course::where('status', true)->get();
-        return view('admin.pages.edit_industry', compact('courses'));
+        $prefill = [
+            'name'      => $request->query('name'),
+            'address'   => $request->query('address'),
+            'latitude'  => $request->query('latitude'),
+            'longitude' => $request->query('longitude'),
+        ];
+        return view('admin.pages.create_industry', compact('courses', 'prefill'));
     }
 
     public function store(Request $request)
@@ -34,9 +40,15 @@ class IndustryController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'website' => 'nullable|url',
-            'industry_status' => 'required|in:active,inactive,blocked',
-            'course_ids' => 'nullable|array',
-            'course_ids.*' => 'exists:courses,id',
+            // 'industry_status' => 'required|in:active,inactive,blocked',
+            'courses' => 'nullable|array',
+            'courses.*.course_id' => 'required|exists:courses,id',
+            'courses.*.documents' => 'nullable|array',
+            'courses.*.documents.*' => 'nullable|string',
+            'courses.*.slots' => 'nullable|array',
+            'courses.*.slots.*.title' => 'nullable|string',
+            'courses.*.slots.*.total_slots' => 'nullable|integer|min:1',
+            'courses.*.slots.*.requirements' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
 
@@ -51,13 +63,21 @@ class IndustryController extends Controller
             'longitude' => $request->longitude,
             'website' => $request->website,
             'status' => true,
-            'industry_status' => $request->industry_status,
+            'industry_status' => 'active',
             'notes' => $request->notes,
         ]);
 
-        // Attach courses
-        if ($request->course_ids) {
-            $industry->courses()->attach($request->course_ids);
+        // Handle course configuration
+        if ($request->courses) {
+            $courseData = [];
+            foreach ($request->courses as $courseConfig) {
+                $courseId = $courseConfig['course_id'];
+                $courseData[$courseId] = [
+                    'additional_documents' => json_encode($courseConfig['documents'] ?? []),
+                    'placement_slots' => json_encode($courseConfig['slots'] ?? []),
+                ];
+            }
+            $industry->courses()->attach($courseData);
         }
 
         return redirect()->route('admin.industries')->with('success', 'Industry created successfully');
@@ -83,8 +103,14 @@ class IndustryController extends Controller
             'longitude' => 'nullable|numeric',
             'website' => 'nullable|url',
             'industry_status' => 'required|in:active,inactive,blocked',
-            'course_ids' => 'nullable|array',
-            'course_ids.*' => 'exists:courses,id',
+            'courses' => 'nullable|array',
+            'courses.*.course_id' => 'required|exists:courses,id',
+            'courses.*.documents' => 'nullable|array',
+            'courses.*.documents.*' => 'nullable|string',
+            'courses.*.slots' => 'nullable|array',
+            'courses.*.slots.*.title' => 'nullable|string',
+            'courses.*.slots.*.total_slots' => 'nullable|integer|min:1',
+            'courses.*.slots.*.requirements' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
 
@@ -103,9 +129,17 @@ class IndustryController extends Controller
             'notes' => $request->notes,
         ]);
 
-        // Sync courses
-        if ($request->course_ids) {
-            $industry->courses()->sync($request->course_ids);
+        // Handle course configuration
+        if ($request->courses) {
+            $courseData = [];
+            foreach ($request->courses as $courseConfig) {
+                $courseId = $courseConfig['course_id'];
+                $courseData[$courseId] = [
+                    'additional_documents' => json_encode($courseConfig['documents'] ?? []),
+                    'placement_slots' => json_encode($courseConfig['slots'] ?? []),
+                ];
+            }
+            $industry->courses()->sync($courseData);
         } else {
             $industry->courses()->detach();
         }

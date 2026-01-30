@@ -148,6 +148,7 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
     ->group(function () {
 
         Route::get('dashboard', [AdminRtoController::class, 'dashboard'])->name('dashboard');
+        Route::get('sourcing-dashboard', [AdminRtoController::class, 'dashboard'])->name('sourcing-dashboard');
 
         // RTOs
         Route::middleware('permission:rtos.view')->group(function () {
@@ -367,4 +368,16 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         Route::get('/map-view', function () {
             return view('admin.pages.map_view');
         })->name('map-view');
+
+        // Find Industries (Sourcing Coordinators)
+        Route::middleware('role:sourcing_coordinator|admin')->group(function () {
+            Route::get('/find-industries', function () {
+                return view('admin.pages.find_industries');
+            })->name('find-industries');
+            Route::post('/industry-contacts', function (\Illuminate\Http\Request $request) {
+                // Log industry contact attempts
+                \Illuminate\Support\Facades\Log::info('Industry Contact', $request->all());
+                return response()->json(['success' => true]);
+            });
+        });
     });

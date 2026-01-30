@@ -47,6 +47,8 @@ class Industry extends Model implements Auditable
 
     public function courses()
     {
-        return $this->belongsToMany(Course::class, 'industry_courses');
+        return $this->belongsToMany(Course::class, 'industry_courses')
+                    ->withPivot(['additional_documents', 'placement_slots'])
+                    ->withTimestamps();
     }
 }
