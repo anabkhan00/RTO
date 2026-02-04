@@ -12,6 +12,13 @@
                     </a>
                 @endcan
 
+                @can('find.placements')
+                    <a href="{{ route('admin.find-placements') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.find-placements') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Find Placements
+                    </a>
+                @endcan
+
                 @can('rtos.view')
                     <a href="{{ route('admin.rtos') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.rtos*') ? 'bg-brand rounded-lg text-white' : '' }}">

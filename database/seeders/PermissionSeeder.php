@@ -132,6 +132,7 @@ class PermissionSeeder extends Seeder
         // Placement Coordinator permissions (Student module focused)
         $placementPermissions = [
             'dashboard.view',
+            'find.placements',
             'students.view',
             'students.create',
             'students.edit',

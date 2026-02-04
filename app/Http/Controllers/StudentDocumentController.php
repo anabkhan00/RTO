@@ -18,6 +18,31 @@ class StudentDocumentController extends Controller
     public function index($studentId)
     {
         $student = User::with('rtos')->findOrFail($studentId); // eager load RTOs
+
+        $radiusKm = 20;
+
+        $nearbyIndustries = [];
+
+        if ($student->latitude && $student->longitude) {
+            $lat = $student->latitude;
+            $lng = $student->longitude;
+
+            $nearbyIndustries = Industry::selectRaw("
+            industries.*,
+            (6371 * acos(
+                cos(radians(?)) * cos(radians(latitude))
+                * cos(radians(longitude) - radians(?))
+                + sin(radians(?)) * sin(radians(latitude))
+            )) AS distance
+        ", [$lat, $lng, $lat])
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->having('distance', '<=', $radiusKm)
+                ->orderBy('distance')
+                ->get();
+        }
+
+
         $courses = Course::all();
 
         // Get checklists based on student's course
@@ -39,10 +64,10 @@ class StudentDocumentController extends Controller
         $studentRtoId = $student->rtos->first()?->id ?? null;
 
         // Get coordinators for assignment
-        $placementCoordinators = User::whereHas('roles', function($q) {
+        $placementCoordinators = User::whereHas('roles', function ($q) {
             $q->where('name', 'placement_coordinator');
         })->get();
-        $sourcingCoordinators = User::whereHas('roles', function($q) {
+        $sourcingCoordinators = User::whereHas('roles', function ($q) {
             $q->where('name', 'sourcing_coordinator');
         })->get();
 
@@ -56,7 +81,18 @@ class StudentDocumentController extends Controller
             return view('rto.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries'));
         }
 
-        return view('admin.student_documents.index', compact('student', 'checklists', 'notes', 'courses', 'industries', 'rtos','studentRtoId', 'placementCoordinators', 'sourcingCoordinators'));
+        return view('admin.student_documents.index', compact(
+            'student',
+            'checklists',
+            'notes',
+            'courses',
+            'industries',
+            'rtos',
+            'studentRtoId',
+            'placementCoordinators',
+            'sourcingCoordinators',
+            'nearbyIndustries'
+        ));
     }
 
     public function store(Request $request, $studentId)

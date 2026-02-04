@@ -40,7 +40,7 @@
     <div class="bg-white rounded-lg shadow-sm mb-6 p-4">
         <div class="flex gap-4">
             <div class="flex-1">
-                <input type="text" id="searchInput" placeholder="Search by student name or email..." 
+                <input type="text" id="searchInput" placeholder="Search by student name or email..."
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
             </div>
             <button id="searchBtn" class="bg-brand text-white text-xs px-3 py-2 rounded-md hover:bg-gold transition-colors font-medium">
@@ -63,7 +63,7 @@
                         <p class="text-sm text-gray-600">Assigned by: {{ $request->placementCoordinator->name }}</p>
                         <p class="text-xs text-gray-500">{{ $request->assigned_at->diffForHumans() }}</p>
                     </div>
-                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full 
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
                         @if($request->status === 'pending') bg-orange-50 text-orange-700 border-orange-100 border
                         @elseif($request->status === 'in_progress') bg-blue-50 text-blue-700 border-blue-100 border
                         @elseif($request->status === 'completed') bg-emerald-50 text-emerald-700 border-emerald-100 border
@@ -81,11 +81,11 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Phone:</span>
-                            <span class="font-medium">{{ $request->student->studentDetail->phone ?? 'N/A' }}</span>
+                            <span class="font-medium">{{ $request->student->phone ?? 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Location:</span>
-                            <span class="font-medium">{{ $request->student->studentDetail->address ?? 'N/A' }}</span>
+                            <span class="font-medium">{{ $request->student->address ?? 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Course:</span>
@@ -176,7 +176,7 @@
                             <i class="bi bi-x-lg text-xl"></i>
                         </button>
                     </div>
-                    
+
                     <div id="modalContent">
                         <!-- Dynamic content will be loaded here -->
                     </div>
@@ -196,13 +196,13 @@
                             <i class="bi bi-x-lg text-xl"></i>
                         </button>
                     </div>
-                    
+
                     <form id="progressForm">
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Progress Notes</label>
                             <textarea id="progressNotes" rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" placeholder="Enter progress notes..."></textarea>
                         </div>
-                        
+
                         <div class="flex gap-3">
                             <button type="button" class="flex-1 bg-brand text-white font-medium text-xs px-3 py-2 rounded-md hover:bg-gold transition-colors" onclick="saveProgress()">
                                 Save Progress
@@ -230,7 +230,7 @@
                 });
                 this.classList.add('active', 'border-brand', 'text-brand');
                 this.classList.remove('border-transparent', 'text-gray-500');
-                
+
                 currentStatus = this.dataset.tab;
                 filterRequests();
             });
@@ -246,14 +246,14 @@
         function filterRequests() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const cards = document.querySelectorAll('.request-card');
-            
+
             cards.forEach(card => {
                 const status = card.dataset.status;
                 const text = card.textContent.toLowerCase();
-                
+
                 const statusMatch = currentStatus === 'all' || status === currentStatus;
                 const searchMatch = searchTerm === '' || text.includes(searchTerm);
-                
+
                 if (statusMatch && searchMatch) {
                     card.style.display = 'block';
                 } else {
@@ -284,7 +284,7 @@
                 alert('Please enter progress notes');
                 return;
             }
-            
+
             updateRequestStatus(currentRequestId, 'in_progress', notes);
             closeProgressModal();
         }
@@ -321,7 +321,7 @@
             .then(data => {
                 const student = data.student;
                 const studentDetail = student.student_detail || {};
-                
+
                 document.getElementById('modalContent').innerHTML = `
                     <div class="space-y-6">
                         <div class="grid grid-cols-2 gap-4">
@@ -335,19 +335,19 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Phone</label>
-                                <p class="mt-1 text-sm text-gray-900">${studentDetail.phone || 'N/A'}</p>
+                                <p class="mt-1 text-sm text-gray-900">${student.phone || 'N/A'}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Course</label>
                                 <p class="mt-1 text-sm text-gray-900">${student.course ? student.course.name : 'N/A'}</p>
                             </div>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Address</label>
-                            <p class="mt-1 text-sm text-gray-900">${studentDetail.address || 'N/A'}</p>
+                            <p class="mt-1 text-sm text-gray-900">${student.address || 'N/A'}</p>
                         </div>
-                        
+
                         ${student.documents && student.documents.length > 0 ? `
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Documents</label>
@@ -360,7 +360,7 @@
                             </div>
                         </div>
                         ` : ''}
-                        
+
                         ${data.special_requirements ? `
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Special Requirements</label>
@@ -369,7 +369,7 @@
                         ` : ''}
                     </div>
                 `;
-                
+
                 document.getElementById('studentProfileModal').classList.remove('hidden');
             })
             .catch(error => {

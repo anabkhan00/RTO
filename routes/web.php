@@ -23,7 +23,12 @@ use App\Http\Controllers\Admin\{
     DocumentChecklistController,
     RtoController as AdminRtoController,
     AuditController,
-    StudentAssignmentController
+    StudentAssignmentController,
+    WeeklyScheduleController,
+    StudentAppointmentController,
+    IndustryKeywordController,
+    PlacementOpportunityController,
+    StudentIndustryController
 };
 
 
@@ -149,6 +154,7 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
 
         Route::get('dashboard', [AdminRtoController::class, 'dashboard'])->name('dashboard');
         Route::get('sourcing-dashboard', [AdminRtoController::class, 'dashboard'])->name('sourcing-dashboard');
+        Route::get('find-placements', [AdminRtoController::class, 'findPlacements'])->name('find-placements')->middleware('permission:find.placements');
 
         // RTOs
         Route::middleware('permission:rtos.view')->group(function () {
@@ -279,14 +285,14 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         });
 
         // Student Assignment (Placement Coordinators & Admin)
-        Route::controller(\App\Http\Controllers\Admin\StudentIndustryController::class)->group(function () {
+        Route::controller(StudentIndustryController::class)->group(function () {
             Route::get('/assign-students', 'index')->name('assign-students');
             Route::post('/assign-students/assign', 'assignStudents')->name('assign-students.assign');
             Route::post('/assign-students/remove', 'removeAssignment')->name('assign-students.remove');
         });
 
         // Placement Opportunities (Sourcing Coordinators & Admin)
-        Route::controller(\App\Http\Controllers\Admin\PlacementOpportunityController::class)->group(function () {
+        Route::controller(PlacementOpportunityController::class)->group(function () {
             Route::get('/placement-opportunities/industry/{industryId}', 'getByIndustry');
             Route::post('/placement-opportunities', 'store')->name('placement-opportunities.store');
             Route::put('/placement-opportunities/{id}', 'update')->name('placement-opportunities.update');
@@ -313,7 +319,7 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         });
 
         // Industry Keywords (All coordinators can view, SC can CRUD)
-        Route::controller(\App\Http\Controllers\Admin\IndustryKeywordController::class)->group(function () {
+        Route::controller(IndustryKeywordController::class)->group(function () {
             Route::get('/industry-keywords', 'index')->name('industry-keywords');
             Route::get('/industry-keywords/search', 'search')->name('industry-keywords.search');
             Route::get('/industry-keywords/all', 'getAll')->name('industry-keywords.all');
@@ -323,7 +329,7 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         });
 
         // Student Appointments (All coordinators can view, PC can CRUD)
-        Route::controller(\App\Http\Controllers\Admin\StudentAppointmentController::class)->group(function () {
+        Route::controller(StudentAppointmentController::class)->group(function () {
             Route::get('/appointments/student/{studentId}', 'getByStudent')->name('appointments.by-student');
             Route::post('/appointments', 'store')->name('appointments.store');
             Route::put('/appointments/{id}', 'update')->name('appointments.update');
@@ -331,7 +337,7 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         });
 
         // Weekly Schedules
-        Route::controller(\App\Http\Controllers\Admin\WeeklyScheduleController::class)->group(function () {
+        Route::controller(WeeklyScheduleController::class)->group(function () {
 
             Route::get('/weekly-schedules/{studentId}/availability', 'getWeekAvailability')->name('weekly-schedules.availability');
             Route::post('/weekly-schedules/{studentId}/availability', 'saveWeekAvailability')->name('weekly-schedules.save');
