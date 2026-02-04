@@ -103,13 +103,13 @@
                   @can('placements.view')
                       <!-- Active Placements -->
                       <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-                          <a href="#" class="block">
+                          <a href="{{ route('admin.assigned-requests') }}" class="block">
                               <div class="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow cursor-pointer">
                                   <div class="flex items-center justify-center w-full">
                                       <img src="{{ asset('assets/images/Started.svg') }}" class="w-10">
                                   </div>
                                   <div class="flex items-center mt-3 justify-center w-full">
-                                      <p class="font-semibold text-brand text-xs">Active Placements</p>
+                                      <p class="font-semibold text-brand text-xs">Assigned Requests</p>
                                   </div>
                                   <div class="w-full max-w-md mt-2">
                                       <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
@@ -611,14 +611,24 @@
               <!-- Student Location Map -->
               <div class="w-full mt-6">
                   <div class="bg-white rounded-lg p-4 shadow-sm">
-                      <h2 class="font-semibold text-sm text-brand mb-4">Student Placement Locations</h2>
+                      <div class="flex justify-between items-center mb-4">
+                          <h2 class="font-semibold text-sm text-brand">Student & Industry Locations</h2>
+                          <div class="flex gap-2">
+                              <button id="toggleStudents" class="bg-blue-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-600 transition-colors">
+                                  <i class="bi bi-people mr-1"></i>Students
+                              </button>
+                              <button id="toggleIndustries" class="bg-green-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-600 transition-colors">
+                                  <i class="bi bi-building mr-1"></i>Industries
+                              </button>
+                          </div>
+                      </div>
                       <div id="map" class="w-full h-96 rounded-lg"></div>
                       <div class="flex justify-center gap-6 mt-4 text-sm">
                           <div class="flex items-center font-semibold text-brand text-xs gap-2">
-                              <span class="w-3 h-3 bg-[#00A8AB] rounded-full"></span> Active Placements
+                              <span class="w-3 h-3 bg-blue-500 rounded-full"></span> Assigned Students ({{ $totalStudents ?? 0 }})
                           </div>
                           <div class="flex items-center font-semibold text-brand text-xs gap-2">
-                              <span class="w-3 h-3 bg-[#00AB03] rounded-full"></span> Completed Placements
+                              <span class="w-3 h-3 bg-green-500 rounded-full"></span> Industries ({{ $totalIndustries ?? 0 }})
                           </div>
                       </div>
                   </div>
@@ -808,102 +818,94 @@
                       ]
                   });
 
-                  // Student locations (dummy data)
-                  const students = [{
-                          lat: -33.8688,
-                          lng: 151.2093,
-                          type: 'active',
-                          name: 'John Smith'
-                      }, // Sydney
-                      {
-                          lat: -37.8136,
-                          lng: 144.9631,
-                          type: 'completed',
-                          name: 'Sarah Johnson'
-                      }, // Melbourne
-                      {
-                          lat: -27.4698,
-                          lng: 153.0251,
-                          type: 'active',
-                          name: 'Mike Wilson'
-                      }, // Brisbane
-                      {
-                          lat: -31.9505,
-                          lng: 115.8605,
-                          type: 'completed',
-                          name: 'Emma Davis'
-                      }, // Perth
-                      {
-                          lat: -34.9285,
-                          lng: 138.6007,
-                          type: 'active',
-                          name: 'Chris Brown'
-                      }, // Adelaide
-                      {
-                          lat: -42.8821,
-                          lng: 147.3272,
-                          type: 'completed',
-                          name: 'Lisa Garcia'
-                      }, // Hobart
-                      {
-                          lat: -12.4634,
-                          lng: 130.8456,
-                          type: 'active',
-                          name: 'David Miller'
-                      }, // Darwin
-                      {
-                          lat: -35.2809,
-                          lng: 149.1300,
-                          type: 'completed',
-                          name: 'Anna Wilson'
-                      }, // Canberra
-                      {
-                          lat: -23.6980,
-                          lng: 133.8807,
-                          type: 'active',
-                          name: 'Tom Anderson'
-                      }, // Alice Springs
-                      {
-                          lat: -19.2590,
-                          lng: 146.8169,
-                          type: 'completed',
-                          name: 'Maria Rodriguez'
-                      } // Townsville
-                  ];
+                  let studentMarkers = [];
+                  let industryMarkers = [];
 
-                  // Add markers for each student
+                  // Add student markers
+                  @if(isset($students) && $students->count() > 0)
+                  const students = @json($students);
                   students.forEach(student => {
-                      const marker = new google.maps.Marker({
-                          position: {
-                              lat: student.lat,
-                              lng: student.lng
-                          },
-                          map: map,
-                          title: `${student.name} - ${student.type}`,
-                          icon: {
-                              path: google.maps.SymbolPath.CIRCLE,
-                              scale: 8,
-                              fillColor: student.type === 'active' ? '#00A8AB' : '#00AB03',
-                              fillOpacity: 0.8,
-                              strokeColor: '#ffffff',
-                              strokeWeight: 2
-                          },
-                          animation: google.maps.Animation.BOUNCE
-                      });
+                      if (student.latitude && student.longitude) {
+                          const marker = new google.maps.Marker({
+                              position: {
+                                  lat: parseFloat(student.latitude),
+                                  lng: parseFloat(student.longitude)
+                              },
+                              map: map,
+                              title: student.name,
+                              icon: {
+                                  path: google.maps.SymbolPath.CIRCLE,
+                                  scale: 8,
+                                  fillColor: '#3B82F6',
+                                  fillOpacity: 0.8,
+                                  strokeColor: '#ffffff',
+                                  strokeWeight: 2
+                              }
+                          });
 
-                      // Stop bouncing after 2 seconds
-                      setTimeout(() => {
-                          marker.setAnimation(null);
-                      }, 2000);
+                          const infoWindow = new google.maps.InfoWindow({
+                              content: `<div class="p-2"><strong>${student.name}</strong><br>Course: ${student.course ? student.course.name : 'N/A'}</div>`
+                          });
 
-                      // Add info window
-                      const infoWindow = new google.maps.InfoWindow({
-                          content: `<div class="p-2"><strong>${student.name}</strong><br>Status: ${student.type}</div>`
-                      });
+                          marker.addListener('click', () => {
+                              infoWindow.open(map, marker);
+                          });
 
-                      marker.addListener('click', () => {
-                          infoWindow.open(map, marker);
+                          studentMarkers.push(marker);
+                      }
+                  });
+                  @endif
+
+                  // Add industry markers
+                  @if(isset($industries) && $industries->count() > 0)
+                  const industries = @json($industries);
+                  industries.forEach(industry => {
+                      if (industry.latitude && industry.longitude) {
+                          const marker = new google.maps.Marker({
+                              position: {
+                                  lat: parseFloat(industry.latitude),
+                                  lng: parseFloat(industry.longitude)
+                              },
+                              map: map,
+                              title: industry.name,
+                              icon: {
+                                  path: google.maps.SymbolPath.CIRCLE,
+                                  scale: 8,
+                                  fillColor: '#10B981',
+                                  fillOpacity: 0.8,
+                                  strokeColor: '#ffffff',
+                                  strokeWeight: 2
+                              }
+                          });
+
+                          const infoWindow = new google.maps.InfoWindow({
+                              content: `<div class="p-2"><strong>${industry.name}</strong><br>Contact: ${industry.contact_person || 'N/A'}</div>`
+                          });
+
+                          marker.addListener('click', () => {
+                              infoWindow.open(map, marker);
+                          });
+
+                          industryMarkers.push(marker);
+                      }
+                  });
+                  @endif
+
+                  // Toggle functionality
+                  document.getElementById('toggleStudents').addEventListener('click', function() {
+                      studentMarkers.forEach(marker => {
+                          marker.setVisible(!marker.getVisible());
                       });
+                      this.classList.toggle('bg-blue-500');
+                      this.classList.toggle('bg-gray-400');
+                  });
+
+                  document.getElementById('toggleIndustries').addEventListener('click', function() {
+                      industryMarkers.forEach(marker => {
+                          marker.setVisible(!marker.getVisible());
+                      });
+                      this.classList.toggle('bg-green-500');
+                      this.classList.toggle('bg-gray-400');
                   });
               }
 

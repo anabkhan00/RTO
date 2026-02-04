@@ -1,13 +1,13 @@
 @extends('admin.master_layout.index')
-@section('page-title', 'Sourcing Coordinator Dashboard')
+@section('page-title', 'Placement Coordinator Dashboard')
 
 @section('content')
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Sourcing Dashboard</h1>
-                <p class="text-gray-600 mt-1">Manage placement opportunities and industry partnerships</p>
+                <h1 class="text-2xl font-bold text-gray-800">Placement Dashboard</h1>
+                <p class="text-gray-600 mt-1">Manage student assignments and track placement progress</p>
             </div>
             <div class="text-right">
                 <p class="text-2xl font-bold text-brand">{{ $totalPlacements ?? 0 }}</p>
@@ -64,6 +64,25 @@
         </div>
     </div>
 
+    <!-- Action Buttons -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-brand">Quick Actions</h2>
+            <div class="flex gap-3">
+                {{-- <a href="{{ route('admin.assigned-requests') }}" class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
+                    <i class="bi bi-clipboard-check mr-1"></i>View Progress
+                </a> --}}
+                <a href="{{ route('admin.student-assignments') }}" class="bg-emerald-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors">
+                    <i class="bi bi-person-plus mr-1"></i>Assign Students
+
+                </a>
+                {{-- <a href="{{ route('admin.students') }}" class="bg-blue-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors">
+                    <i class="bi bi-people mr-1"></i>All Students
+                </a> --}}
+            </div>
+        </div>
+    </div>
+
     <!-- Map Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
@@ -77,12 +96,12 @@
                 </button>
             </div>
         </div>
-        <div id="sourcingMap" class="w-full h-[500px] rounded-xl shadow-lg border border-gray-200"></div>
+        <div id="placementMap" class="w-full h-[500px] rounded-xl shadow-lg border border-gray-200"></div>
         <div class="mt-3 flex items-center justify-between">
             <div class="flex gap-4 text-xs text-gray-600">
                 <div class="flex items-center">
                     <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                    <span>Students ({{ $totalStudents ?? 0 }})</span>
+                    <span>Assigned Students ({{ $totalStudents ?? 0 }})</span>
                 </div>
                 <div class="flex items-center">
                     <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
@@ -93,132 +112,74 @@
         </div>
     </div>
 
-    <!-- Filter Section -->
-    <div class="bg-white rounded-lg shadow-sm mb-6 mt-6">
-        <div class="p-4 border-b border-gray-200">
-            <button id="toggleFilters" class="flex items-center justify-between w-full text-left">
-                <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
-                <i id="filterIcon" class="bi bi-chevron-down text-gray-500 transition-transform"></i>
-            </button>
-        </div>
-        <div id="filterContent" class="hidden p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <input type="text" id="searchFilter" placeholder="Search opportunities..."
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                </div>
-                <div>
-                    <select id="industryFilter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                        <option value="">All Industries</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Retail">Retail</option>
-                        <option value="Manufacturing">Manufacturing</option>
-                    </select>
-                </div>
-                <div>
-                    <select id="statusFilter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
-                        <option value="">All Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Closed">Closed</option>
-                    </select>
-                </div>
-                <div>
-                    <input type="date" id="fromDate"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                </div>
-                <div>
-                    <input type="date" id="toDate"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                </div>
-                <div class="flex items-end gap-2">
-                    <button id="resetFilters"
-                        class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
-                        Reset Filters
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Industries Overview -->
+    <!-- Recent Assignments -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         <div class="p-4 border-b border-gray-200">
-            <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-brand">Industries</h2>
-                <div class="flex gap-3">
-                    @if(auth()->user()->hasRole('sourcing_coordinator'))
-                    <a href="{{ route('admin.live-appointments') }}" class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
-                        <i class="bi bi-calendar-check mr-1"></i>Live Appointments
-                    </a>
-                    <a href="{{ route('admin.assigned-requests') }}" class="bg-emerald-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors">
-                        <i class="bi bi-clipboard-check mr-1"></i>Assigned Requests
-                    </a>
-                    <a href="{{ route('admin.find-industries') }}" class="bg-orange-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-orange-700 transition-colors">
-                        <i class="bi bi-search mr-1"></i>Find Industries
-                    </a>
-                    <a href="{{ route('admin.industries.create') }}" class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
-                        <i class="bi bi-plus mr-1"></i>New Industry
-                    </a>
-                    @endif
-                </div>
-            </div>
+            <h2 class="text-lg font-semibold text-brand">Recent Assignments</h2>
         </div>
-
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Contact</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Location</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Courses</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Course</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Sourcing Coordinator</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Status</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Assigned Date</th>
+                        {{-- <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">Actions</th> --}}
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($industries as $industry)
+                    @php
+                        $recentAssignments = \App\Models\StudentAssignmentRequest::where('placement_coordinator_id', auth()->id())
+                            ->with(['student.course', 'sourcingCoordinator'])
+                            ->latest()
+                            ->take(10)
+                            ->get();
+                    @endphp
+                    @forelse($recentAssignments as $assignment)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">
-                                    {{ substr($industry->name, 0, 1) }}
+                                    {{ substr($assignment->student->name, 0, 1) }}
                                 </div>
-                                <div class="text-sm font-medium text-gray-900">{{ $industry->name }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $assignment->student->name }}</div>
                             </div>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $industry->contact_person ?? 'N/A' }}</div>
-                            <div class="text-xs text-gray-500">{{ $industry->email ?? 'N/A' }}</div>
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                            {{ Str::limit($industry->address ?? 'N/A', 30) }}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="text-xs text-gray-500">{{ $industry->courses->count() }} courses</span>
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $industry->status ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100' }} border shadow-sm">
-                                {{ $industry->status ? 'Active' : 'Inactive' }}
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {{ $assignment->student->course->name ?? 'N/A' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-center">
-                            <div class="flex justify-center gap-2">
-                                <a href="{{ route('admin.industries.edit', $industry->id) }}" class="text-brand hover:text-gold text-sm font-medium">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            {{ $assignment->sourcingCoordinator->name ?? 'N/A' }}
                         </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            @php
+                                $statusColors = [
+                                    'pending' => 'bg-yellow-100 text-yellow-800',
+                                    'in_progress' => 'bg-blue-100 text-blue-800',
+                                    'completed' => 'bg-green-100 text-green-800'
+                                ];
+                            @endphp
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusColors[$assignment->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                {{ ucfirst(str_replace('_', ' ', $assignment->status)) }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                            {{ $assignment->assigned_at ? $assignment->assigned_at->format('j M Y') : $assignment->created_at->format('j M Y') }}
+                        </td>
+                        {{-- <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <a href="{{ route('admin.assigned-requests') }}" class="text-brand hover:text-gold text-sm font-medium">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td> --}}
                     </tr>
                     @empty
                     <tr>
                         <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                            <i class="bi bi-building text-4xl mb-2"></i>
-                            <p>No industries found</p>
+                            No assignments found. <a href="{{ route('admin.student-assignments') }}" class="text-brand hover:text-gold">Start assigning students</a>
                         </td>
                     </tr>
                     @endforelse
@@ -227,15 +188,14 @@
         </div>
     </div>
 
-    <!-- Google Maps API -->
     <script>
-        function initSourcingMap() {
+        function initPlacementMap() {
             if (typeof google === 'undefined' || !google.maps) {
                 console.warn('Google Maps API not loaded');
                 return;
             }
 
-            const mapElement = document.getElementById('sourcingMap');
+            const mapElement = document.getElementById('placementMap');
             if (!mapElement) return;
 
             const mapOptions = {
@@ -352,30 +312,6 @@
                 this.classList.toggle('bg-green-500', visible);
             });
         }
-
-        // Filter toggle functionality
-        document.getElementById('toggleFilters').addEventListener('click', function() {
-            const filterContent = document.getElementById('filterContent');
-            const filterIcon = document.getElementById('filterIcon');
-            filterContent.classList.toggle('hidden');
-            filterIcon.classList.toggle('rotate-180');
-        });
-
-        // Reset filters functionality
-        document.getElementById('resetFilters').addEventListener('click', function() {
-            document.getElementById('searchFilter').value = '';
-            document.getElementById('industryFilter').value = '';
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('fromDate').value = '';
-            document.getElementById('toDate').value = '';
-        });
-
-        // Initialize map when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof google !== 'undefined' && google.maps) {
-                initSourcingMap();
-            }
-        });
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&libraries=places,geometry&callback=initSourcingMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&libraries=places&callback=initPlacementMap" async defer></script>
 @endsection

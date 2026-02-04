@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Industry;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\IndustryWeeklySchedule;
 use Illuminate\Support\Facades\Response;
 
 class IndustryController extends Controller
@@ -86,7 +87,7 @@ class IndustryController extends Controller
     public function edit($id)
     {
         $industry = Industry::with('courses')->findOrFail($id);
-        $courses = \App\Models\Course::where('status', true)->get();
+        $courses = Course::where('status', true)->get();
         return view('admin.pages.edit_industry', compact('industry', 'courses'));
     }
 
@@ -317,7 +318,7 @@ class IndustryController extends Controller
         $endDate = substr($end, 0, 10);
 
         // Fetch ALL schedules that overlap with the requested range
-        $schedules = \App\Models\IndustryWeeklySchedule::where('industry_id', $id)
+        $schedules = IndustryWeeklySchedule::where('industry_id', $id)
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('week_start_date', [$startDate, $endDate])
                       ->orWhereBetween('week_end_date', [$startDate, $endDate])
@@ -360,7 +361,7 @@ class IndustryController extends Controller
         $weekStart = \Carbon\Carbon::parse($request->week_start)->startOfWeek(\Carbon\Carbon::MONDAY);
         $weekEnd = $weekStart->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
 
-        \App\Models\IndustryWeeklySchedule::updateOrCreate(
+        IndustryWeeklySchedule::updateOrCreate(
             [
                 'industry_id' => $id,
                 'week_start_date' => $weekStart->toDateString()
