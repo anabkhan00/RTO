@@ -138,4 +138,13 @@ class User extends Authenticatable implements Auditable
     {
         return $this->hasMany(StudentDocument::class, 'student_id');
     }
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        if (!$this->profile_image) {
+            return null;
+        }
+
+        return asset('storage/' . ltrim($this->profile_image, '/'));
+    }
 }

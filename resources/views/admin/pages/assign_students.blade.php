@@ -82,13 +82,13 @@
                             ->whereIn('status', ['pending', 'in_progress'])
                             ->exists();
                     @endphp
-                    <tr class="hover:bg-gray-50 transition-colors student-row" 
+                    <tr class="hover:bg-gray-50 transition-colors student-row"
                         data-student-id="{{ $student->id }}"
                         data-course="{{ $student->course->name ?? '' }}"
                         data-status="{{ $hasActiveAssignment ? 'assigned' : 'available' }}">
                         <td class="px-4 py-3">
                             @if(!$hasActiveAssignment)
-                            <input type="checkbox" class="student-checkbox rounded border-gray-300 text-brand focus:ring-brand" 
+                            <input type="checkbox" class="student-checkbox rounded border-gray-300 text-brand focus:ring-brand"
                                 value="{{ $student->id }}">
                             @endif
                         </td>
@@ -138,7 +138,7 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                             @if(!$hasActiveAssignment)
-                            <button class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors" 
+                            <button class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors"
                                 onclick="assignSingleStudent({{ $student->id }})">
                                 <i class="bi bi-person-plus mr-1"></i>Assign
                             </button>
@@ -174,35 +174,35 @@
                             <i class="bi bi-x-lg text-xl"></i>
                         </button>
                     </div>
-                    
+
                     <form id="assignmentForm">
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Sourcing Coordinator</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Placement Coordinator</label>
                                 <select id="sourcingCoordinatorSelect" required
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                                     <option value="">Select Coordinator</option>
-                                    @foreach($sourcingCoordinators as $coordinator)
+                                    @foreach($placementCoordinators as $coordinator)
                                     <option value="{{ $coordinator->id }}">{{ $coordinator->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Industry Preference (Optional)</label>
-                                <input type="text" id="industryPreference" 
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" 
+                                <input type="text" id="industryPreference"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                                     placeholder="e.g. Healthcare, Technology">
                             </div>
-                            
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Special Requirements (Optional)</label>
                                 <textarea id="specialRequirements" rows="3"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" 
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                                     placeholder="Any special requirements or notes..."></textarea>
                             </div>
                         </div>
-                        
+
                         <div class="flex gap-3 mt-6">
                             <button type="button" class="flex-1 bg-brand text-white font-medium text-xs px-3 py-2 rounded-md hover:bg-gold transition-colors" onclick="submitAssignment()">
                                 <i class="bi bi-check mr-1"></i>Assign Students
@@ -250,18 +250,18 @@
             const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
             const courseFilter = document.getElementById('courseFilter').value;
             const statusFilter = document.getElementById('statusFilter').value;
-            
+
             const rows = document.querySelectorAll('.student-row');
-            
+
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 const course = row.dataset.course;
                 const status = row.dataset.status;
-                
+
                 const searchMatch = searchTerm === '' || text.includes(searchTerm);
                 const courseMatch = courseFilter === '' || course === courseFilter;
                 const statusMatch = statusFilter === '' || status === statusFilter;
-                
+
                 if (searchMatch && courseMatch && statusMatch) {
                     row.style.display = '';
                 } else {
@@ -284,10 +284,10 @@
         function updateSelectedCount() {
             const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
             const count = checkedBoxes.length;
-            
+
             document.getElementById('selectedCount').textContent = count;
             document.getElementById('bulkAssignBtn').disabled = count === 0;
-            
+
             selectedStudents = Array.from(checkedBoxes).map(cb => cb.value);
         }
 
@@ -313,23 +313,23 @@
 
         function submitAssignment() {
             if (isAssigning) return;
-            
+
             const coordinatorId = document.getElementById('sourcingCoordinatorSelect').value;
             const industryPreference = document.getElementById('industryPreference').value;
             const specialRequirements = document.getElementById('specialRequirements').value;
-            
+
             if (!coordinatorId) {
                 alert('Please select a sourcing coordinator');
                 return;
             }
-            
+
             if (selectedStudents.length === 0) {
                 alert('No students selected');
                 return;
             }
-            
+
             isAssigning = true;
-            
+
             const url = selectedStudents.length === 1 ? '/admin/student-assignments' : '/admin/student-assignments/bulk';
             const data = selectedStudents.length === 1 ? {
                 student_id: selectedStudents[0],
@@ -342,7 +342,7 @@
                 industry_preference: industryPreference,
                 special_requirements: specialRequirements
             };
-            
+
             fetch(url, {
                 method: 'POST',
                 headers: {

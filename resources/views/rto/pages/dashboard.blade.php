@@ -388,6 +388,7 @@
                                       {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->rto_number ?? '-----' }}</td> --}}
                                       <!-- Industry -->
 
+                                      
                                       @php
                                           // Pastel color palette
                                           $palette = [
@@ -496,16 +497,16 @@
                                       </td>
                                       <!-- Sectors -->
                                       {{-- <td class="px-4 py-3 whitespace-nowrap">
-                                <a href="#" class="text-brand hover:text-gold text-sm font-medium">
-                                    VIEW / EDIT
-                                    <i class="bi bi-layers ml-1"></i>
-                                </a>
-                            </td> --}}
+                            <a href="#" class="text-brand hover:text-gold text-sm font-medium">
+                                VIEW / EDIT
+                                <i class="bi bi-layers ml-1"></i>
+                            </a>
+                        </td> --}}
                                       <!-- Email -->
                                       {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->email }}</td>
-                            <!-- Phone -->
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->phone ?? '-----' }}
-                            </td> --}}
+                        <!-- Phone -->
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $student->phone ?? '-----' }}
+                        </td> --}}
                                       <!-- Course -->
 
                                       <td class="px-4 py-3 whitespace-nowrap">
@@ -537,14 +538,14 @@
                                       </td>
                                       <!-- Address -->
                                       {{-- <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                                          {{ $student->address ?? '-----' }}</td> --}}
+                                      {{ $student->address ?? '-----' }}</td> --}}
                                       <!-- Assign Coordinator -->
                                       {{-- <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-900 mr-2">Admin</span>
-                                    <a href="#" class="text-brand hover:text-gold text-xs font-medium">change</a>
-                                </div>
-                            </td> --}}
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-900 mr-2">Admin</span>
+                                <a href="#" class="text-brand hover:text-gold text-xs font-medium">change</a>
+                            </div>
+                        </td> --}}
                                       <!-- Created At -->
                                       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                                           {{ $student->created_at->format('j M Y') }}</td>
@@ -573,19 +574,32 @@
               </div>
           </div>
 
-          <!-- Student Location Map -->
-          <div class="w-full mt-6">
-              <div class="bg-white rounded-lg p-4 shadow-sm">
-                  <h2 class="font-semibold text-sm text-brand mb-4">Student Placement Locations</h2>
-                  <div id="map" class="w-full h-96 rounded-lg"></div>
-                  <div class="flex justify-center gap-6 mt-4 text-sm">
-                      <div class="flex items-center font-semibold text-brand text-xs gap-2">
-                          <span class="w-3 h-3 bg-[#00A8AB] rounded-full"></span> Active Placements
+          <!-- Map Section -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6 mt-6">
+              <div class="flex justify-between items-center mb-4">
+                  <h2 class="text-lg font-semibold text-brand">Students & Industries Map</h2>
+                  <div class="flex gap-2">
+                      <button id="toggleStudents" class="bg-blue-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-600 transition-colors">
+                          <i class="bi bi-people mr-1"></i>Students
+                      </button>
+                      <button id="toggleIndustries" class="bg-green-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-600 transition-colors">
+                          <i class="bi bi-building mr-1"></i>Industries
+                      </button>
+                  </div>
+              </div>
+              <div id="placementMap" class="w-full h-[500px] rounded-xl shadow-lg border border-gray-200"></div>
+              <div class="mt-3 flex items-center justify-between">
+                  <div class="flex gap-4 text-xs text-gray-600">
+                      <div class="flex items-center">
+                          <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                          <span>Assigned Students ({{ $mapStudents?->count() ?? 0 }})</span>
                       </div>
-                      <div class="flex items-center font-semibold text-brand text-xs gap-2">
-                          <span class="w-3 h-3 bg-[#00AB03] rounded-full"></span> Completed Placements
+                      <div class="flex items-center">
+                          <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                          <span>Industries ({{ $mapIndustries?->count() ?? 0 }})</span>
                       </div>
                   </div>
+                  <p class="text-xs text-gray-500">Click markers for details</p>
               </div>
           </div>
 
@@ -614,7 +628,7 @@
               }
           </style>
           <script>
-              // 📈 Line Chart
+              // Line Chart
               const ctx = document.getElementById('lineChart');
               new Chart(ctx, {
                   type: 'line',
@@ -642,7 +656,7 @@
                               fill: false
                           },
                           {
-                              label: 'Don\'t Have Workplace',
+                              label: "Don't Have Workplace",
                               data: [1, 1, 0, 2, 1, 2, 1],
                               borderColor: '#000000',
                               tension: 0.4,
@@ -683,7 +697,7 @@
                   }
               });
               // Initialize DataTable
-              $('#studentsTable').DataTable({
+              const table = $('#studentsTable').DataTable({
                   "pageLength": 25,
                   "searching": false,
                   "ordering": true,
@@ -718,9 +732,9 @@
               });
 
               // Dashboard dropdown toggle
-              function toggleDashDropdown(index) {
-                  const dropdown = document.getElementById(`dash-dropdown-${index}`);
-                  const allDropdowns = document.querySelectorAll('[id^="dash-dropdown-"]');
+              function toggleDropdown(index) {
+                  const dropdown = document.getElementById(`dropdown-${index}`);
+                  const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
 
                   allDropdowns.forEach(dd => {
                       if (dd !== dropdown) {
@@ -732,8 +746,8 @@
               }
 
               document.addEventListener('click', (e) => {
-                  if (!e.target.closest('[onclick^="toggleDashDropdown"]')) {
-                      const allDropdowns = document.querySelectorAll('[id^="dash-dropdown-"]');
+                  if (!e.target.closest('[onclick^="toggleDropdown"]')) {
+                      const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
                       allDropdowns.forEach(dd => dd.classList.add('hidden'));
                   }
               });
@@ -747,142 +761,124 @@
                   filterIcon.classList.toggle('rotate-180');
               });
 
-              // 🗺️ Initialize Google Map
-              function initMap() {
-                  const map = new google.maps.Map(document.getElementById('map'), {
-                      zoom: 6,
-                      center: {
-                          lat: -25.274398,
-                          lng: 133.775136
-                      }, // Australia center
+              function initPlacementMap() {
+                  if (typeof google === 'undefined' || !google.maps) {
+                      console.warn('Google Maps API not loaded');
+                      return;
+                  }
+
+                  const mapElement = document.getElementById('placementMap');
+                  if (!mapElement) return;
+
+                  const mapOptions = {
+                      center: { lat: -33.8688, lng: 151.2093 },
+                      zoom: 11,
+                      gestureHandling: 'greedy',
+                      disableDefaultUI: true,
+                      zoomControl: true,
+                      fullscreenControl: true,
                       styles: [{
-                              featureType: 'all',
-                              elementType: 'geometry.fill',
-                              stylers: [{
-                                  color: '#f5f5f5'
-                              }]
-                          },
-                          {
-                              featureType: 'water',
-                              elementType: 'geometry',
-                              stylers: [{
-                                  color: '#e9e9e9'
-                              }]
-                          }
-                      ]
-                  });
+                          featureType: 'poi',
+                          elementType: 'labels',
+                          stylers: [{ visibility: 'off' }]
+                      }, {
+                          featureType: 'transit',
+                          stylers: [{ visibility: 'off' }]
+                      }, {
+                          featureType: 'road',
+                          elementType: 'geometry',
+                          stylers: [{ color: '#f8f9fa' }]
+                      }, {
+                          featureType: 'water',
+                          elementType: 'geometry',
+                          stylers: [{ color: '#c9d6e8' }]
+                      }, {
+                          featureType: 'landscape',
+                          elementType: 'geometry',
+                          stylers: [{ color: '#f5f5f5' }]
+                      }]
+                  };
 
-                  // Student locations (dummy data)
-                  const students = [{
-                          lat: -33.8688,
-                          lng: 151.2093,
-                          type: 'active',
-                          name: 'John Smith'
-                      }, // Sydney
-                      {
-                          lat: -37.8136,
-                          lng: 144.9631,
-                          type: 'completed',
-                          name: 'Sarah Johnson'
-                      }, // Melbourne
-                      {
-                          lat: -27.4698,
-                          lng: 153.0251,
-                          type: 'active',
-                          name: 'Mike Wilson'
-                      }, // Brisbane
-                      {
-                          lat: -31.9505,
-                          lng: 115.8605,
-                          type: 'completed',
-                          name: 'Emma Davis'
-                      }, // Perth
-                      {
-                          lat: -34.9285,
-                          lng: 138.6007,
-                          type: 'active',
-                          name: 'Chris Brown'
-                      }, // Adelaide
-                      {
-                          lat: -42.8821,
-                          lng: 147.3272,
-                          type: 'completed',
-                          name: 'Lisa Garcia'
-                      }, // Hobart
-                      {
-                          lat: -12.4634,
-                          lng: 130.8456,
-                          type: 'active',
-                          name: 'David Miller'
-                      }, // Darwin
-                      {
-                          lat: -35.2809,
-                          lng: 149.1300,
-                          type: 'completed',
-                          name: 'Anna Wilson'
-                      }, // Canberra
-                      {
-                          lat: -23.6980,
-                          lng: 133.8807,
-                          type: 'active',
-                          name: 'Tom Anderson'
-                      }, // Alice Springs
-                      {
-                          lat: -19.2590,
-                          lng: 146.8169,
-                          type: 'completed',
-                          name: 'Maria Rodriguez'
-                      } // Townsville
-                  ];
+                  const map = new google.maps.Map(mapElement, mapOptions);
 
-                  // Add markers for each student
-                  students.forEach(student => {
-                      const marker = new google.maps.Marker({
-                          position: {
-                              lat: student.lat,
-                              lng: student.lng
-                          },
-                          map: map,
-                          title: `${student.name} - ${student.type}`,
-                          icon: {
-                              path: google.maps.SymbolPath.CIRCLE,
-                              scale: 8,
-                              fillColor: student.type === 'active' ? '#00A8AB' : '#00AB03',
-                              fillOpacity: 0.8,
-                              strokeColor: '#ffffff',
-                              strokeWeight: 2
-                          },
-                          animation: google.maps.Animation.BOUNCE
-                      });
+                  const students = @json($mapStudents ?? []);
+                  const industries = @json($mapIndustries ?? []);
 
-                      // Stop bouncing after 2 seconds
+                  let studentMarkers = [];
+                  let industryMarkers = [];
+
+                  students.forEach((student, index) => {
                       setTimeout(() => {
-                          marker.setAnimation(null);
-                      }, 2000);
+                          const marker = new google.maps.Marker({
+                              position: { lat: parseFloat(student.latitude), lng: parseFloat(student.longitude) },
+                              map: map,
+                              title: student.name,
+                              animation: google.maps.Animation.DROP,
+                              icon: {
+                                  url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#3b82f6"/>
+                                          <circle cx="12" cy="9" r="2.5" fill="white"/>
+                                      </svg>
+                                  `),
+                                  scaledSize: new google.maps.Size(24, 24),
+                                  anchor: new google.maps.Point(12, 24)
+                              }
+                          });
 
-                      // Add info window
-                      const infoWindow = new google.maps.InfoWindow({
-                          content: `<div class="p-2"><strong>${student.name}</strong><br>Status: ${student.type}</div>`
-                      });
+                          const course = student.course ? student.course.name : 'No Course';
+                          const status = student.student_detail ? student.student_detail.progress_status : 'Active';
+                          const infoWindow = new google.maps.InfoWindow({
+                              content: `<div style="font-family: system-ui, sans-serif; padding: 8px;"><strong>${student.name}</strong><br><span style="color: #666; font-size: 13px;">${course}</span><br><small style="color: #3b82f6;">Status: ${status}</small></div>`
+                          });
 
-                      marker.addListener('click', () => {
-                          infoWindow.open(map, marker);
-                      });
+                          marker.addListener('click', () => infoWindow.open(map, marker));
+                          studentMarkers.push(marker);
+                      }, index * 200);
+                  });
+
+                  industries.forEach((industry, index) => {
+                      setTimeout(() => {
+                          const marker = new google.maps.Marker({
+                              position: { lat: parseFloat(industry.latitude), lng: parseFloat(industry.longitude) },
+                              map: map,
+                              title: industry.name,
+                              animation: google.maps.Animation.DROP,
+                              icon: {
+                                  url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#059669"/>
+                                          <circle cx="12" cy="9" r="2.5" fill="white"/>
+                                      </svg>
+                                  `),
+                                  scaledSize: new google.maps.Size(24, 24),
+                                  anchor: new google.maps.Point(12, 24)
+                              }
+                          });
+
+                          const infoWindow = new google.maps.InfoWindow({
+                              content: `<div style="font-family: system-ui, sans-serif; padding: 8px;"><strong>${industry.name}</strong><br><span style="color: #666; font-size: 13px;">${industry.contact_person || 'No Contact'}</span><br><small style="color: #059669;">Industry Partner</small></div>`
+                          });
+
+                          marker.addListener('click', () => infoWindow.open(map, marker));
+                          industryMarkers.push(marker);
+                      }, (students.length + index) * 200);
+                  });
+
+                  document.getElementById('toggleStudents').addEventListener('click', function() {
+                      const visible = studentMarkers.length > 0 ? studentMarkers[0].getVisible() : false;
+                      studentMarkers.forEach(marker => marker.setVisible(!visible));
+                      this.classList.toggle('bg-blue-300', !visible);
+                      this.classList.toggle('bg-blue-500', visible);
+                  });
+
+                  document.getElementById('toggleIndustries').addEventListener('click', function() {
+                      const visible = industryMarkers.length > 0 ? industryMarkers[0].getVisible() : false;
+                      industryMarkers.forEach(marker => marker.setVisible(!visible));
+                      this.classList.toggle('bg-green-300', !visible);
+                      this.classList.toggle('bg-green-500', visible);
                   });
               }
-
-              // Load Google Maps API and initialize
-              function loadGoogleMaps() {
-                  const script = document.createElement('script');
-                  script.src = 'https://maps.googleapis.com/maps/api/js?callback=initMap';
-                  script.async = true;
-                  script.defer = true;
-                  document.head.appendChild(script);
-              }
-
-              // Initialize map when page loads
-              setTimeout(loadGoogleMaps, 500);
-
 
               // Radial Progress Chart (Multi-layered)
               const radialCtx = document.getElementById('radialChart');
@@ -923,7 +919,7 @@
                   },
                   options: {
                       responsive: true,
-                      maintainAspectRatio: false, // ⚠️ allow flexible resizing
+                      maintainAspectRatio: false,
                       plugins: {
                           legend: {
                               display: false
@@ -940,4 +936,6 @@
                   }
               });
           </script>
+      <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&libraries=places&callback=initPlacementMap" async defer></script>
       @endsection
+

@@ -1,8 +1,11 @@
 @extends('admin.master_layout.index')
-
+@section('page-title', 'Industry Details')
 @push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
+        .fc .fc-toolbar-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
         .select2-container--default .select2-selection--single {
             height: 38px;
             border: 1px solid #d1d5db;
@@ -21,9 +24,9 @@
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #d4af37;
-            border: 1px solid #c19b2e;
-            color: white;
+            background-color: #d4b373 !important;
+            border: 1px solid #c19b2e !important;
+            color: white !important;
         }
     </style>
 @endpush
@@ -33,13 +36,16 @@
         <!-- Header -->
         <div class="mb-6">
             <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-2xl font-semibold" style="color: #5A5A5A;">
-                        {{ isset($industry) ? 'Edit Industry' : 'Create Industry' }}</h2>
-                    <p class="text-sm text-gray-600 mt-1">
-                        {{ isset($industry) ? 'Update industry information and manage placement opportunities' : 'Add new industry with courses and placement details' }}
-                    </p>
-                </div>
+                {{-- <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center">
+                        <i class="bi bi-building text-brand text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            {{ isset($industry) ? 'Edit Industry' : 'Create Industry' }}
+                        </h2>
+                    </div>
+                </div> --}}
                 <a href="{{ route('admin.industries') }}"
                     class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
                     <i class="bi bi-arrow-left mr-2"></i>Back to Industries
@@ -49,7 +55,7 @@
 
         <form
             action="{{ isset($industry) ? route('admin.industries.update', $industry->id) : route('admin.industries.store') }}"
-            method="POST" class="space-y-6">
+            method="POST" class="space-y-6" data-client-validate="industry" novalidate>
             @csrf
             @if (isset($industry))
                 @method('PUT')
@@ -58,18 +64,22 @@
             <!-- Basic Information -->
             <div class="bg-white rounded-lg border shadow-sm">
                 <div class="p-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium" style="color: #5A5A5A;">Basic Information</h3>
+                    <h3 class="text-lg font-medium text-gray-800">Basic Information</h3>
                 </div>
                 <div class="p-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Industry Name *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-building mr-1 text-brand"></i> Industry Name *
+                            </label>
                             <input type="text" name="name"
                                 value="{{ old('name', $industry->name ?? ($prefill['name'] ?? '')) }}" required
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-check-circle mr-1 text-emerald-600"></i> Status
+                            </label>
                             <select name="industry_status"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
                                 <option value="active"
@@ -84,7 +94,9 @@
                             </select>
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-file-text mr-1 text-amber-600"></i> Description
+                            </label>
                             <textarea name="description" rows="3"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('description', $industry->description ?? '') }}</textarea>
                         </div>
@@ -95,33 +107,43 @@
             <!-- Contact Information -->
             <div class="bg-white rounded-lg border shadow-sm">
                 <div class="p-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium" style="color: #5A5A5A;">Contact Information</h3>
+                    <h3 class="text-lg font-medium text-gray-800">Contact Information</h3>
                 </div>
                 <div class="p-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Person</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-person mr-1 text-indigo-600"></i> Contact Person
+                            </label>
                             <input type="text" name="contact_person"
                                 value="{{ old('contact_person', $industry->contact_person ?? '') }}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-envelope mr-1 text-blue-600"></i> Email
+                            </label>
                             <input type="email" name="email" value="{{ old('email', $industry->email ?? '') }}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-phone mr-1 text-emerald-600"></i> Phone
+                            </label>
                             <input type="text" name="phone" value="{{ old('phone', $industry->phone ?? '') }}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-globe mr-1 text-cyan-600"></i> Website
+                            </label>
                             <input type="url" name="website" value="{{ old('website', $industry->website ?? '') }}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="bi bi-geo-alt mr-1 text-rose-600"></i> Address
+                            </label>
                             <input type="text" name="address" id="addressInput"
                                 value="{{ old('address', $industry->address ?? ($prefill['address'] ?? '')) }}"
                                 placeholder="Start typing address..."
@@ -139,7 +161,9 @@
             <div class="bg-white rounded-lg border shadow-sm">
                 <div class="p-4 border-b border-gray-200">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-medium" style="color: #5A5A5A;">Course Configuration</h3>
+                        <h3 class="text-lg font-medium text-gray-800">
+                            <i class="bi bi-book mr-1 text-indigo-600"></i> Course Configuration
+                        </h3>
 
                     </div>
                 </div>
@@ -265,20 +289,23 @@
                             @endforeach
                         @endif
                     </div>
+                    @can('industries.edit')
                     <div class="mt-4 flex">
                         <button type="button" id="addCourse"
                             class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
                             <i class="bi bi-plus mr-1"></i>Add Another Course
                         </button>
                     </div>
-
+@endcan
                 </div>
             </div>
 
             <!-- Availability Calendar -->
             <div class="bg-white rounded-lg border shadow-sm">
                 <div class="p-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium" style="color: #5A5A5A;">Availability Schedule</h3>
+                    <h3 class="text-lg font-medium text-green-700 flex items-center gap-2">
+                        <i class="bi bi-calendar-event text-green-600"></i> Industry Schedule
+                    </h3>
                 </div>
                 <div class="p-4">
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -292,7 +319,7 @@
                         <!-- Sidebar -->
                         <div class="lg:col-span-1">
                             <div class="bg-white rounded-lg border shadow-sm p-4 sticky top-6">
-                                <h4 class="text-lg font-medium mb-4" style="color: #d4af37;">Week Summary</h4>
+                                <h4 class="text-lg font-medium mb-4 text-green-700">Week Summary</h4>
 
                                 <div class="mb-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Total Hours</label>
@@ -301,14 +328,12 @@
                                 </div>
 
                                 <div class="space-y-3">
+                                    @can('industries.edit')
                                     <button type="button" id="saveScheduleBtn"
-                                        class="w-full px-4 py-2 rounded-lg text-white font-medium flex justify-center items-center gap-2"
-                                        style="background-color: #d4af37;"
-                                        onmouseover="this.style.backgroundColor='#c19b2e'"
-                                        onmouseout="this.style.backgroundColor='#d4af37'">
+                                        class="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium flex justify-center items-center gap-2 hover:bg-emerald-700 transition-colors">
                                         <i class="fas fa-save"></i> Save Schedule
                                     </button>
-
+@endcan
                                     <div class="p-3 bg-blue-50 text-blue-800 rounded-lg text-xs leading-relaxed">
                                         <i class="fas fa-info-circle mr-1"></i>
                                         <strong>Instructions:</strong><br>
@@ -373,6 +398,7 @@
             @endif --}}
 
             <!-- Submit Button -->
+            @can('industries.edit')
             <div class="flex justify-end space-x-3">
                 <a href="{{ route('admin.industries') }}"
                     class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
@@ -380,9 +406,10 @@
                 </a>
                 <button type="submit"
                     class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
-                    {{ isset($industry) ? 'Update Industry' : 'Create Industry' }}
+                    {{ isset($industry) ? 'Update' : 'Create' }}
                 </button>
             </div>
+            @endcan
         </form>
     </div>
 
@@ -495,79 +522,6 @@
                         toastr.error('Failed to save opportunity');
                     });
             });
-
-            // function loadOpportunities() {
-            //     const industryId = document.getElementById('industryId').value;
-
-            //     fetch(`/admin/placement-opportunities/industry/${industryId}`)
-            //         .then(res => res.json())
-            //         .then(data => {
-            //             const listDiv = document.getElementById('opportunitiesList');
-            //             if (data.opportunities && data.opportunities.length > 0) {
-            //                 listDiv.innerHTML = data.opportunities.map(opp => `
-            //     <div class="border rounded-lg p-4 hover:border-brand transition-colors">
-            //         <div class="flex justify-between items-start">
-            //             <div class="flex-1">
-            //                 <h4 class="font-medium text-gray-900">${opp.course ? opp.course.name : 'No Course'}</h4>
-            //                 <p class="text-sm text-gray-600 mt-1">Total Slots: ${opp.total_slots} | Filled: ${opp.filled_slots || 0}</p>
-            //                 ${opp.requirements ? `<p class="text-sm text-gray-500 mt-1">${opp.requirements}</p>` : ''}
-            //                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-2 ${opp.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-            //                     ${opp.status}
-            //                 </span>
-            //             </div>
-            //             <div class="flex gap-2 ml-4">
-            //                 <button onclick='openOpportunityModal(${JSON.stringify(opp)})'
-            //                         class="text-blue-600 hover:text-blue-800 text-sm">
-            //                     <i class="bi bi-pencil"></i>
-            //                 </button>
-            //                 <button onclick="deleteOpportunity(${opp.id})"
-            //                         class="text-red-600 hover:text-red-800 text-sm">
-            //                     <i class="bi bi-trash"></i>
-            //                 </button>
-            //             </div>
-            //         </div>
-            //     </div>
-            // `).join('');
-            //             } else {
-            //                 listDiv.innerHTML =
-            //                     '<p class="text-gray-500 text-sm text-center py-8">No placement opportunities created yet</p>';
-            //             }
-            //         })
-            //         .catch(err => {
-            //             console.error(err);
-            //             toastr.error('Failed to load opportunities');
-            //         });
-            // }
-
-            // function deleteOpportunity(id) {
-            //     if (!confirm('Are you sure you want to delete this opportunity?')) return;
-
-            //     fetch(`/admin/placement-opportunities/${id}`, {
-            //             method: 'DELETE',
-            //             headers: {
-            //                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            //             }
-            //         })
-            //         .then(res => res.json())
-            //         .then(data => {
-            //             if (data.success) {
-            //                 toastr.success('Opportunity deleted successfully');
-            //                 loadOpportunities();
-            //             } else {
-            //                 toastr.error('Failed to delete opportunity');
-            //             }
-            //         })
-            //         .catch(err => {
-            //             console.error(err);
-            //             toastr.error('Failed to delete opportunity');
-            //         });
-            // }
-
-            // document.addEventListener('DOMContentLoaded', function() {
-            //     @if (isset($industry))
-            //         loadOpportunities();
-            //     @endif
-            // });
         </script>
     @endif
 @endsection
@@ -750,6 +704,55 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const forms = document.querySelectorAll('form[data-client-validate="industry"]');
+
+            forms.forEach((form) => {
+                form.addEventListener('submit', (e) => {
+                    let firstInvalid = null;
+
+                    form.querySelectorAll('.js-client-error').forEach((el) => el.remove());
+
+                    form.querySelectorAll('[required]').forEach((field) => {
+                        const isCheckbox = field.type === 'checkbox' || field.type === 'radio';
+                        const isEmpty = isCheckbox ? !field.checked : field.value.trim() === '';
+
+                        if (isEmpty) {
+                            e.preventDefault();
+                            field.classList.add('border-red-500');
+
+                            const error = document.createElement('p');
+                            error.className = 'text-red-500 text-xs mt-1 js-client-error';
+                            error.textContent = 'This field is required.';
+                            field.insertAdjacentElement('afterend', error);
+
+                            if (!firstInvalid) {
+                                firstInvalid = field;
+                            }
+                        } else {
+                            field.classList.remove('border-red-500');
+                        }
+                    });
+
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+                });
+
+                form.querySelectorAll('[required]').forEach((field) => {
+                    field.addEventListener('input', () => {
+                        field.classList.remove('border-red-500');
+                        const next = field.nextElementSibling;
+                        if (next && next.classList.contains('js-client-error')) {
+                            next.remove();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endpush
 
 @section('scripts')
@@ -810,8 +813,8 @@
                     initialView: 'timeGridWeek',
                     headerToolbar: {
                         left: 'prev,next today',
-                        center: 'title',
-                        right: ''
+                        center: '',
+                        right: 'title'
                     },
                     slotMinTime: '06:00:00',
                     slotMaxTime: '22:00:00',

@@ -72,12 +72,13 @@ Route::middleware(['auth', 'role:rto|admin'])->prefix('rto')->group(function () 
      * -------------------------- */
     Route::controller(RtoController::class)->group(function () {
         Route::get('/students', 'students')->name('rto.students');
-        Route::post('/students', 'storeStudent');
-        Route::put('/students/{id}', 'updateStudent');
+        Route::get('/students/create', 'create')->name('rto.students.create');
+        Route::post('/students/store', 'store')->name('rto.students.store');
+        Route::put('/students/{id}', 'update')->name('rto.students.update');
+        Route::get('/students/data', 'data')->name('rto.students.data');
         Route::delete('/students/{id}', 'destroyStudent');
         Route::post('/students/upload', 'uploadStudents');
         Route::get('/students/csv-format', 'csvFormat');
-        // Route::post('/students/{id}/notes', 'saveStudentNotes');
     });
 
 
@@ -87,6 +88,7 @@ Route::middleware(['auth', 'role:rto|admin'])->prefix('rto')->group(function () 
     Route::controller(StudentNoteController::class)->prefix('students/{student}')->group(function () {
         Route::get('/notes', 'index');
         Route::post('/notes', 'store');
+        Route::put('/notes/{note}', 'update');
     });
 
 
@@ -96,11 +98,20 @@ Route::middleware(['auth', 'role:rto|admin'])->prefix('rto')->group(function () 
     Route::controller(StudentDocumentController::class)->prefix('student-documents')->group(function () {
         Route::get('/{student}', 'index')->name('rto.student-documents.index');
         Route::post('/{student}', 'store')->name('rto.student-documents.store');
+        Route::get('/{student}/match-checklist', 'matchChecklist')->name('rto.student-documents.match-checklist');
+        Route::post('/{student}/additional-document', 'uploadAdditionalDocument')->name('rto.student-documents.additional-document.upload');
         Route::get('/{student}/existing-checklists', 'getExistingChecklists');
         Route::post('/assign-types/{student}', 'assignTypes');
         Route::delete('/{document}', 'destroy');
     });
 
+
+    Route::controller(StudentAppointmentController::class)->group(function () {
+        Route::get('/appointments/student/{studentId}', 'getByStudent')->name('appointments.by-student');
+        Route::post('/appointments', 'store')->name('appointments.store');
+        Route::put('/appointments/{id}', 'update')->name('appointments.update');
+        Route::delete('/appointments/{id}', 'destroy')->name('appointments.destroy');
+    });
 
     /** -------------------------
      *  Personal Documents
@@ -117,7 +128,7 @@ Route::middleware(['auth', 'role:rto|admin'])->prefix('rto')->group(function () 
      * -------------------------- */
     Route::get('/industries', [RtoController::class, 'industries'])->name('rto.industries');
 
-
+    Route::get('/industries/data', [RtoController::class, 'data'])->name('rto.industries.data');
     /** -------------------------
      *  E-Signature
      * -------------------------- */
@@ -127,6 +138,12 @@ Route::middleware(['auth', 'role:rto|admin'])->prefix('rto')->group(function () 
         Route::put('/{esignature}', 'update');
         Route::delete('/{esignature}', 'destroy');
     });
+
+    Route::controller(WeeklyScheduleController::class)->group(function () {
+
+            Route::get('/weekly-schedules/{studentId}/availability', 'getWeekAvailability')->name('rto.weekly-schedules.availability');
+            Route::post('/weekly-schedules/{studentId}/availability', 'saveWeekAvailability')->name('rto.weekly-schedules.save');
+        });
 
 
     /** -------------------------
@@ -196,52 +213,52 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         // Coordinators
         Route::middleware('permission:coordinators.view')->group(function () {
             Route::controller(CoordinatorController::class)->group(function () {
-                    Route::get('/coordinators', 'index')->name('coordinators');
-                    Route::get('/coordinators/data', 'data')->name('coordinators.data');
-                    Route::middleware('permission:coordinators.create')->group(function () {
-                        Route::get('/coordinators/create', 'create')->name('coordinators.create');
-                        Route::post('/coordinators', 'store')->name('coordinators.store');
-                    });
-                    Route::middleware('permission:coordinators.edit')->group(function () {
-                        Route::get('/coordinators/{id}/edit', 'edit')->name('coordinators.edit');
-                        Route::put('/coordinators/{id}', 'update')->name('coordinators.update');
-                        Route::patch('/coordinators/{id}/toggle-status', 'toggleStatus');
-                        Route::post('/coordinators/update-status/{id}', 'updateStatus');
-                        Route::patch('/coordinators/{id}/reset-password', 'resetPassword')->middleware('permission:coordinators.reset_password');
-                    });
-                    Route::delete('/coordinators/{id}', 'destroy')->middleware('permission:coordinators.delete');
+                Route::get('/coordinators', 'index')->name('coordinators');
+                Route::get('/coordinators/data', 'data')->name('coordinators.data');
+                Route::middleware('permission:coordinators.create')->group(function () {
+                    Route::get('/coordinators/create', 'create')->name('coordinators.create');
+                    Route::post('/coordinators', 'store')->name('coordinators.store');
+                });
+                Route::middleware('permission:coordinators.edit')->group(function () {
+                    Route::get('/coordinators/{id}/edit', 'edit')->name('coordinators.edit');
+                    Route::put('/coordinators/{id}', 'update')->name('coordinators.update');
+                    Route::patch('/coordinators/{id}/toggle-status', 'toggleStatus');
+                    Route::post('/coordinators/update-status/{id}', 'updateStatus');
+                    Route::patch('/coordinators/{id}/reset-password', 'resetPassword')->middleware('permission:coordinators.reset_password');
+                });
+                Route::delete('/coordinators/{id}', 'destroy')->middleware('permission:coordinators.delete');
             });
         });
 
         // Role & Permissions
         Route::controller(RolePermissionController::class)->group(function () {
-                Route::get('/roles', 'roles')->name('roles');
-                Route::post('/roles', 'storeRole');
-                Route::put('/roles/{id}', 'updateRole');
-                Route::delete('/roles/{id}', 'deleteRole');
+            Route::get('/roles', 'roles')->name('roles');
+            Route::post('/roles', 'storeRole');
+            Route::put('/roles/{id}', 'updateRole');
+            Route::delete('/roles/{id}', 'deleteRole');
 
-                Route::get('/permissions', 'permissions')->name('permissions');
-                Route::post('/permissions', 'storePermission');
-                Route::put('/permissions/{id}', 'updatePermission');
-                Route::delete('/permissions/{id}', 'deletePermission');
+            Route::get('/permissions', 'permissions')->name('permissions');
+            Route::post('/permissions', 'storePermission');
+            Route::put('/permissions/{id}', 'updatePermission');
+            Route::delete('/permissions/{id}', 'deletePermission');
 
-                Route::get('/assign-permissions', 'assignPermissions')->name('assign-permissions');
-                Route::post('/assign-permissions', 'updateRolePermissions');
-            });
+            Route::get('/assign-permissions', 'assignPermissions')->name('assign-permissions');
+            Route::post('/assign-permissions', 'updateRolePermissions');
+        });
 
-            // Document Checklist
-            Route::controller(DocumentChecklistController::class)->group(function () {
-                Route::get('/document-checklist', 'index')->name('document-checklist');
-                Route::post('/document-checklist', 'store');
-                Route::put('/document-checklist/{id}', 'update');
-                Route::delete('/document-checklist/{id}', 'destroy');
-                Route::patch('/document-checklist/{id}/toggle-status', 'toggleStatus');
-            });
+        // Document Checklist
+        Route::controller(DocumentChecklistController::class)->group(function () {
+            Route::get('/document-checklist', 'index')->name('document-checklist');
+            Route::post('/document-checklist', 'store');
+            Route::put('/document-checklist/{id}', 'update');
+            Route::delete('/document-checklist/{id}', 'destroy');
+            Route::patch('/document-checklist/{id}/toggle-status', 'toggleStatus');
+        });
 
-            // Contracts
-            Route::controller(ContractController::class)->group(function () {
-                Route::get('/contracts', 'adminIndex')->name('contracts');
-                Route::post('/contracts', 'store');
+        // Contracts
+        Route::controller(ContractController::class)->group(function () {
+            Route::get('/contracts', 'adminIndex')->name('contracts');
+            Route::post('/contracts', 'store');
             Route::get('/contracts/{contract}/view', 'adminViewContract')->name('contracts.view');
             Route::delete('/contracts/{contract}', 'destroy');
         });
@@ -259,8 +276,8 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
                     Route::post('/students/upload', 'upload');
                     Route::get('/students/csv-format', 'csvFormat');
                 });
+                Route::put('/students/{id}', 'update')->name('students.update');
                 Route::middleware('permission:students.edit')->group(function () {
-                    Route::put('/students/{id}', 'update')->name('students.update');
                     Route::post('/students/{id}/availability', 'updateAvailability')->name('students.availability.update');
                     Route::get('/students/{id}/availability/week', 'getWeekAvailability')->name('admin.students.availability.week');
                     Route::post('/students/{id}/availability/week', 'saveWeekAvailability')->name('admin.students.availability.save');
@@ -271,12 +288,16 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
             Route::controller(StudentNoteController::class)->prefix('students/{student}')->group(function () {
                 Route::get('/notes', 'index');
                 Route::post('/notes', 'store');
+                Route::put('/notes/{note}', 'update');
             });
 
             Route::middleware('permission:students.documents')->group(function () {
                 Route::controller(StudentDocumentController::class)->group(function () {
                     Route::get('/student-documents/{student}', 'index')->name('student-documents.index');
                     Route::post('/student-documents/{student}', 'store')->name('student-documents.store');
+                    Route::post('/student-documents/{student}/interviews', 'storeInterview')->name('student-documents.interviews.store');
+                    Route::get('/student-documents/{student}/match-checklist', 'matchChecklist')->name('student-documents.match-checklist');
+                    Route::post('/student-documents/{student}/additional-document', 'uploadAdditionalDocument')->name('student-documents.additional-document.upload');
                     Route::post('/student-documents/assign-types/{student}', 'assignTypes');
                     Route::delete('/student-documents/{document}', 'destroy');
                     Route::post('/student-documents/assign-coordinator/{student}', 'assignCoordinator')->name('student-documents.assign-coordinator');
@@ -285,11 +306,11 @@ Route::middleware(['auth', 'role:admin|placement_coordinator|sourcing_coordinato
         });
 
         // Student Assignment (Placement Coordinators & Admin)
-        Route::controller(StudentIndustryController::class)->group(function () {
-            Route::get('/assign-students', 'index')->name('assign-students');
-            Route::post('/assign-students/assign', 'assignStudents')->name('assign-students.assign');
-            Route::post('/assign-students/remove', 'removeAssignment')->name('assign-students.remove');
-        });
+        // Route::controller(StudentIndustryController::class)->group(function () {
+        //     Route::get('/assign-students', 'index')->name('assign-students');
+        //     Route::post('/assign-students/assign', 'assignStudents')->name('assign-students.assign');
+        //     Route::post('/assign-students/remove', 'removeAssignment')->name('assign-students.remove');
+        // });
 
         // Placement Opportunities (Sourcing Coordinators & Admin)
         Route::controller(PlacementOpportunityController::class)->group(function () {

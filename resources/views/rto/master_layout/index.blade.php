@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RTO Dashboard</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>PlaceBridge - @yield('page-title', 'Dashboard')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
@@ -48,6 +49,18 @@
 <body class="bg-gray-100 font-[Poppins,sans-serif] relative">
     <!-- Sidebar -->
     @include('rto.layout.sidebar')
+    <aside id="rightSidebar"
+        class="fixed top-0 right-0 h-full w-80 bg-white border-l border-gray-200 shadow-xl transform translate-x-full transition-transform duration-300 z-40">
+        <div id="rightSidebarContent" class="h-full">
+            @yield('right-sidebar')
+        </div>
+    </aside>
+    <button id="rightSidebarToggle"
+        class="fixed bottom-6 right-6 hidden items-center gap-2 px-3 py-2 rounded-full bg-brand text-white text-xs font-medium shadow-lg hover:bg-gold transition-colors z-50"
+        type="button">
+        <i class="bi bi-layout-sidebar-inset-reverse"></i>
+        Panel
+    </button>
     <!-- Main Content -->
     <div id="mainContent" class="transition-all duration-300 ml-64 min-h-screen bg-gray-100">
         <!-- Top Bar -->
@@ -123,30 +136,26 @@
         });
 
 
-        // const openModalBtn = document.getElementById("openModalBtn");
-        // const closeModalBtn = document.getElementById("closeModalBtn");
-        // const closeModalBtn2 = document.getElementById("closeModalBtn2");
-        const modal = document.getElementById("rtoModal");
-
-        openModalBtn.addEventListener("click", () => {
-            modal.classList.remove("hidden");
-        });
-
-        closeModalBtn.addEventListener("click", () => {
-            modal.classList.add("hidden");
-        });
-
-        closeModalBtn2.addEventListener("click", () => {
-            modal.classList.add("hidden");
-        });
-
-        // close modal on clicking outside
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-                modal.classList.add("hidden");
-            }
-        });
     </script>
-</body>
+    @stack('vendor-scripts')
+        <script>
+        (function() {
+            const sidebar = document.getElementById('rightSidebar');
+            const content = document.getElementById('rightSidebarContent');
+            const toggle = document.getElementById('rightSidebarToggle');
+            if (!sidebar || !content || !toggle) return;
 
-</html>
+            const hasContent = !!content.querySelector('[data-right-sidebar="true"]');
+            if (!hasContent) return;
+
+            toggle.classList.remove('hidden');
+            toggle.classList.add('inline-flex');
+
+            toggle.addEventListener('click', () => {
+                sidebar.classList.toggle('translate-x-full');
+            });
+        })();
+    </script>
+    @stack('scripts')
+    @yield('scripts')
+</body>

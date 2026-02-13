@@ -18,13 +18,12 @@
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">RTO Management</h1>
-                <p class="text-gray-600 mt-1">Manage and track registered training organizations</p>
+                <h1 class="text-2xl font-bold text-gray-800">Manage RTO</h1>
             </div>
             @can('rtos.create')
             <div class="flex gap-3">
                 <a href="{{ route('admin.rtos.create') }}"
-                    class="bg-brand text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors">
+                    class="bg-emerald-600 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors">
                     Add RTO
                 </a>
             </div>
@@ -41,39 +40,34 @@
             </button>
         </div>
         <div id="filterContent" class="hidden p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name/RTO Number</label>
-                    <input type="text" id="searchFilter" placeholder="Search RTOs..."
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="text" id="emailFilter" placeholder="Search email..."
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Contact Person</label>
-                    <input type="text" id="contactPersonFilter" placeholder="Search contact person..."
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+                <div class="lg:col-span-1">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">From Date</label>
                     <input type="date" id="fromDate"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                        class="w-full h-9 px-2 text-xs border border-gray-300 rounded-md bg-white leading-none focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                <div class="lg:col-span-1">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">To Date</label>
                     <input type="date" id="toDate"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                        class="w-full h-9 px-2 text-xs border border-gray-300 rounded-md bg-white leading-none focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
                 </div>
-                <div class="flex items-end gap-2">
+                <div class="lg:col-span-2">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Search by Name</label>
+                    <input type="text" id="searchFilter" placeholder="Search by name..."
+                        class="w-full h-9 px-2 text-xs border border-gray-300 rounded-md bg-white leading-none focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+                </div>
+                <div class="lg:col-span-1">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                    <input type="text" id="emailFilter" placeholder="Search email..."
+                        class="w-full h-9 px-2 text-xs border border-gray-300 rounded-md bg-white leading-none focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+                </div>
+                <div class="lg:col-span-1 flex gap-2 lg:justify-end">
                     <button id="applyFilters"
-                        class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
-                        Apply Filters
+                        class="h-9 px-3 text-[11px] font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors">
+                        Apply
                     </button>
                     <button id="resetFilters"
-                        class="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors font-medium">
+                        class="h-9 px-3 text-[11px] font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors">
                         Reset
                     </button>
                 </div>
@@ -83,7 +77,7 @@
 
     <!-- RTOs Table -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+        <div>
             <table id="rtosTable" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
@@ -95,19 +89,19 @@
                             RTO Code</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Contact Info</th>
+                            Email</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Contact Person</th>
+                            RTO Phone</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Website</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Status</th>
+                            Created At</th>
                         <th
                             class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
-                            Created At</th>
+                            Status</th>
                         <th
                             class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-b">
                             Actions</th>
@@ -293,7 +287,6 @@
                 "data": function(d) {
                     d.search = $('#searchFilter').val();
                     d.email = $('#emailFilter').val();
-                    d.contact_person = $('#contactPersonFilter').val();
                     d.from_date = $('#fromDate').val();
                     d.to_date = $('#toDate').val();
                 }
@@ -311,20 +304,20 @@
                     "orderable": false
                 },
                 {
-                    "data": "contact_person",
-                    "orderable": true
+                    "data": "rto_phone",
+                    "orderable": false
                 },
                 {
                     "data": "website",
                     "orderable": false
                 },
                 {
-                    "data": "status",
-                    "orderable": false
-                },
-                {
                     "data": "created_at",
                     "orderable": true
+                },
+                {
+                    "data": "status",
+                    "orderable": false
                 },
                 {
                     "data": "actions",
@@ -337,7 +330,6 @@
             "info": false,
             "lengthChange": false,
             "dom": 'rt<"flex justify-end mt-4"p>',
-            "scrollX": true,
             "language": {
                 "processing": "Processing..."
             },
@@ -386,7 +378,6 @@
         $('#resetFilters').on('click', function() {
             $('#searchFilter').val('');
             $('#emailFilter').val('');
-            $('#contactPersonFilter').val('');
             $('#fromDate').val('');
             $('#toDate').val('');
             rtosTable.ajax.reload();
@@ -556,6 +547,17 @@
         /* Ensure table container allows overflow for dropdowns */
         .overflow-x-auto {
             overflow-y: visible !important;
+        }
+
+        /* Remove default date input indicators/icons */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            display: none;
+        }
+
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-clear-button {
+            display: none;
         }
     </style>
 @endsection

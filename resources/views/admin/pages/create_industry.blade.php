@@ -4,9 +4,14 @@
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Create New Industry</h1>
-                <p class="text-gray-600 mt-1">Add a new industry to the system</p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center">
+                    <i class="bi bi-building text-brand text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Create New Industry</h1>
+                    {{-- <p class="text-gray-600 mt-1">Add a new industry to the system</p> --}}
+                </div>
             </div>
             <a href="{{ route('admin.industries') }}"
                 class="bg-gray-500 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors">
@@ -17,13 +22,13 @@
 
     <!-- Create Form -->
     <div class="bg-white rounded-lg shadow-sm p-6">
-        <form method="POST" action="{{ route('admin.industries.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('admin.industries.store') }}" class="space-y-6" data-client-validate="industry" novalidate>
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-building mr-1"></i> Industry Name <span class="text-red-500">*</span>
+                        <i class="bi bi-building mr-1 text-brand"></i> Industry Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="name" value="{{ old('name', urldecode(request('name', ''))) }}" placeholder="Enter Industry Name" required
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('name') border-red-500 @enderror" />
@@ -34,7 +39,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-person mr-1"></i> Contact Person
+                        <i class="bi bi-person mr-1 text-indigo-600"></i> Contact Person
                     </label>
                     <input type="text" name="contact_person" value="{{ old('contact_person') }}" placeholder="Enter Contact Person Name"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('contact_person') border-red-500 @enderror" />
@@ -45,7 +50,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-envelope mr-1"></i> Email
+                        <i class="bi bi-envelope mr-1 text-blue-600"></i> Email
                     </label>
                     <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter Email"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('email') border-red-500 @enderror" />
@@ -56,7 +61,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-phone mr-1"></i> Phone
+                        <i class="bi bi-phone mr-1 text-emerald-600"></i> Phone
                     </label>
                     <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Enter Phone Number"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('phone') border-red-500 @enderror" />
@@ -67,7 +72,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-globe mr-1"></i> Website
+                        <i class="bi bi-globe mr-1 text-cyan-600"></i> Website
                     </label>
                     <input type="url" name="website" value="{{ old('website') }}" placeholder="https://example.com"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('website') border-red-500 @enderror" />
@@ -78,7 +83,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="bi bi-geo-alt mr-1"></i> Address
+                        <i class="bi bi-geo-alt mr-1 text-rose-600"></i> Address
                     </label>
                     <input type="text" name="address" id="addressInput" value="{{ old('address', urldecode(request('address', ''))) }}" placeholder="Start typing address..."
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('address') border-red-500 @enderror" />
@@ -92,7 +97,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="bi bi-file-text mr-1"></i> Description
+                    <i class="bi bi-file-text mr-1 text-amber-600"></i> Description
                 </label>
                 <textarea name="description" rows="4" placeholder="Enter Industry Description"
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
@@ -105,7 +110,7 @@
             <div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">
-                        <i class="bi bi-book mr-1"></i> Course Configuration
+                        <i class="bi bi-book mr-1 text-indigo-600"></i> Course Configuration
                     </label>
                 </div>
                 <div id="coursesContainer" class="space-y-4 mb-4">
@@ -119,7 +124,7 @@
             <div class="flex gap-3 pt-4 border-t">
                 <button type="submit"
                     class="bg-brand text-white text-sm px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium">
-                     Create Industry
+                     Create
                 </button>
                 <a href="{{ route('admin.industries') }}"
                     class="bg-gray-500 text-white text-sm px-4 py-2 rounded-md hover:bg-gray-600 transition-colors font-medium">
@@ -382,5 +387,54 @@
 
             console.log('✅ Course numbers updated');
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const forms = document.querySelectorAll('form[data-client-validate="industry"]');
+
+            forms.forEach((form) => {
+                form.addEventListener('submit', (e) => {
+                    let firstInvalid = null;
+
+                    form.querySelectorAll('.js-client-error').forEach((el) => el.remove());
+
+                    form.querySelectorAll('[required]').forEach((field) => {
+                        const isCheckbox = field.type === 'checkbox' || field.type === 'radio';
+                        const isEmpty = isCheckbox ? !field.checked : field.value.trim() === '';
+
+                        if (isEmpty) {
+                            e.preventDefault();
+                            field.classList.add('border-red-500');
+
+                            const error = document.createElement('p');
+                            error.className = 'text-red-500 text-xs mt-1 js-client-error';
+                            error.textContent = 'This field is required.';
+                            field.insertAdjacentElement('afterend', error);
+
+                            if (!firstInvalid) {
+                                firstInvalid = field;
+                            }
+                        } else {
+                            field.classList.remove('border-red-500');
+                        }
+                    });
+
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+                });
+
+                form.querySelectorAll('[required]').forEach((field) => {
+                    field.addEventListener('input', () => {
+                        field.classList.remove('border-red-500');
+                        const next = field.nextElementSibling;
+                        if (next && next.classList.contains('js-client-error')) {
+                            next.remove();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 @endsection

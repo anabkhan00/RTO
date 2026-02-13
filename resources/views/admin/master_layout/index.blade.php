@@ -23,6 +23,43 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
     </style>
+
+<style>
+    /* Remove toastr background icons (tick, error, info, warning) */
+    #toast-container > .toast {
+        background-image: none !important;
+        padding-left: 14px !important;
+    }
+
+    /* Compact professional sizing */
+    #toast-container > div {
+        padding: 10px 14px;
+        width: 280px;
+        font-size: 13px;
+        line-height: 1.4;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    #toast-container .toast-title {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    #toast-container .toast-message {
+        font-size: 12px;
+    }
+
+    #toast-container .toast-close-button {
+        font-size: 16px;
+        top: 6px;
+        right: 8px;
+        opacity: 0.6;
+    }
+</style>
+
+
+
     <script>
         tailwind.config = {
             /*  */
@@ -52,6 +89,19 @@
 <body class="bg-gray-100 font-[Poppins,sans-serif] relative">
     <!-- Sidebar -->
     @include('admin.layout.sidebar')
+    <!-- Right Sidebar (context panel) -->
+    <aside id="rightSidebar"
+        class="fixed top-0 right-0 h-full w-80 bg-white border-l border-gray-200 shadow-xl transform translate-x-full transition-transform duration-300 z-40">
+        <div id="rightSidebarContent" class="h-full">
+            @yield('right-sidebar')
+        </div>
+    </aside>
+    <button id="rightSidebarToggle"
+        class="fixed bottom-6 right-6 hidden items-center gap-2 px-3 py-2 rounded-full bg-brand text-white text-xs font-medium shadow-lg hover:bg-gold transition-colors z-50"
+        type="button">
+        <i class="bi bi-layout-sidebar-inset-reverse"></i>
+        Panel
+    </button>
     <!-- Main Content -->
     <div id="mainContent" class="transition-all duration-300 ml-64 min-h-screen bg-gray-100">
         <!-- Top Bar -->
@@ -69,11 +119,14 @@
     <!-- Google Maps API -->
     <script>
         toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "timeOut": "5000"
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-top-right",
+            timeOut: 4000,
+            extendedTimeOut: 1500,
+            newestOnTop: true
         };
+
         @if (session('success'))
             toastr.success('{{ session('success') }}');
         @endif
@@ -85,6 +138,24 @@
                 toastr.error('{{ $error }}');
             @endforeach
         @endif
+    </script>
+    <script>
+        (function() {
+            const sidebar = document.getElementById('rightSidebar');
+            const content = document.getElementById('rightSidebarContent');
+            const toggle = document.getElementById('rightSidebarToggle');
+            if (!sidebar || !content || !toggle) return;
+
+            const hasContent = !!content.querySelector('[data-right-sidebar="true"]');
+            if (!hasContent) return;
+
+            toggle.classList.remove('hidden');
+            toggle.classList.add('inline-flex');
+
+            toggle.addEventListener('click', () => {
+                sidebar.classList.toggle('translate-x-full');
+            });
+        })();
     </script>
     @stack('scripts')
     @yield('scripts')

@@ -2,175 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Rto;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Industry;
-use App\Models\RtoDetail;
 use App\Models\RtoStudent;
+use App\Models\StudentAssignmentRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\PlacementOpportunity;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response;
 
 class RtoController extends Controller
 {
-    public function findPlacements()
-    {
-        $user = auth()->user();
-        
-        // Get students with coordinates for map
-        $students = User::where('role', 'user')
-            ->whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->with(['course', 'studentDetail'])
-            ->get();
-
-        // Get industries with coordinates for map
-        $industries = Industry::whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->get();
-
-        return view('admin.pages.find_placements', compact('students', 'industries'));
-    }
-
-    public function dashboard()
-    {
-        $data = [];
-        $user = auth()->user();
-        $userRole = $user->getRoleNames()->first();
-
-        if ($userRole === 'sourcing_coordinator') {
-            // Get assigned students for this sourcing coordinator
-            $assignedStudentIds = \App\Models\StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
-                ->pluck('student_id');
-            
-            // Sourcing Coordinator Dashboard Data - based on assigned students only
-            $data['totalOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)->count();
-            $data['activeOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
-                ->where('status', 'active')->count();
-            $data['filledOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
-                ->where('status', 'filled')->count();
-            $data['totalSlots'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
-                ->sum('total_slots');
-            $data['filledSlots'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
-                ->sum('filled_slots');
-
-            // Get only assigned students with coordinates for map
-            $data['students'] = User::where('role', 'user')
-                ->whereIn('id', $assignedStudentIds)
-                ->whereNotNull('latitude')
-                ->whereNotNull('longitude')
-                ->with(['course', 'studentDetail'])
-                ->get();
-
-            // Get industries with coordinates for map
-            $data['industries'] = Industry::whereNotNull('latitude')
-                ->whereNotNull('longitude')
-                ->get();
-
-            $data['totalStudents'] = $data['students']->count();
-            $data['totalIndustries'] = $data['industries']->count();
-            
-            // Total placements based on assigned students only
-            $data['totalPlacements'] = \App\Models\StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
-                ->where('status', 'completed')
-                ->count();
-            $data['activePlacements'] = \App\Models\StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
-                ->where('status', 'in_progress')
-                ->count();
-            $data['pendingPlacements'] = \App\Models\StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
-                ->where('status', 'pending')
-                ->count();
-
-            // Recent placement opportunities with applications
-            $data['recentOpportunities'] = PlacementOpportunity::with(['industry', 'assignments.student'])
-                ->where('sourcing_coordinator_id', $user->id)
-                ->latest()
-                ->take(10)
-                ->get();
-
-            return view('admin.pages.sourcing_dashboard', $data);
-        }
-
-        if ($userRole === 'placement_coordinator') {
-            // Get students assigned by this placement coordinator
-            $assignedStudentIds = \App\Models\StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
-                ->pluck('student_id');
-            
-            // Placement Coordinator Dashboard Data - based on assigned students only
-            $data['totalPlacements'] = \App\Models\StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
-                ->where('status', 'completed')
-                ->count();
-            $data['activePlacements'] = \App\Models\StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
-                ->where('status', 'in_progress')
-                ->count();
-            $data['pendingPlacements'] = \App\Models\StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
-                ->where('status', 'pending')
-                ->count();
-            $data['completedPlacements'] = $data['totalPlacements'];
-
-            // Get only assigned students with coordinates for map
-            $data['students'] = User::where('role', 'user')
-                ->whereIn('id', $assignedStudentIds)
-                ->whereNotNull('latitude')
-                ->whereNotNull('longitude')
-                ->with(['course', 'studentDetail'])
-                ->get();
-
-            // Get industries with coordinates for map
-            $data['industries'] = Industry::whereNotNull('latitude')
-                ->whereNotNull('longitude')
-                ->get();
-
-            $data['totalStudents'] = User::whereIn('id', $assignedStudentIds)->count();
-            $data['totalIndustries'] = $data['industries']->count();
-
-            return view('admin.pages.placement_dashboard', $data);
-        } else {
-            // Default data for admin and other roles
-            if (auth()->user()->can('students.view')) {
-                $data['totalStudents'] = User::where('role', 'user')->count();
-                $data['thisMonthStudents'] = User::where('role', 'user')
-                    ->whereMonth('created_at', now()->month)
-                    ->count();
-                $data['students'] = User::with(['course', 'studentDetail.industry'])
-                    ->where('role', 'user')
-                    ->latest()
-                    ->take(10)
-                    ->get();
-            }
-
-            if (auth()->user()->can('placements.view')) {
-                $data['activePlacements'] = User::whereHas('studentDetail', function ($q) {
-                    $q->where('progress_status', 'active_placements');
-                })->count();
-                $data['completedPlacements'] = User::whereHas('studentDetail', function ($q) {
-                    $q->where('progress_status', 'completed_placements');
-                })->count();
-            }
-        }
-
-        if (auth()->user()->can('courses.view')) {
-            $data['activeCourses'] = Course::where('status', true)->count();
-        }
-
-        return view('admin.pages.dashboard', $data);
-    }
-
     public function index()
     {
-        $query = User::with('rtoDetail')->where('role', 'rto');
-
-        if (auth()->user()->hasRole('placement_coordinator')) {
-            $query->whereHas('coordinatorAssignments', function ($q) {
-                $q->where('coordinator_id', auth()->id());
-            });
-        }
-
-        $rtos = $query->latest()->get();
-        return view('admin.pages.rtos', compact('rtos'));
+        return view('admin.pages.rtos');
     }
 
     public function create()
@@ -182,9 +28,10 @@ class RtoController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'rto_number' => 'nullable|string|unique:rto_details,rto_number',
+            'rto_number' => 'required|string|unique:rto_details,rto_number',
             'code' => 'required|string|unique:rto_details,code',
             'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'website' => 'nullable|url',
@@ -197,7 +44,7 @@ class RtoController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'role' => 'rto',
-            'password' => bcrypt('password'),
+            'password' => bcrypt($request->password),
             'status' => true,
         ]);
 
@@ -227,8 +74,9 @@ class RtoController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'rto_number' => 'nullable|string|unique:rto_details,rto_number,' . $rto->rtoDetail?->id,
-            'code' => 'nullable|string|unique:rto_details,code,' . $rto->rtoDetail?->id,
+            'code' => 'required|string|unique:rto_details,code,' . $rto->rtoDetail?->id,
             'email' => 'required|email|unique:users,email,' . $rto->id,
+            'password' => 'nullable|string|min:6',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'website' => 'nullable|url',
@@ -241,6 +89,12 @@ class RtoController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
         ]);
+
+        if ($request->filled('password')) {
+            $rto->update([
+                'password' => bcrypt($request->password),
+            ]);
+        }
 
         $rto->rtoDetail()->updateOrCreate(
             ['user_id' => $rto->id],
@@ -281,9 +135,9 @@ class RtoController extends Controller
     {
         $query = User::with('rtoDetail')->where('role', 'rto');
 
-        if (auth()->user()->hasRole('placement_coordinator')) {
+        if (Auth::user()->hasRole('placement_coordinator')) {
             $query->whereHas('coordinatorAssignments', function ($q) {
-                $q->where('coordinator_id', auth()->id());
+                $q->where('coordinator_id', Auth::id());
             });
         }
 
@@ -303,12 +157,6 @@ class RtoController extends Controller
             $query->where('email', 'like', "%{$request->email}%");
         }
 
-        if ($request->filled('contact_person')) {
-            $query->whereHas('rtoDetail', function ($q) use ($request) {
-                $q->where('contact_person', 'like', "%{$request->contact_person}%");
-            });
-        }
-
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
@@ -323,7 +171,7 @@ class RtoController extends Controller
         $orderColumn = $request->get('order.0.column', 0);
         $orderDir = $request->get('order.0.dir', 'desc');
 
-        $columns = ['name', 'code', 'contact_info', 'contact_person', 'website', 'status', 'created_at', 'actions'];
+        $columns = ['name', 'code', 'contact_info', 'rto_phone', 'website', 'created_at', 'status', 'actions'];
         $orderBy = $columns[$orderColumn] ?? 'created_at';
 
         $query->orderBy($orderBy, $orderDir);
@@ -337,7 +185,6 @@ class RtoController extends Controller
         foreach ($rtos as $rto) {
             $rtoDetail = $rto->rtoDetail;
             $code = $rtoDetail?->code ?? 'N/A';
-            $contactPerson = $rtoDetail?->contact_person ?? '-----';
             $website = $rtoDetail?->website;
             $status = $rto->status;
 
@@ -346,7 +193,7 @@ class RtoController extends Controller
 
             $deleteAction = '';
 
-            if (auth()->user()->can('rtos.delete')) {
+            if (Auth::user()->can('rtos.delete')) {
                 $deleteAction = '
         <a href="#" onclick="deleteRto(' . $rto->id . ')"
            class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50">
@@ -379,14 +226,17 @@ class RtoController extends Controller
 
 
             $data[] = [
-                'row_url' => route('admin.rtos.edit', $rto->id),
-                'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($rto->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $rto->name . '</div></div>',
+                'row_url' => Auth::user()->hasRole('admin')
+                    ? route('admin.rtos.edit', $rto->id)
+                    : '#',
+
+                'name' => '<div class="flex items-center"><div class="h-[31px] w-[31px] rounded-full ' . $rtoColor . ' flex items-center justify-center text-[11px] font-semibold mr-3">RT</div><div class="text-sm font-medium text-gray-900">' . $rto->name . '</div></div>',
                 'code' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $rtoColor . ' border shadow-sm">' . $code . '</span>',
-                'contact_info' => '<div class="space-y-1"><div class="flex items-center text-xs"><i class="bi bi-envelope mr-1"></i>' . $rto->email . '</div><div class="flex items-center text-xs"><i class="bi bi-phone mr-1"></i>' . ($rto->phone ?? 'N/A') . '</div></div>',
-                'contact_person' => $contactPerson,
+                'contact_info' => '<div class="flex items-center text-xs"><i class="bi bi-envelope mr-1"></i>' . $rto->email . '</div>',
+                'rto_phone' => '<div class="flex items-center text-xs"><i class="bi bi-phone mr-1"></i>' . ($rto->phone ?? 'N/A') . '</div>',
                 'website' => $website ? '<a href="' . $website . '" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center text-xs"><i class="bi bi-globe mr-1"></i>Visit</a>' : '<span class="text-gray-400 text-xs">N/A</span>',
                 'status' => '<select onchange="updateStatus(' . $rto->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value=1' . ($status ? ' selected' : '') . '>Active</option><option value=0' . (!$status ? ' selected' : '') . '>Inactive</option></select>',
-                'created_at' => $rto->created_at->format('j M Y'),
+                'created_at' => '<span class="text-xs text-gray-600">' . $rto->created_at->format('j M Y') . '</span>',
                 'actions' => $actions
             ];
         }
@@ -397,5 +247,155 @@ class RtoController extends Controller
             'recordsFiltered' => $filteredRecords,
             'data' => $data
         ]);
+    }
+
+    public function findPlacements()
+    {
+        $user = Auth::user();
+
+        $studentsQuery = User::where('role', 'user')
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->with(['course', 'studentDetail']);
+
+        if ($user->hasRole('placement_coordinator')) {
+            $assignedRtoIds = $user->assignedRtos()->pluck('rto_id');
+
+            $studentIds = RtoStudent::whereIn('rto_id', $assignedRtoIds)->pluck('student_id');
+            $studentsQuery = User::with(['course', 'studentDetail.industry'])
+                ->where('role', 'user')
+                ->whereIn('id', $studentIds);
+        }
+
+        $students = $studentsQuery->get();
+
+        $industries = Industry::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get();
+
+        return view('admin.pages.find_placements', compact('students', 'industries'));
+    }
+
+    public function dashboard()
+    {
+        $data = [];
+        $user = Auth::user();
+        $userRole = $user->getRoleNames()->first();
+
+        if ($userRole === 'sourcing_coordinator') {
+            // Get assigned students for this sourcing coordinator
+            $assignedStudentIds = StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
+                ->pluck('student_id');
+
+            // Sourcing Coordinator Dashboard Data - based on assigned students only
+            $data['totalOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)->count();
+            $data['activeOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'active')->count();
+            $data['filledOpportunities'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'filled')->count();
+            $data['totalSlots'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->sum('total_slots');
+            $data['filledSlots'] = PlacementOpportunity::where('sourcing_coordinator_id', $user->id)
+                ->sum('filled_slots');
+
+            // Map should show all students with coordinates
+            $data['students'] = User::where('role', 'user')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->with(['course', 'studentDetail'])
+                ->get();
+
+            // Get industries with coordinates for map
+            $data['industries'] = Industry::whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->get();
+
+            $data['totalStudents'] = $data['students']->count();
+            $data['totalIndustries'] = $data['industries']->count();
+
+            // Total placements based on assigned students only
+            $data['totalPlacements'] = StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'completed')
+                ->count();
+            $data['activePlacements'] = StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'in_progress')
+                ->count();
+            $data['pendingPlacements'] = StudentAssignmentRequest::where('sourcing_coordinator_id', $user->id)
+                ->where('status', 'pending')
+                ->count();
+
+            // Recent placement opportunities with applications
+            $data['recentOpportunities'] = PlacementOpportunity::with(['industry', 'assignments.student'])
+                ->where('sourcing_coordinator_id', $user->id)
+                ->latest()
+                ->take(10)
+                ->get();
+
+            return view('admin.pages.sourcing_dashboard', $data);
+        }
+
+        if ($userRole === 'placement_coordinator') {
+            // Get students from RTOs assigned to this placement coordinator
+            $assignedRtoIds = $user->assignedRtos()->pluck('rto_id');
+            $studentIds = RtoStudent::whereIn('rto_id', $assignedRtoIds)->pluck('student_id');
+
+            // Placement Coordinator Dashboard Data - based on RTO students only
+            $data['totalPlacements'] = StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
+                ->where('status', 'completed')
+                ->count();
+            $data['activePlacements'] = StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
+                ->where('status', 'in_progress')
+                ->count();
+            $data['pendingPlacements'] = StudentAssignmentRequest::where('placement_coordinator_id', $user->id)
+                ->where('status', 'pending')
+                ->count();
+            $data['completedPlacements'] = $data['totalPlacements'];
+
+            // Get students from assigned RTOs with coordinates for map
+            $data['students'] = User::where('role', 'user')
+                ->whereIn('id', $studentIds)
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->with(['course', 'studentDetail'])
+                ->get();
+
+            // Get industries with coordinates for map
+            $data['industries'] = Industry::whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->get();
+
+            $data['totalStudents'] = User::whereIn('id', $studentIds)->count();
+            $data['totalIndustries'] = $data['industries']->count();
+
+            return view('admin.pages.placement_dashboard', $data);
+        } else {
+            // Default data for admin and other roles
+            if (Auth::user()->can('students.view')) {
+                $data['totalStudents'] = User::where('role', 'user')->count();
+                $data['thisMonthStudents'] = User::where('role', 'user')
+                    ->whereMonth('created_at', now()->month)
+                    ->count();
+                $data['students'] = User::with(['course', 'studentDetail.industry'])
+                    ->where('role', 'user')
+                    ->latest()
+                    ->take(10)
+                    ->get();
+            }
+
+            if (Auth::user()->can('placements.view')) {
+                $data['activePlacements'] = User::whereHas('studentDetail', function ($q) {
+                    $q->where('progress_status', 'active_placements');
+                })->count();
+                $data['completedPlacements'] = User::whereHas('studentDetail', function ($q) {
+                    $q->where('progress_status', 'completed_placements');
+                })->count();
+            }
+        }
+
+        if (Auth::user()->can('courses.view')) {
+            $data['activeCourses'] = Course::where('status', true)->count();
+        }
+
+        return view('admin.pages.dashboard', $data);
     }
 }

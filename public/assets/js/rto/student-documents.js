@@ -21,6 +21,9 @@ function getStudentId() {
     return match?.[1];
 }
 
+function getBasePrefix() {
+    return window.location.pathname.startsWith('/rto') ? '/rto' : '/admin';
+}
 
 function safeQuery(selector) {
     return document.querySelector(selector);
@@ -28,7 +31,7 @@ function safeQuery(selector) {
 
 // Single DOMContentLoaded init function
 function init() {
-    console.log('🚀 Initializing student documents page...');
+    // console.log(''Initializing student documents page...'');
     initDropzone();
     initNotes();
     initUploads();
@@ -36,10 +39,243 @@ function init() {
     initAutocomplete();
     initAppointments();
     initAvailability();
+    initMatchSidebar();
     handleHashScroll();
-    console.log('✅ All modules initialized');
+    // console.log(''All modules initialized'');
 }
 
+function initMatchSidebar() {
+    const scheduleBtn = safeQuery('#matchScheduleBtn');
+    const scrollDocsBtn = safeQuery('#matchScrollDocsBtn');
+    const interviewSelect = safeQuery('#interviewIndustrySelect');
+    const statusNote = safeQuery('#matchStatusNote');
+    const industryName = safeQuery('#matchIndustryName');
+    const industryMeta = safeQuery('#matchIndustryMeta');
+    const courseStatus = safeQuery('#matchCourseStatus');
+    const courseChecklist = safeQuery('#matchCourseChecklist');
+    const industryChecklist = safeQuery('#matchIndustryChecklist');
+    const additionalDocs = safeQuery('#matchAdditionalDocs');
+    const interviewSection = safeQuery('#interviewScheduleSection');
+    const documentSection = safeQuery('#document-section');
+    const basePrefix = getBasePrefix();
+    let selectedIndustryId = null;
+
+    if (!industryName || !courseStatus) return;
+
+    function setCourseStatus(ok) {
+        courseStatus.className = ok
+            ? 'text-xs inline-flex items-center px-2 py-1 rounded-full bg-emerald-50 text-emerald-700'
+            : 'text-xs inline-flex items-center px-2 py-1 rounded-full bg-red-50 text-red-700';
+        courseStatus.textContent = ok ? 'Course matched' : 'Course mismatch';
+    }
+
+    function renderList(container, items, emptyText) {
+        if (!container) return;
+        if (!items || items.length === 0) {
+            container.innerHTML = `<div class="text-xs text-gray-400">${emptyText}</div>`;
+            return;
+        }
+        container.innerHTML = items.map(item => {
+            const ok = item.status === 'available';
+            const icon = ok ? 'bi-check-circle-fill text-emerald-600' : 'bi-x-circle text-red-600';
+            const textClass = ok ? 'text-emerald-700' : 'text-red-700';
+            return `
+                <div class="flex items-center justify-between p-2 border rounded bg-white">
+                    <div class="flex items-center gap-2">
+                        <i class="bi ${icon} text-sm"></i>
+                        <span class="text-xs ${textClass}">${item.name}</span>
+                    </div>
+                    <span class="text-[10px] ${ok ? 'text-emerald-600' : 'text-red-600'}">
+                        ${ok ? 'Available' : 'Missing'}
+                    </span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderAdditionalDocuments(items) {
+        if (!additionalDocs) return;
+        if (!items || items.length === 0) {
+            additionalDocs.innerHTML = '<div class="text-xs text-gray-400">No additional documents required.</div>';
+            return;
+        }
+
+        additionalDocs.innerHTML = items.map((item, index) => {
+            const ok = item.status === 'available';
+            const icon = ok ? 'bi-check-circle-fill text-emerald-600' : 'bi-x-circle text-red-600';
+            const textClass = ok ? 'text-emerald-700' : 'text-red-700';
+            const escapedName = (item.name || '').replace(/"/g, '&quot;');
+
+            return `
+                <div class="p-2 border rounded bg-white space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="bi ${icon} text-sm"></i>
+                            <span class="text-xs ${textClass}">${item.name}</span>
+                        </div>
+                        <span class="text-[10px] ${ok ? 'text-emerald-600' : 'text-red-600'}">
+                            ${ok ? 'Available' : 'Missing'}
+                        </span>
+                    </div>
+                    ${ok ? '' : `
+                        <div class="flex items-center gap-2">
+                            <input type="file"
+                                class="additional-doc-file block w-full text-xs border border-gray-300 rounded px-2 py-1"
+                                data-doc-name="${escapedName}"
+                                data-doc-index="${index}"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip" />
+                            <button type="button"
+                                class="upload-additional-doc-btn bg-brand text-white text-[11px] px-2 py-1 rounded whitespace-nowrap"
+                                data-doc-name="${escapedName}"
+                                data-doc-index="${index}">
+                                Upload
+                            </button>
+                        </div>
+                    `}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function uploadAdditionalDocument(docName, file, buttonEl) {
+        const studentId = getStudentId();
+        if (!studentId || !selectedIndustryId) {
+            toastr.error('Please select an industry first.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('industry_id', selectedIndustryId);
+        formData.append('label', docName);
+        formData.append('file', file);
+        formData.append('_token', getCsrf());
+
+        const originalText = buttonEl.textContent;
+        buttonEl.disabled = true;
+        buttonEl.textContent = 'Uploading...';
+
+        fetch(`${basePrefix}/student-documents/${studentId}/additional-document`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(async res => {
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err?.message || 'Upload failed');
+                }
+                return res.json();
+            })
+            .then(() => {
+                toastr.success('Additional document uploaded successfully');
+                updateMatch(selectedIndustryId);
+            })
+            .catch(() => {
+                toastr.error('Failed to upload additional document');
+            })
+            .finally(() => {
+                buttonEl.disabled = false;
+                buttonEl.textContent = originalText;
+            });
+    }
+
+    function updateMatch(industryId) {
+        const studentId = getStudentId();
+        if (!studentId || !industryId) return;
+        selectedIndustryId = String(industryId);
+
+        fetch(`${basePrefix}/student-documents/${studentId}/match-checklist?industry_id=${encodeURIComponent(industryId)}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Request failed');
+                return res.json();
+            })
+            .then(data => {
+                setCourseStatus(!!data.course_match);
+                renderList(courseChecklist, data.course_checklist, 'No course checklist assigned.');
+                renderList(industryChecklist, data.industry_checklist, 'No industry checklist assigned.');
+                renderAdditionalDocuments(data.additional_documents);
+
+                const canSchedule = !!data.all_required_met;
+                if (scheduleBtn) scheduleBtn.disabled = !canSchedule;
+
+                if (statusNote) {
+                    statusNote.textContent = canSchedule
+                        ? 'All required documents are available.'
+                        : (data.missing && data.missing.length
+                            ? `Missing ${data.missing.length} required document(s).`
+                            : 'Missing required documents.');
+                }
+            })
+            .catch(() => {
+                setCourseStatus(false);
+                renderList(courseChecklist, [], 'Unable to load checklist.');
+                renderList(industryChecklist, [], 'Unable to load checklist.');
+                renderAdditionalDocuments([]);
+                if (scheduleBtn) scheduleBtn.disabled = true;
+                if (statusNote) statusNote.textContent = 'Unable to load requirements.';
+            });
+    }
+
+    function setIndustry(industry) {
+        if (industryName) industryName.textContent = industry?.name || 'Not selected';
+        if (industryMeta) industryMeta.textContent = industry?.distance ? `${industry.distance} km away` : '';
+
+        if (interviewSelect && industry?.id) {
+            interviewSelect.value = String(industry.id);
+        }
+
+        updateMatch(industry?.id);
+    }
+
+    if (interviewSelect) {
+        interviewSelect.addEventListener('change', function() {
+            const id = this.value;
+            if (!id) return;
+            const industry = (window.industries || []).find(i => String(i.id) === String(id)) || {
+                id,
+                name: this.options[this.selectedIndex]?.text || 'Selected Industry'
+            };
+            setIndustry(industry);
+        });
+    }
+
+    if (scheduleBtn) {
+        scheduleBtn.addEventListener('click', () => {
+            if (interviewSection) {
+                interviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
+
+    if (scrollDocsBtn) {
+        scrollDocsBtn.addEventListener('click', () => {
+            if (documentSection) {
+                documentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('.upload-additional-doc-btn');
+        if (!button) return;
+
+        const docName = button.getAttribute('data-doc-name');
+        const docIndex = button.getAttribute('data-doc-index');
+        const fileInput = document.querySelector(`.additional-doc-file[data-doc-index="${docIndex}"]`);
+        const file = fileInput?.files?.[0];
+
+        if (!file) {
+            toastr.error('Please select a file first');
+            return;
+        }
+
+        uploadAdditionalDocument(docName, file, button);
+    });
+
+    window.selectIndustryForMatch = setIndustry;
+}
 // Profile Image Dropzone functionality
 function initDropzone() {
     const dropzone = safeQuery('#profileDropzone');
@@ -51,7 +287,10 @@ function initDropzone() {
 
     if (!dropzone || !fileInput) return;
 
-    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('click', () => {
+        if (fileInput.disabled) return;
+        fileInput.click();
+    });
 
     dropzone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -65,20 +304,32 @@ function initDropzone() {
     dropzone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropzone.classList.remove('border-brand', 'bg-blue-50');
+        if (fileInput.disabled) return;
         const files = e.dataTransfer.files;
         if (files.length > 0) {
-            handleFile(files[0]);
+            handleFile(files[0], true);
         }
     });
 
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
-            handleFile(e.target.files[0]);
+            handleFile(e.target.files[0], false);
         }
     });
 
-    function handleFile(file) {
+    function handleFile(file, fromDrop) {
         if (file.type.startsWith('image/')) {
+            if (file.size > 5 * 1024 * 1024) {
+                toastr.error('Image must be 5MB or smaller');
+                return;
+            }
+
+            if (fromDrop) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
@@ -96,6 +347,12 @@ function initDropzone() {
             dropzoneContent.classList.remove('hidden');
             imagePreview.classList.add('hidden');
         });
+    }
+
+    // If an image already exists from server data, show preview state on load.
+    if (previewImg && previewImg.src && !previewImg.src.endsWith('/')) {
+        dropzoneContent.classList.add('hidden');
+        imagePreview.classList.remove('hidden');
     }
 }
 
@@ -121,8 +378,9 @@ function initNotes() {
 
         const studentId = getStudentId();
 
+        const basePrefix = getBasePrefix();
         $.ajax({
-            url: `/admin/students/${studentId}/notes`,
+            url: `${basePrefix}/students/${studentId}/notes`,
             method: 'POST',
             data: {
                 content: noteContent,
@@ -138,14 +396,21 @@ function initNotes() {
                     const roleColor = roleColors[response.note.author_role] ||
                         'bg-gray-50 border-gray-200 text-gray-800';
 
+                    const canEdit = String(response.note.author_id) === String(window.authUser?.id);
+                    const roleText = (response.note.author_role || '').replace('_', ' ');
                     const noteHtml = `
-                        <div class="p-3 rounded-lg border ${roleColor}">
+                        <div class="p-3 rounded-lg border ${roleColor}" data-note-id="${response.note.id}">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wide">${response.note.author_role}</span>
-                                <span class="text-xs opacity-75">${response.note.created_at}</span>
+                                <span class="text-xs font-medium uppercase tracking-wide flex items-center gap-1">
+                                    <i class="bi bi-person-badge"></i>
+                                    ${roleText.charAt(0).toUpperCase() + roleText.slice(1)}
+                                </span>
+                                <div class="flex items-center gap-2 text-xs opacity-75">
+                                    <span>${response.note.created_at}</span>
+                                    ${canEdit ? `<button type="button" class="note-edit-btn text-blue-600 hover:text-blue-800" data-note-id="${response.note.id}"><i class="bi bi-pencil"></i></button>` : ''}
+                                </div>
                             </div>
-                            <p class="text-sm mb-1">${response.note.content}</p>
-                            <p class="text-xs opacity-75">by ${response.note.author_name}</p>
+                            <p class="text-sm note-content">${response.note.content}</p>
                         </div>
                     `;
 
@@ -167,9 +432,59 @@ function initNotes() {
     });
 }
 
+// Inline note edit (modal)
+$(document).on('click', '.note-edit-btn', function() {
+    const noteId = $(this).data('note-id');
+    const card = $(this).closest('[data-note-id]');
+    const currentContent = card.find('.note-content').text().trim();
+
+    $('#editNoteId').val(noteId);
+    $('#editNoteContent').val(currentContent);
+    $('#editNoteModal').removeClass('hidden');
+});
+
+$('#closeEditNoteModal, #cancelEditNote').on('click', function() {
+    $('#editNoteModal').addClass('hidden');
+});
+
+$('#editNoteForm').on('submit', function(e) {
+    e.preventDefault();
+    const noteId = $('#editNoteId').val();
+    const content = $('#editNoteContent').val().trim();
+    const studentId = getStudentId();
+
+    if (!content) {
+        toastr.error('Please enter a note');
+        return;
+    }
+
+    const basePrefix = getBasePrefix();
+    $.ajax({
+        url: `${basePrefix}/students/${studentId}/notes/${noteId}`,
+        method: 'PUT',
+        data: {
+            content: content,
+            _token: getCsrf()
+        },
+        success: function(response) {
+            if (response.success) {
+                toastr.success('Note updated');
+                setTimeout(() => {
+                    location.reload();
+                }, 800);
+            } else {
+                toastr.error('Failed to update note');
+            }
+        },
+        error: function() {
+            toastr.error('Failed to update note');
+        }
+    });
+});
+
 // Document upload functionality
 function initUploads() {
-    $('form[enctype="multipart/form-data"]').on('submit', function(e) {
+    $('#studentDocumentsUploadForm').on('submit', function(e) {
         e.preventDefault();
 
         const uploadBtn = $('#uploadBtn');
@@ -216,8 +531,9 @@ function initUploads() {
         e.preventDefault();
         const studentId = getStudentId();
 
+        const basePrefix = getBasePrefix();
         $.ajax({
-            url: `/admin/student-documents/assign-types/${studentId}`,
+            url: `${basePrefix}/student-documents/assign-types/${studentId}`,
             type: 'POST',
             data: $(this).serialize(),
             success: function(response) {
@@ -251,8 +567,9 @@ function initUploads() {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
+                const basePrefix = getBasePrefix();
                 $.ajax({
-                    url: `/rto/student-documents/${documentId}`,
+                    url: `${basePrefix}/student-documents/${documentId}`,
                     type: 'DELETE',
                     data: {
                         _token: getCsrf()
@@ -275,14 +592,14 @@ function initUploads() {
 
 // FullCalendar initialization - FIXED VERSION
 function initCalendar() {
-    console.log('📅 Starting FullCalendar initialization...');
+    // console.log('📅 Starting FullCalendar initialization...');
 
     const calendarEl = safeQuery('#calendar');
     if (!calendarEl) {
         console.warn('❌ Calendar element #calendar not found');
         return;
     }
-    console.log('✅ Calendar element found');
+    // console.log('✅ Calendar element found');
 
     // Wait for FullCalendar to be loaded
     const waitForFullCalendar = () => {
@@ -291,24 +608,23 @@ function initCalendar() {
             setTimeout(waitForFullCalendar, 100);
             return;
         }
-        console.log('✅ FullCalendar is loaded');
+        // console.log('✅ FullCalendar is loaded');
 
         const studentId = getStudentId();
         const saveBtn = safeQuery('#saveBtn');
         if (!studentId || !saveBtn) {
             console.warn('❌ Student ID or save button not found');
-            console.log('Student ID:', studentId);
-            console.log('Save button:', saveBtn);
+            // console.log('Student ID:', studentId);
+            // console.log('Save button:', saveBtn);
             return;
         }
-        console.log('✅ Student ID and save button found:', studentId);
+        // console.log('✅ Student ID and save button found:', studentId);
 
         try {
-            console.log('🔧 Creating FullCalendar instance...');
+            // console.log('🔧 Creating FullCalendar instance...');
 
             // Define updateSummary function outside the calendar config to avoid scope issues
             function updateSummary() {
-                console.log('📊 Updating summary...');
                 const events = calendar.getEvents();
                 let totalHours = 0;
                 let listHtml = '';
@@ -350,15 +666,14 @@ function initCalendar() {
                 if (eventList) {
                     eventList.innerHTML = listHtml || '<span class="text-gray-400 italic">No availability set</span>';
                 }
-                console.log('✅ Summary updated, total hours:', totalHours.toFixed(1));
             }
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 headerToolbar: {
                     left: 'prev,next today',
-                    center: 'title',
-                    right: ''
+                    center: '',
+                    right: 'title'
                 },
                 slotMinTime: '06:00:00',
                 slotMaxTime: '22:00:00',
@@ -369,11 +684,10 @@ function initCalendar() {
                 height: '100%',
 
                 events: function(info, successCallback, failureCallback) {
-                    console.log('📡 Fetching events for:', info.startStr, 'to', info.endStr);
-                    fetch(`/admin/weekly-schedules/${studentId}/availability?start=${info.startStr}&end=${info.endStr}`)
+                    const basePrefix = getBasePrefix();
+                    fetch(`${basePrefix}/weekly-schedules/${studentId}/availability?start=${info.startStr}&end=${info.endStr}`)
                         .then(response => response.json())
                         .then(data => {
-                            console.log('✅ Events loaded:', data.length || 0, 'events');
                             successCallback(data);
                         })
                         .catch(error => {
@@ -383,7 +697,6 @@ function initCalendar() {
                 },
 
                 select: function(info) {
-                    console.log('➕ Adding event:', info.startStr, 'to', info.endStr);
                     calendar.addEvent({
                         title: 'Available',
                         start: info.startStr,
@@ -396,32 +709,28 @@ function initCalendar() {
 
                 eventClick: function(info) {
                     if (confirm('Remove this time slot?')) {
-                        console.log('🗑️ Removing event:', info.event.title);
                         info.event.remove();
                         updateSummary();
                     }
                 },
 
                 eventDrop: function(info) {
-                    console.log('🔄 Event dropped:', info.event.title);
                     updateSummary();
                 },
                 eventResize: function(info) {
-                    console.log('📏 Event resized:', info.event.title);
                     updateSummary();
                 },
                 eventsSet: function() {
-                    console.log('📋 Events set');
                     updateSummary();
                 }
             });
 
             calendar.render();
-            console.log('🎉 FullCalendar rendered successfully!');
+            // console.log('🎉 FullCalendar rendered successfully!');
 
             // Save button functionality
             saveBtn.addEventListener('click', function() {
-                console.log('💾 Saving schedule...');
+                // console.log('💾 Saving schedule...');
                 const viewStart = calendar.view.activeStart;
                 const offset = viewStart.getTimezoneOffset() * 60000;
                 const localDate = new Date(viewStart.getTime() - offset);
@@ -443,7 +752,8 @@ function initCalendar() {
                 saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
                 saveBtn.disabled = true;
 
-                fetch(`/admin/weekly-schedules/${studentId}/availability`, {
+                const basePrefix = getBasePrefix();
+                fetch(`${basePrefix}/weekly-schedules/${studentId}/availability`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -454,10 +764,10 @@ function initCalendar() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            console.log('✅ Schedule saved successfully');
+                            // console.log('✅ Schedule saved successfully');
                             toastr.success('Schedule saved successfully');
                         } else {
-                            console.error('❌ Failed to save schedule:', data);
+                            // console.error('❌ Failed to save schedule:', data);
                             toastr.error('Failed to save schedule');
                         }
                     })
@@ -508,7 +818,7 @@ window.initIndustryMap = function() {
 
     const map = new google.maps.Map(mapElement, {
         center: { lat: studentLat, lng: studentLng },
-        zoom: 11,
+        zoom: 10,
         gestureHandling: 'greedy',
         disableDefaultUI: true,
         zoomControl: true,
@@ -542,14 +852,28 @@ window.initIndustryMap = function() {
         title: student.name,
         icon: {
             url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444"/>
                     <circle cx="12" cy="9" r="2.5" fill="white"/>
                 </svg>
             `),
-            scaledSize: new google.maps.Size(24, 24),
-            anchor: new google.maps.Point(12, 24)
+            scaledSize: new google.maps.Size(30, 30),
+            anchor: new google.maps.Point(15, 30)
         }
+    });
+
+    // 20km radius circle around student
+    const hasIndustries = (industries && industries.length > 0);
+    const radiusColor = hasIndustries ? '#22c55e' : '#ef4444';
+    new google.maps.Circle({
+        strokeColor: radiusColor,
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: radiusColor,
+        fillOpacity: 0.1,
+        map: map,
+        center: { lat: studentLat, lng: studentLng },
+        radius: 20000 // 20km in meters
     });
 
     // Industry markers (green) - filter to 20km radius
@@ -570,21 +894,42 @@ window.initIndustryMap = function() {
                 animation: google.maps.Animation.DROP,
                 icon: {
                     url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#22c55e"/>
                             <circle cx="12" cy="9" r="2.5" fill="white"/>
                         </svg>
                     `),
-                    scaledSize: new google.maps.Size(24, 24),
-                    anchor: new google.maps.Point(12, 24)
+                    scaledSize: new google.maps.Size(30, 30),
+                    anchor: new google.maps.Point(15, 30)
                 }
             });
 
             const infoWindow = new google.maps.InfoWindow({
-                content: `<div style="font-family: system-ui, sans-serif; padding: 8px;"><strong>${industry.name}</strong><br><span style="color: #666; font-size: 13px;">${industry.contact_person || 'No Contact'}</span><br><small style="color: #22c55e;">Industry Partner</small></div>`
-            });
+  content: `
+    <div style="font-family: system-ui, sans-serif; padding: 8px; min-width: 180px;">
 
-            marker.addListener('click', () => infoWindow.open(map, marker));
+      <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">
+        ${industry.name ?? 'N/A'}
+      </div>
+
+      <div style="font-size: 12px; color: #555; margin-bottom: 4px;">
+        ${industry.address ?? 'No address available'}
+      </div>
+
+      <div style="font-size: 12px; color: #16a34a; font-weight: 500;">
+        ${industry.distance ? industry.distance + ' km away' : ''}
+      </div>
+
+    </div>
+  `
+});
+
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
+                if (typeof window.selectIndustryForMatch === 'function') {
+                    window.selectIndustryForMatch(industry);
+                }
+            });
         }, index * 200);
     });
 };
@@ -674,7 +1019,8 @@ function initAppointments() {
             _token: getCsrf()
         };
 
-        const url = id ? `/admin/appointments/${id}` : '/admin/appointments';
+        const basePrefix = getBasePrefix();
+        const url = id ? `${basePrefix}/appointments/${id}` : `${basePrefix}/appointments`;
         const method = id ? 'PUT' : 'POST';
 
         $.ajax({
@@ -690,8 +1036,9 @@ function initAppointments() {
     });
 
     window.loadAppointments = function() {
+        const basePrefix = getBasePrefix();
         $.ajax({
-            url: `/admin/appointments/student/${studentId}`,
+            url: `${basePrefix}/appointments/student/${studentId}`,
             success: function(appointments) {
                 let html = '';
                 const canEdit = window.authUser?.role === 'admin' || window.authUser?.coordinator_type === 'placement';
@@ -725,8 +1072,9 @@ function initAppointments() {
     window.deleteAppointment = function(id) {
         if (!confirm('Delete this appointment?')) return;
 
+        const basePrefix = getBasePrefix();
         $.ajax({
-            url: `/admin/appointments/${id}`,
+            url: `${basePrefix}/appointments/${id}`,
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': getCsrf()
@@ -781,7 +1129,8 @@ function initAvailability() {
                 }
             });
 
-            fetch(`/admin/students/${studentId}/availability`, {
+            const basePrefix = getBasePrefix();
+            fetch(`${basePrefix}/students/${studentId}/availability`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -917,7 +1266,8 @@ window.assignCoordinators = function() {
 
     if (!studentId) return;
 
-    fetch(`/admin/student-documents/assign-coordinator/${studentId}`, {
+    const basePrefix = getBasePrefix();
+    fetch(`${basePrefix}/student-documents/assign-coordinator/${studentId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -960,3 +1310,5 @@ function handleHashScroll() {
 
 // Initialize everything when DOM is ready - SINGLE LISTENER
 document.addEventListener('DOMContentLoaded', init);
+
+

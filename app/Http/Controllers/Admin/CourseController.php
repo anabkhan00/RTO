@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\CourseChecklist;
 use App\Models\DocumentChecklist;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class CourseController extends Controller
@@ -196,7 +197,7 @@ class CourseController extends Controller
         $orderDir = $request->get('order.0.dir', 'desc');
 
         // Order mapping
-        $columns = ['name', 'code', 'credit_hours', 'status', 'created_at', 'actions'];
+        $columns = ['name', 'code', 'credit_hours', 'created_at', 'status', 'actions'];
         $orderBy = $columns[$orderColumn] ?? 'created_at';
 
         if ($orderBy === 'created_at') {
@@ -219,9 +220,9 @@ class CourseController extends Controller
             $courseColors = ['bg-blue-50 text-blue-700 border-blue-100', 'bg-purple-50 text-purple-700 border-purple-100', 'bg-emerald-50 text-emerald-700 border-emerald-100'];
             $courseColor = $courseColors[abs(crc32($course->code)) % count($courseColors)];
             $statusColor = $course->status ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100';
-            
+
             $actions = '';
-            if (auth()->user()->can('courses.delete')) {
+            if (Auth::user()->can('courses.delete')) {
                 $actions = '
         <div class="text-center flex justify-center gap-2">
             <div class="relative inline-block dropdown-container" onclick="event.stopPropagation()">
@@ -242,11 +243,11 @@ class CourseController extends Controller
 
             $data[] = [
                 'row_url' => route('admin.courses.edit', $course->id),
-                'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($course->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $course->name . '</div></div>',
+                'name' => '<div class="flex items-center"><div class="h-[31px] w-[31px] rounded-full ' . $courseColor . ' flex items-center justify-center text-[11px] font-semibold mr-3">AR</div><div class="text-sm font-medium text-gray-900">' . $course->name . '</div></div>',
                 'code' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $courseColor . ' border shadow-sm">' . $course->code . '</span>',
                 'credit_hours' => $course->credit_hours ?? '-----',
+                'created_at' => '<span class="text-xs text-gray-600">' . $course->created_at->format('j M Y') . '</span>',
                 'status' => '<select onchange="updateStatus(' . $course->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($course->status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value="1"' . ($course->status ? ' selected' : '') . '>Active</option><option value="0"' . (!$course->status ? ' selected' : '') . '>Inactive</option></select>',
-                'created_at' => $course->created_at->format('j M Y'),
                 'actions' => $actions
             ];
         }

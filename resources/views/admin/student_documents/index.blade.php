@@ -1,15 +1,35 @@
 @extends('admin.master_layout.index')
-@section('page-title', 'Student Documents')
+@section('page-title', 'Student Profile')
 
-@section('title', 'Student Documents - ' . $student->name)
+@section('title', 'Student Profile - ' . $student->name)
 
 @section('content')
     <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-2xl font-semibold text-brand mb-6">Documents for {{ $student->name }}</h2>
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Details of {{ $student->name }}</h2>
+            </div>
+            <a href="{{ route('admin.students') }}"
+                class="bg-gray-500 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors">
+                <i class="bi bi-arrow-left mr-1"></i> Back to Students
+            </a>
+        </div>
 
         <!-- Student Update Section -->
         <div class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Student Information</h3>
+            {{-- <h3 class="text-lg font-medium text-brand mb-4">Student Information</h3> --}}
+
+            @php
+                $isAdmin = auth()->user()->hasRole('admin');
+
+                $readOnlyAttr = $isAdmin ? '' : 'readonly';
+                $disabledAttr = $isAdmin ? '' : 'disabled';
+
+                $readOnlyClass = $isAdmin
+                    ? ''
+                    : 'bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0 focus:border-gray-300';
+            @endphp
+
             <form action="{{ route('admin.students.update', $student->id) }}" method="POST" enctype="multipart/form-data"
                 class="bg-white rounded-lg border p-6 shadow-sm">
                 @csrf
@@ -22,45 +42,54 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- Name -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-person mr-1 text-brand"></i> Name
+                                </label>
                                 <input type="text" name="name" value="{{ old('name', $student->name) }}" required
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                    {{ $readOnlyAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
                             </div>
 
                             <!-- Email -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-envelope mr-1 text-blue-600"></i> Email
+                                </label>
                                 <input type="email" name="email" value="{{ old('email', $student->email) }}" required
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                    {{ $readOnlyAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
                             </div>
 
                             <!-- Phone -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-phone mr-1 text-emerald-600"></i> Phone
+                                </label>
                                 <input type="text" name="phone" value="{{ old('phone', $student->phone) }}"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                    {{ $readOnlyAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
                             </div>
 
                             <!-- Emergency Contact -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Emergency Contact No
+                                    <i class="bi bi-telephone mr-1 text-rose-600"></i> Emergency Contact No
                                 </label>
-                                <input type="text" name="emergency_contact"
+                                <input type="text" name="emergency_contact" {{ $readOnlyAttr }}
                                     value="{{ old('emergency_contact', $student->studentDetail->emergency_contact ?? '') }}"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-               focus:ring-2 focus:ring-brand focus:border-brand" />
+               focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
                             </div>
 
                             <!-- Placement Hours -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Placement Hours
+                                    <i class="bi bi-clock mr-1 text-amber-600"></i> Placement Hours
                                 </label>
-                                <input type="number" name="placement_hours"
+                                <input type="number" name="placement_hours" {{ $readOnlyAttr }}
                                     value="{{ old('placement_hours', $student->studentDetail->placement_hours ?? '') }}"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-               focus:ring-2 focus:ring-brand focus:border-brand" />
+               focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
                             </div>
 
 
@@ -69,8 +98,8 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="bi bi-building mr-1"></i> RTO
                                 </label>
-                                <select name="rto_id" id="studentRto"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <select name="rto_id" id="studentRto" {{ $disabledAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white {{ $readOnlyClass }}">
                                     <option value="">Select RTO</option>
                                     @foreach ($rtos as $rto)
                                         <option value="{{ $rto->id }}"
@@ -79,6 +108,9 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @if (!$isAdmin)
+                                    <input type="hidden" name="rto_id" value="{{ old('rto_id', $studentRtoId) }}">
+                                @endif
                             </div>
 
 
@@ -86,8 +118,8 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2"><i class="bi bi-flag mr-1"></i>
                                     Priority</label>
-                                <select name="priority"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <select name="priority" {{ $disabledAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white {{ $readOnlyClass }}">
                                     <option value="">Select Priority</option>
                                     <option value="high_priority"
                                         {{ old('priority', $student->studentDetail->priority ?? '') == 'high_priority' ? 'selected' : '' }}>
@@ -103,9 +135,11 @@
 
                             <!-- Course -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
-                                <select name="course_id"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-book mr-1 text-indigo-600"></i> Course
+                                </label>
+                                <select name="course_id" {{ $disabledAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white {{ $readOnlyClass }}">
                                     <option value="">Select Course</option>
                                     @foreach ($courses as $course)
                                         <option value="{{ $course->id }}"
@@ -114,14 +148,18 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @if (!$isAdmin)
+                                    <input type="hidden" name="course_id"
+                                        value="{{ old('course_id', $student->course_id) }}">
+                                @endif
                             </div>
 
                             <!-- Industry -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2"><i class="bi bi-book mr-1"></i>
                                     Industry</label>
-                                <select name="industry_id"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <select name="industry_id" {{ $disabledAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white {{ $readOnlyClass }}">
                                     <option value="">Select Industry</option>
                                     @foreach ($industries as $industry)
                                         <option value="{{ $industry->id }}"
@@ -130,6 +168,10 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @if (!$isAdmin)
+                                    <input type="hidden" name="industry_id"
+                                        value="{{ old('industry_id', $student->studentDetail->industry_id ?? '') }}">
+                                @endif
                             </div>
 
                             <!-- Progress Status -->
@@ -176,11 +218,13 @@
 
                             <!-- Address -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                                <input type="text" name="address" id="addressInput"
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-geo-alt mr-1 text-rose-600"></i> Address
+                                </label>
+                                <input type="text" name="address" id="addressInput" {{ $readOnlyAttr }}
                                     value="{{ old('address', $student->address) }}" required
                                     placeholder="Start typing address..."
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
                                 <input type="hidden" name="latitude" id="latitudeInput"
                                     value="{{ old('latitude', $student->latitude) }}">
                                 <input type="hidden" name="longitude" id="longitudeInput"
@@ -189,9 +233,11 @@
 
                             <!-- Gender -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                                <select name="gender"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-gender-ambiguous mr-1 text-purple-600"></i> Gender
+                                </label>
+                                <select name="gender" {{ $disabledAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white {{ $readOnlyClass }}">
                                     <option value="">Select Gender</option>
                                     <option value="male"
                                         {{ old('gender', $student->studentDetail->gender ?? '') == 'male' ? 'selected' : '' }}>
@@ -203,35 +249,68 @@
                                         {{ old('gender', $student->studentDetail->gender ?? '') == 'other' ? 'selected' : '' }}>
                                         Other</option>
                                 </select>
+                                @if (!$isAdmin)
+                                    <input type="hidden" name="gender"
+                                        value="{{ old('gender', $student->studentDetail->gender ?? '') }}">
+                                @endif
                             </div>
 
                             <!-- Transport -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Transport</label>
-                                <input type="text" name="transport"
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-truck mr-1 text-cyan-600"></i> Transport
+                                </label>
+                                <input type="text" name="transport" {{ $readOnlyAttr }}
                                     value="{{ old('transport', $student->studentDetail->transport ?? '') }}"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}" />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><i
+                                        class="bi bi-clipboard-check mr-1"></i> Interview Status</label>
+                                <select name="interview_status"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                                    <option value="">Select Interview Status</option>
+                                    <option value="scheduled"
+                                        {{ old('interview_status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                    <option value="in_progress"
+                                        {{ old('interview_status') == 'in_progress' ? 'selected' : '' }}>In Progress
+                                    </option>
+                                    <option value="completed"
+                                        {{ old('interview_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="no_show" {{ old('interview_status') == 'no_show' ? 'selected' : '' }}>
+                                        No Show</option>
+                                    <option value="rescheduled"
+                                        {{ old('interview_status') == 'rescheduled' ? 'selected' : '' }}>Rescheduled
+                                    </option>
+                                </select>
                             </div>
 
                             <!-- Medical Condition -->
                             <div class="md:col-span-3">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Medical Condition</label>
-                                <textarea name="medical_condition" rows="2"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('medical_condition', $student->studentDetail->medical_condition ?? '') }}</textarea>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-heart-pulse mr-1 text-red-600"></i> Medical Condition
+                                </label>
+                                <textarea name="medical_condition" rows="2" {{ $readOnlyAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}">{{ old('medical_condition', $student->studentDetail->medical_condition ?? '') }}</textarea>
                             </div>
 
                             <!-- Placement Data -->
                             <div class="md:col-span-3">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Placement Data</label>
-                                <textarea name="placement_data" rows="2"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">{{ old('placement_data', $student->studentDetail->placement_data ?? '') }}</textarea>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-clipboard-data mr-1 text-gray-600"></i> Placement Data
+                                </label>
+                                <textarea name="placement_data" rows="2" {{ $readOnlyAttr }}
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand {{ $readOnlyClass }}">{{ old('placement_data', $student->studentDetail->placement_data ?? '') }}</textarea>
                             </div>
                         </div>
                     </div>
                     <!-- Profile Image -->
                     <div class="col-span-12 lg:col-span-4">
                         <div>
-                            <h4 class="text-sm font-medium text-gray-700 mb-3">Profile Image</h4>
+                            <h4 class="text-sm font-medium text-gray-700 mb-3">
+                                <i class="bi bi-image mr-1 text-blue-600"></i> Profile Image
+                            </h4>
                             <div id="profileDropzone"
                                 class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-brand transition-colors cursor-pointer bg-gray-50 hover:bg-blue-50">
                                 <div id="dropzoneContent">
@@ -249,27 +328,38 @@
                                 </div>
                             </div>
                             <input type="file" id="profileImageInput" name="profile_image" accept="image/*"
-                                class="hidden" />
+                                {{ $disabledAttr }} class="hidden" />
                             <p class="text-xs text-gray-400 mt-2">Use high-quality portrait images for best results</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex justify-between mt-4 items-center"> @php
-                    $status = 'Interview';
+                    $statusRaw = old('interview_status', $student->studentDetail->interview_status ?? 'pending');
+                    $status = ucwords(str_replace('_', ' ', $statusRaw));
                     $statusColors = [
                         'Assigned' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-100'],
-                        'Interview' => [
+                        'Scheduled' => [
                             'bg' => 'bg-orange-50',
                             'text' => 'text-orange-700',
                             'border' => 'border-orange-100',
                         ],
-                        'Placed' => [
+                        'In Progress' => [
+                            'bg' => 'bg-blue-50',
+                            'text' => 'text-blue-700',
+                            'border' => 'border-blue-100',
+                        ],
+                        'Completed' => [
                             'bg' => 'bg-emerald-50',
                             'text' => 'text-emerald-700',
                             'border' => 'border-emerald-100',
                         ],
-                        'Completed' => [
+                        'No Show' => [
+                            'bg' => 'bg-red-50',
+                            'text' => 'text-red-700',
+                            'border' => 'border-red-100',
+                        ],
+                        'Rescheduled' => [
                             'bg' => 'bg-indigo-50',
                             'text' => 'text-indigo-700',
                             'border' => 'border-indigo-100',
@@ -279,19 +369,24 @@
                 @endphp <span
                         class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full {{ $colors['bg'] }} {{ $colors['text'] }} {{ $colors['border'] }} border shadow">
                         {{ $status }} </span>
-                    @can('students.edit')
+                    <div class="flex gap-2">
                         <button type="submit"
-                            class="bg-brand text-white text-xs px-3 py-1.5 rounded-md hover:bg-gold transition-colors font-medium">
+                            class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors font-medium">
                             Update
                         </button>
-                    @endcan
+                        <button type="reset"
+                            class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors font-medium">
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </form>
-
         </div>
 
         <div class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Notes</h3>
+            <h3 class="text-lg font-medium text-brand mb-4 flex items-center gap-2">
+                <i class="bi bi-sticky text-amber-600"></i> Notes
+            </h3>
             <div class="location-tab-content block bg-white rounded-lg border shadow-sm p-4">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
                     <!-- All Notes Display -->
@@ -311,15 +406,26 @@
                                             $roleColors[$note->author_role] ??
                                             'bg-gray-50 border-gray-200 text-gray-800';
                                     @endphp
-                                    <div class="p-3 rounded-lg border {{ $roleColor }}">
+                                    <div class="p-3 rounded-lg border {{ $roleColor }}"
+                                        data-note-id="{{ $note->id }}">
                                         <div class="flex justify-between items-start mb-2">
                                             <span
-                                                class="text-xs font-medium uppercase tracking-wide">{{ $note->author_role }}</span>
-                                            <span
-                                                class="text-xs opacity-75">{{ $note->created_at->format('M j, Y') }}</span>
+                                                class="text-xs font-medium uppercase tracking-wide flex items-center gap-1">
+                                                <i class="bi bi-person-badge"></i>
+                                                {{ ucfirst(str_replace('_', ' ', $note->author_role)) }}
+                                            </span>
+                                            <div class="flex items-center gap-2 text-xs opacity-75">
+                                                <span>{{ $note->created_at->format('M j, Y') }}</span>
+                                                @if ($note->author_id === auth()->id())
+                                                    <button type="button"
+                                                        class="note-edit-btn text-blue-600 hover:text-blue-800"
+                                                        data-note-id="{{ $note->id }}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
-                                        <p class="text-sm mb-1">{{ $note->content }}</p>
-                                        <p class="text-xs opacity-75">by {{ $note->author->name }}</p>
+                                        <p class="text-sm note-content">{{ $note->content }}</p>
                                     </div>
                                 @endforeach
                             @else
@@ -343,7 +449,7 @@
                             @can('students.edit')
                                 <button type="submit"
                                     class="bg-brand text-white text-xs px-3 py-1.5 mt-3 rounded-md hover:bg-gold transition-colors font-medium">
-                                    Save Note
+                                    Save
                                 </button>
                             @endcan
                         </form>
@@ -374,7 +480,9 @@
 
         <!-- Map & Notes Section -->
         <div class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Industries Within 20km Radius</h3>
+            <h3 class="text-lg font-medium text-brand mb-4 flex items-center gap-2">
+                <i class="bi bi-geo-alt text-emerald-600"></i> Industries Within 20km Radius
+            </h3>
             <div class="location-tab-content block bg-white rounded-lg border shadow-sm p-4">
                 <div id="industryMap" class="w-full h-[420px] rounded-xl shadow-lg border border-gray-200"></div>
                 {{-- <div class="mt-3 flex items-center justify-between">
@@ -387,15 +495,101 @@
             </div>
         </div>
 
+        <!-- Interview Links Section -->
+        <div class="mb-8" id="interviewScheduleSection">
+            <h3 class="text-lg font-medium text-brand mb-4 flex items-center gap-2">
+                <i class="bi bi-calendar2-week text-indigo-600"></i> Interview Schedule
+            </h3>
+            <div class="bg-white rounded-lg border shadow-sm p-4">
+                <form action="{{ route('admin.student-documents.interviews.store', $student->id) }}" method="POST"
+                    class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-6">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                        <select name="industry_id" id="interviewIndustrySelect" required
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                            <option value="">Select Industry</option>
+                            @foreach ($industries as $industry)
+                                <option value="{{ $industry->id }}">{{ $industry->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Interview Date & Time</label>
+                        <input type="datetime-local" name="interview_at"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select name="status"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white">
+                            <option value="">Select Status</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="no_show">No Show</option>
+                            <option value="rescheduled">Rescheduled</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit"
+                            class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-md hover:bg-emerald-700 transition-colors font-medium">
+                            Update
+                        </button>
+                        <button type="reset"
+                            class="bg-red-600 text-white text-xs px-4 py-2 rounded-md hover:bg-red-700 transition-colors font-medium">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+                <div>
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-600 border-b">
+                                <th class="py-2 pr-4">Industry</th>
+                                <th class="py-2 pr-4">Interview At</th>
+                                <th class="py-2 pr-4">Status</th>
+                                <th class="py-2 pr-4">Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($interviews as $interview)
+                                <tr class="border-b text-gray-700">
+                                    <td class="py-2 pr-4">{{ $interview->industry->name ?? 'N/A' }}</td>
+                                    <td class="py-2 pr-4">
+                                        {{ $interview->interview_at ? \Carbon\Carbon::parse($interview->interview_at)->format('j M Y, g:i A') : '—' }}
+                                    </td>
+                                    <td class="py-2 pr-4">
+                                        {{ $interview->status ? str_replace('_', ' ', ucfirst($interview->status)) : '—' }}
+                                    </td>
+                                    <td class="py-2 pr-4">{{ $interview->created_at->format('j M Y') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="py-3 text-gray-500" colspan="4">No interview links yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Document Management Section (Checklist & Upload) -->
         <div id="document-section" class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Document Management</h3>
+            <h3 class="text-lg font-medium text-brand mb-4 flex items-center gap-2">
+                <i class="bi bi-folder2-open text-amber-600"></i> Student Profile
+            </h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Checklist Status Card -->
                 <div class="bg-white rounded-lg border shadow-sm">
                     <div class="p-4 border-b">
                         <h3 class="text-lg font-medium text-brand flex items-center">
-                            <i class="bi bi-list-check mr-2"></i>Document Checklist
+                            <i class="bi bi-list-check mr-2 text-emerald-600"></i>Document Checklist
                         </h3>
                         <p class="text-sm text-gray-600 mt-1">
                             {{ $checklists ? $checklists->count() : 0 }} required documents
@@ -477,13 +671,14 @@
                 <div class="bg-white rounded-lg border shadow-sm">
                     <div class="p-4 border-b">
                         <h3 class="text-lg font-medium text-brand flex items-center">
-                            <i class="bi bi-cloud-upload mr-2"></i>Upload Documents
+                            <i class="bi bi-cloud-upload mr-2 text-blue-600"></i>Upload Documents
                         </h3>
                         <p class="text-sm text-gray-600 mt-1">Upload multiple files (Max 50MB each)</p>
                     </div>
                     <div class="p-4">
                         @can('documents.upload')
-                            <form action="{{ route('admin.student-documents.store', $student->id) }}" method="POST"
+                            <form id="studentDocumentsUploadForm"
+                                action="{{ route('admin.student-documents.store', $student->id) }}" method="POST"
                                 enctype="multipart/form-data" class="space-y-4">
                                 @csrf
 
@@ -519,7 +714,9 @@
 
         <!-- Student Availability Section (FullCalendar) -->
         <div class="mb-8">
-            <h3 class="text-lg font-medium text-brand mb-4">Student Availability</h3>
+            <h3 class="text-lg font-medium text-green-700 mb-4 flex items-center gap-2">
+                <i class="bi bi-calendar-event text-green-600"></i> Student Schedule
+            </h3>
 
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <!-- Calendar Area -->
@@ -532,19 +729,17 @@
                 <!-- Sidebar -->
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-lg border shadow-sm p-4 sticky top-6">
-                        <h4 class="text-lg font-medium mb-4" style="color: #d4af37;">Week Summary</h4>
+                        <h4 class="text-lg font-medium mb-4 text-green-700">Week Summary</h4>
 
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Total Hours</label>
-                            <div class="text-3xl font-bold text-gray-800" id="totalHoursDisplay">0</div>
+                            <div class="text-3xl font-bold text-gray-800" id="totalHoursDisplay">0.0</div>
                             <input type="hidden" id="totalHoursInput">
                         </div>
 
                         <div class="space-y-3">
                             <button id="saveBtn"
-                                class="w-full px-4 py-2 rounded-lg text-white font-medium flex justify-center items-center gap-2"
-                                style="background-color: #d4af37;" onmouseover="this.style.backgroundColor='#c19b2e'"
-                                onmouseout="this.style.backgroundColor='#d4af37'">
+                                class="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium flex justify-center items-center gap-2 hover:bg-emerald-700 transition-colors">
                                 <i class="fas fa-save"></i> Save Schedule
                             </button>
 
@@ -658,48 +853,152 @@
         </div>
     </div>
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('public/assets/css/student-documents.css') }}">
-@endpush
+    <!-- Edit Note Modal -->
+    <div id="editNoteModal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden z-50">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 relative">
+            <button id="closeEditNoteModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
+                &times;
+            </button>
 
-@push('vendor-scripts')
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-@include('includes.google-maps')
-@endpush
+            <h3 class="text-xl font-semibold text-brand mb-4">Edit Note</h3>
 
-@push('scripts')
-@php
-    $studentMap = [
-        'name' => $student->name,
-        'lat'  => $student->latitude,
-        'lng'  => $student->longitude,
-    ];
+            <form id="editNoteForm" class="space-y-4">
+                @csrf
+                <input type="hidden" id="editNoteId" value="">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Note</label>
+                    <textarea id="editNoteContent" rows="4" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelEditNote"
+                        class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors font-medium">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors font-medium">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    $industryMap = $nearbyIndustries->map(function ($i) {
-        return [
-            'id'       => $i->id,
-            'name'     => $i->name,
-            'type'     => $i->type ?? 'Industry',
-            'lat'      => $i->latitude,
-            'lng'      => $i->longitude,
-            'distance' => round($i->distance, 2),
-        ];
-    })->values();
+    @section('right-sidebar')
+        <div data-right-sidebar="true" class="h-full flex flex-col">
+            <div class="p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">Placement Match</h3>
+                <p class="text-xs text-gray-500">Select an industry to verify documents</p>
+            </div>
+            <div class="p-4 space-y-4 overflow-y-auto">
+                <div class="p-3 bg-gray-50 rounded border">
+                    <div class="text-xs text-gray-500">Student</div>
+                    <div id="matchStudentName" class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
+                    <div id="matchCourseName" class="text-xs text-gray-600">
+                        {{ $student->course->name ?? 'No Course' }}
+                    </div>
+                </div>
+                <div class="p-3 bg-gray-50 rounded border">
+                    <div class="text-xs text-gray-500">Industry</div>
+                    <div id="matchIndustryName" class="text-sm font-medium text-gray-900">Not selected</div>
+                    <div id="matchIndustryMeta" class="text-xs text-gray-600">Select from map or list</div>
+                </div>
+                <div>
+                    <div class="text-xs font-medium text-gray-600 mb-2">Course Match</div>
+                    <div id="matchCourseStatus"
+                        class="text-xs inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                        Not checked
+                    </div>
+                </div>
+                <div>
+                    <div class="text-xs font-medium text-gray-600 mb-2">Course Checklist</div>
+                    <div id="matchCourseChecklist" class="space-y-2 text-sm">
+                        <div class="text-xs text-gray-400">Select an industry to evaluate.</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-xs font-medium text-gray-600 mb-2">Industry Checklist</div>
+                    <div id="matchIndustryChecklist" class="space-y-2 text-sm">
+                        <div class="text-xs text-gray-400">Select an industry to evaluate.</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-xs font-medium text-gray-600 mb-2">Additional Documents</div>
+                    <div id="matchAdditionalDocs" class="space-y-2 text-sm">
+                        <div class="text-xs text-gray-400">Select an industry to evaluate.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 space-y-2">
+                <button id="matchScheduleBtn" type="button" disabled
+                    class="w-full bg-emerald-600 disabled:bg-gray-300 text-white text-xs px-3 py-2 rounded-md font-medium">
+                    Schedule Interview
+                </button>
+                <button id="matchScrollDocsBtn" type="button"
+                    class="w-full bg-gray-100 text-gray-700 text-xs px-3 py-2 rounded-md font-medium">
+                    View Documents
+                </button>
+                <div id="matchStatusNote" class="text-xs text-gray-500">Select an industry to see requirements.</div>
+            </div>
+        </div>
+    @endsection
 
-    $authUserMap = [
-        'role' => auth()->user()->role,
-        'coordinator_type' => auth()->user()->coordinator_type ?? null,
-    ];
-@endphp
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('/assets/css/admin/student-documents.css') }}">
+        <style>
+            .fc .fc-toolbar-title {
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+        </style>
+    @endpush
 
-<script>
-    window.studentId  = @json($student->id);
-    window.student    = @json($studentMap);
-    window.industries = @json($industryMap);
-    window.authUser   = @json($authUserMap);
-</script>
+    @push('vendor-scripts')
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+        @include('includes.google-maps', ['callback' => 'initIndustryMap'])
+    @endpush
 
-<script src="{{ asset('public/assets/js/student-documents.js') }}"></script>
-@endpush
+    @push('scripts')
+        @php
+            $studentMap = [
+                'name' => $student->name,
+                'lat' => $student->latitude,
+                'lng' => $student->longitude,
+            ];
+
+            $industryMap = $nearbyIndustries
+                ->map(function ($i) {
+                    return [
+                        'id' => $i->id,
+                        'name' => $i->name,
+                        'industry_status' => $i->industry_status ?? 'Industry Partner', // or remove if not needed
+                        'contact_person' => $i->contact_person,
+                        'phone' => $i->phone,
+                        'email' => $i->email,
+                        'address' => $i->address,
+                        'website' => $i->website,
+                        'lat' => $i->latitude,
+                        'lng' => $i->longitude,
+                        'distance' => round($i->distance, 2),
+                    ];
+                })
+                ->values();
+
+            $authUserMap = [
+                'id' => auth()->id(),
+                'role' => auth()->user()->role,
+                'coordinator_type' => auth()->user()->coordinator_type ?? null,
+            ];
+        @endphp
+
+        <script>
+            window.studentId = @json($student->id);
+            window.student = @json($studentMap);
+            window.industries = @json($industryMap);
+            window.authUser = @json($authUserMap);
+        </script>
+
+        <script src="{{ asset('/assets/js/admin/student-documents.js') }}"></script>
+    @endpush
 
 @endsection
