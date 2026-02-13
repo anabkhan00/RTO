@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\PlacementOpportunity;
+use Illuminate\Http\Request;
 use App\Models\PlacementAssignment;
+use App\Http\Controllers\Controller;
+use App\Models\PlacementOpportunity;
+use Illuminate\Support\Facades\Auth;
 
 class StudentIndustryController extends Controller
 {
@@ -15,10 +16,14 @@ class StudentIndustryController extends Controller
         $opportunities = PlacementOpportunity::with(['industry', 'sourcingCoordinator', 'assignments.student'])
             ->where('status', true)
             ->get();
-        
+
         $students = User::where('role', 'user')->get();
-        
-        return view('admin.pages.assign_students', compact('opportunities', 'students'));
+
+        $placementCoordinators = User::role('placement_coordinator')
+            ->where('status', true)
+            ->get();
+
+        return view('admin.pages.assign_students', compact('opportunities', 'students', 'placementCoordinators'));
     }
 
     public function assignStudents(Request $request)
@@ -30,7 +35,7 @@ class StudentIndustryController extends Controller
         ]);
 
         $opportunity = PlacementOpportunity::findOrFail($request->opportunity_id);
-        
+
         if ($opportunity->available_slots < count($request->student_ids)) {
             return response()->json(['error' => 'Not enough available slots'], 400);
         }
@@ -41,7 +46,7 @@ class StudentIndustryController extends Controller
                     'placement_opportunity_id' => $request->opportunity_id,
                     'student_id' => $studentId
                 ],
-                ['placement_coordinator_id' => auth()->id()]
+                ['placement_coordinator_id' => Auth::id()]
             );
         }
 

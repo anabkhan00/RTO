@@ -19,6 +19,7 @@ class StudentDetail extends Model implements Auditable
         'emergency_contact',
         'placement_hours',
         'student_status',
+        'interview_status',
         'student_availability',
         'assigned_coordinator_id',
         'placement_coordinator_id',

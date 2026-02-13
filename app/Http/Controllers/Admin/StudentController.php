@@ -6,10 +6,10 @@ use App\Models\User;
 use App\Models\Course;
 use App\Models\Industry;
 use App\Models\RtoStudent;
-use App\Models\RTOIndustry;
 use Illuminate\Http\Request;
 use App\Models\StudentDetail;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -18,42 +18,26 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $rtoId = $request->get('rto_id');
-        $user = auth()->user();
+        $user = Auth::user();
         $userRole = $user->getRoleNames()->first();
-
+        $rtoId = $request->get('rto_id');
+        $assignedRtoIds = collect();
         if ($userRole === 'placement_coordinator') {
-            if (!$rtoId) {
-                $assignedRtoIds = $user->assignedRtos()->pluck('users.id');
-                if ($assignedRtoIds->isEmpty()) {
-                    abort(403, 'No RTOs assigned to you.');
-                }
-                $rtoId = $assignedRtoIds->first();
-            } else {
-                $hasAccess = $user->assignedRtos()->where('users.id', $rtoId)->exists();
-                if (!$hasAccess) {
-                    abort(403, 'You do not have access to this RTO.');
-                }
-            }
-        }
-
-        if ($rtoId) {
-            $studentIds = RtoStudent::where('rto_id', $rtoId)->pluck('student_id');
-            $students = User::with(['course', 'studentDetail.industry'])
-                ->where('role', 'user')
-                ->whereIn('id', $studentIds)
-                ->latest()
-                ->get();
-        } else {
-            $students = User::with(['course', 'studentDetail.industry'])->where('role', 'user')->latest()->get();
-            $rtoId = null;
+            $assignedRtoIds = $user->assignedRtos()->pluck('users.id');
         }
 
         $courses = Course::where('status', true)->get();
-        $rtos = User::where('role', 'rto')->latest()->get();
+        if ($userRole === 'placement_coordinator') {
+            $rtos = User::where('role', 'rto')
+                ->whereIn('id', $assignedRtoIds)
+                ->latest()
+                ->get();
+        } else {
+            $rtos = User::where('role', 'rto')->latest()->get();
+        }
         $industries = Industry::all();
 
-        return view('admin.pages.students', compact('students', 'courses', 'rtos', 'industries', 'rtoId'));
+        return view('admin.pages.students', compact('courses', 'rtos', 'industries', 'rtoId'));
     }
 
     public function create()
@@ -71,14 +55,15 @@ class StudentController extends Controller
             'email' => 'required|email|unique:users',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'course_id' => 'nullable|exists:courses,id',
-            'rto_id' => 'nullable|exists:users,id',
             'priority' => 'nullable|string',
-            'progress_status' => 'nullable|string',
             'industry_id' => 'nullable|exists:industries,id',
             'emergency_contact' => 'nullable|string|max:20',
             'placement_hours' => 'nullable|numeric|min:0',
             'student_status' => 'nullable|in:active,inactive,blocked',
+            'interview_status' => 'nullable|string',
             'medical_condition' => 'nullable|string',
             'transport' => 'nullable|string|max:255',
             'placement_data' => 'nullable|string',
@@ -90,6 +75,8 @@ class StudentController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'course_id' => $request->course_id,
             'password' => Hash::make('password'),
             'role' => 'user',
@@ -100,26 +87,26 @@ class StudentController extends Controller
                 'rto_id' => $request->rto_id,
                 'student_id' => $student->id,
             ]);
+        } else {
+            RtoStudent::create([
+                'rto_id' => Auth::id(),
+                'student_id' => $student->id,
+            ]);
         }
 
         $daysLeft = null;
         $placementBookedAt = null;
 
-        if ($request->progress_status === 'booked_placements') {
-            $daysLeft = 120;
-            $placementBookedAt = now();
-        }
-
         StudentDetail::create([
             'user_id' => $student->id,
             'priority' => $request->priority,
-            'progress_status' => $request->progress_status ?? 'awaiting_placements',
             'industry_id' => $request->industry_id,
             'days_left' => $daysLeft,
             'placement_booked_at' => $placementBookedAt,
             'emergency_contact' => $request->emergency_contact,
             'placement_hours' => $request->placement_hours,
             'student_status' => $request->student_status ?? 'active',
+            'interview_status' => $request->interview_status,
             'medical_condition' => $request->medical_condition,
             'transport' => $request->transport,
             'placement_data' => $request->placement_data,
@@ -147,6 +134,7 @@ class StudentController extends Controller
             'emergency_contact' => 'nullable|string|max:20',
             'placement_hours' => 'nullable|numeric|min:0',
             'student_status' => 'nullable|in:active,inactive,blocked',
+            'interview_status' => 'nullable|string',
             'profile_image' => 'nullable|image|max:2048',
             'medical_condition' => 'nullable|string',
             'transport' => 'nullable|string|max:255',
@@ -159,10 +147,10 @@ class StudentController extends Controller
         $profileImagePath = $student->profile_image;
 
         if ($request->hasFile('profile_image')) {
-            if ($profileImagePath && Storage::exists($profileImagePath)) {
-                Storage::delete($profileImagePath);
+            if ($profileImagePath && Storage::disk('public')->exists($profileImagePath)) {
+                Storage::disk('public')->delete($profileImagePath);
             }
-            $profileImagePath = $request->file('profile_image')->store('profile_images');
+            $profileImagePath = $request->file('profile_image')->store('profile_images', 'public');
         }
 
         $student->update([
@@ -205,6 +193,7 @@ class StudentController extends Controller
                 'emergency_contact' => $request->emergency_contact,
                 'placement_hours' => $request->placement_hours,
                 'student_status' => $request->student_status,
+                'interview_status' => $request->interview_status,
                 'medical_condition' => $request->medical_condition,
                 'transport' => $request->transport,
                 'placement_data' => $request->placement_data,
@@ -218,9 +207,32 @@ class StudentController extends Controller
 
     public function destroy($id)
     {
-        $student = User::findOrFail($id);
-        $student->delete();
-        return back()->with('success', 'Student deleted successfully');
+        try {
+            $student = User::findOrFail($id);
+
+            // Clear RTO mapping first to avoid FK conflicts on delete.
+            RtoStudent::where('student_id', $student->id)->delete();
+            $student->delete();
+
+            if (request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Student removed successfully',
+                ]);
+            }
+
+
+            return back()->with('success', 'Student deleted successfully');
+        } catch (\Throwable $e) {
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete student',
+                ], 500);
+            }
+
+            return back()->with('error', 'Failed to delete student');
+        }
     }
 
     public function upload(Request $request)
@@ -290,13 +302,6 @@ class StudentController extends Controller
         ]);
     }
 
-    public function resetPassword($id)
-    {
-        $student = User::findOrFail($id);
-        $student->update(['password' => Hash::make('password')]);
-        return back()->with('success', 'Password reset to "password" successfully');
-    }
-
     public function toggleStatus($id)
     {
         $student = User::findOrFail($id);
@@ -306,10 +311,16 @@ class StudentController extends Controller
 
     public function data(Request $request)
     {
-        $query = User::with(['course', 'studentDetail.industry', 'assignmentRequests.sourcingCoordinator'])->where('role', 'user');
+        $query = User::with(['course', 'studentDetail.industry', 'assignmentRequests.sourcingCoordinator'])
+            ->where('role', 'user');
 
-        $user = auth()->user();
+        $user = Auth::user();
         $userRole = $user->getRoleNames()->first();
+
+        // If NOT admin, only show active students
+        if (!$user->hasRole('admin')) {
+            $query->where('status', 1);
+        }
 
         if ($userRole === 'placement_coordinator') {
             $assignedRtoIds = $user->assignedRtos()->pluck('users.id');
@@ -396,7 +407,9 @@ class StudentController extends Controller
             $query->orderBy('name', $orderDir);
         }
 
-        $totalRecords = User::where('role', 'user')->count();
+        $totalRecords = $user->hasRole('admin')
+            ? User::where('role', 'user')->count()
+            : User::where('role', 'user')->where('status', 1)->count();
         $filteredRecords = $query->count();
 
         $students = $query->skip($start)->take($length)->get();
@@ -427,7 +440,7 @@ class StudentController extends Controller
                 ? '<span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border-blue-100 border shadow-sm">' . $assignedCoordinator->sourcingCoordinator->name . '</span>'
                 : '<span class="text-sm text-gray-600">Not Assigned</span>';
 
-            if (auth()->user()->hasRole('admin')) {
+            if (Auth::user()->hasRole('admin')) {
                 $actionsHtml = '
         <div class="text-center flex justify-center gap-2">
             <div class="relative inline-block dropdown-container" onclick="event.stopPropagation()">
@@ -437,14 +450,13 @@ class StudentController extends Controller
                 </button>
                 <div id="dropdown-' . $student->id . '"
                      class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1">
-                    <a href="#" onclick="deleteStudent(' . $student->id . ')"
-                       class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <a href="#" class="delete-student block px-3 py-2 text-sm text-red-600 hover:bg-red-50" data-student-id="' . $student->id . '" onclick="deleteStudent(this.dataset.studentId); return false;">
                        <i class="bi bi-trash mr-2"></i>Delete
                     </a>
                 </div>
             </div>
         </div>';
-            } elseif (auth()->user()->hasRole('placement_coordinator')) {
+            } elseif (Auth::user()->hasRole('placement_coordinator')) {
                 $actionsHtml = '
         <div class="text-center flex justify-center gap-2">
             <div class="relative inline-block dropdown-container" onclick="event.stopPropagation()">
@@ -465,11 +477,11 @@ class StudentController extends Controller
 
             $data[] = [
                 'row_url' => route('admin.student-documents.index', $student->id),
-                'checkbox' => auth()->user()->hasRole('placement_coordinator') ? '<input type="checkbox" class="student-checkbox rounded border-gray-300" value="' . $student->id . '">' : '',
+                'checkbox' => Auth::user()->hasRole('placement_coordinator') ? '<input type="checkbox" class="student-checkbox rounded border-gray-300" value="' . $student->id . '">' : '',
                 'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($student->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $student->name . '</div></div>',
                 'industry' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $industryColor . ' border shadow-sm">' . $industry . '</span>',
                 'course' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $courseColor . ' border shadow-sm">' . $courseName . '</span>',
-                'days_left' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $daysColor . ' border shadow-sm">' . $daysLeft . ' Days left</span>',
+                // 'days_left' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ' . $daysColor . ' border shadow-sm">' . $daysLeft . ' Days left</span>',
                 'progress' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-700 border-indigo-100 border shadow-sm"><i class="bi bi-person mr-1"></i>' . $progress . '</span>',
                 'status' => '<span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700 border-green-100 border shadow-sm">Active</span>',
                 'coordinator' => $coordinatorDisplay,

@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Industry;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\IndustryWeeklySchedule;
 use Illuminate\Support\Facades\Response;
 
@@ -13,9 +14,9 @@ class IndustryController extends Controller
 {
     public function index()
     {
-        $industries = Industry::latest()->get();
-        return view('admin.pages.industries', compact('industries'));
+        return view('admin.pages.industries');
     }
+
 
     public function create(Request $request)
     {
@@ -234,6 +235,11 @@ class IndustryController extends Controller
     {
         $query = Industry::query();
 
+        // If NOT admin, only show active industries
+        if (!Auth::user()->hasRole('admin')) {
+            $query->where('status', 1);
+        }
+
         // Apply filters
         if ($request->filled('search')) {
             $search = $request->search;
@@ -266,7 +272,7 @@ class IndustryController extends Controller
         $orderDir = $request->get('order.0.dir', 'desc');
 
         // Order mapping
-        $columns = ['name', 'contact_info', 'contact_person', 'status', 'created_at', 'actions'];
+        $columns = ['name', 'contact_info', 'contact_person', 'created_at', 'status', 'actions'];
         $orderBy = $columns[$orderColumn] ?? 'created_at';
 
         if ($orderBy === 'created_at') {
@@ -279,12 +285,13 @@ class IndustryController extends Controller
             $query->orderBy('contact_person', $orderDir);
         }
 
-        $totalRecords = Industry::count();
+        $totalRecords = Auth::user()->hasRole('admin') ? Industry::count() : Industry::where('status', 1)->count();
         $filteredRecords = $query->count();
 
         $industries = $query->skip($start)->take($length)->get();
 
         $data = [];
+
         foreach ($industries as $industry) {
             $industryColors = ['bg-blue-50 text-blue-700 border-blue-100', 'bg-purple-50 text-purple-700 border-purple-100', 'bg-emerald-50 text-emerald-700 border-emerald-100'];
             $industryColor = $industryColors[abs(crc32($industry->name)) % count($industryColors)];
@@ -292,11 +299,11 @@ class IndustryController extends Controller
 
             $data[] = [
                 'row_url' => route('admin.industries.edit', $industry->id),
-                'name' => '<div class="flex items-center"><div class="h-8 w-8 rounded-full bg-brand flex items-center justify-center text-white font-semibold text-xs mr-3">' . substr($industry->name, 0, 1) . '</div><div class="text-sm font-medium text-gray-900">' . $industry->name . '</div></div>',
+                'name' => '<div class="flex items-center"><div class="h-[31px] w-[31px] rounded-full ' . $industryColor . ' flex items-center justify-center text-[11px] font-semibold mr-3">IN</div><div class="text-sm font-medium text-gray-900">' . $industry->name . '</div></div>',
                 'contact_info' => '<div class="space-y-1"><div class="flex items-center text-xs"><i class="bi bi-envelope mr-1"></i>' . ($industry->email ?? 'N/A') . '</div><div class="flex items-center text-xs"><i class="bi bi-phone mr-1"></i>' . ($industry->phone ?? 'N/A') . '</div></div>',
                 'contact_person' => $industry->contact_person ?? '-----',
+                'created_at' => '<span class="text-xs text-gray-600">' . $industry->created_at->format('j M Y') . '</span>',
                 'status' => '<select onchange="updateStatus(' . $industry->id . ', this.value)" onclick="event.stopPropagation()" class="border border-gray-300 text-xs px-2 py-1 rounded-md ' . ($industry->status ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200') . ' focus:ring-brand focus:border-brand"><option value="1"' . ($industry->status ? ' selected' : '') . '>Active</option><option value="0"' . (!$industry->status ? ' selected' : '') . '>Inactive</option></select>',
-                'created_at' => $industry->created_at->format('j M Y'),
                 'actions' => '<div class="text-center"><div class="relative inline-block dropdown-container" onclick="event.stopPropagation()"><button onclick="toggleDropdown(' . $industry->id . ')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"><i class="bi bi-three-dots-vertical text-gray-700"></i></button><div id="dropdown-' . $industry->id . '" class="dropdown-menu hidden absolute right-0 mt-2 w-32 z-[9999] bg-white shadow-lg rounded-md border py-1"><a href="#" onclick="deleteIndustry(' . $industry->id . ')" class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="bi bi-trash mr-2"></i>Delete</a></div></div></div>'
             ];
         }
@@ -308,6 +315,7 @@ class IndustryController extends Controller
             'data' => $data
         ]);
     }
+
     public function getWeekAvailability(Request $request, $id)
     {
         $start = $request->query('start');
@@ -321,11 +329,11 @@ class IndustryController extends Controller
         $schedules = IndustryWeeklySchedule::where('industry_id', $id)
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('week_start_date', [$startDate, $endDate])
-                      ->orWhereBetween('week_end_date', [$startDate, $endDate])
-                      ->orWhere(function ($q) use ($startDate, $endDate) {
-                          $q->where('week_start_date', '<', $startDate)
+                    ->orWhereBetween('week_end_date', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('week_start_date', '<', $startDate)
                             ->where('week_end_date', '>', $endDate);
-                      });
+                    });
             })
             ->get();
 

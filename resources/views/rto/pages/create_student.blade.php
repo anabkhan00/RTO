@@ -1,4 +1,4 @@
-@extends('admin.master_layout.index')
+@extends('rto.master_layout.index')
 @section('page-title', 'Create Student')
 
 @section('content')
@@ -9,7 +9,7 @@
                 <h1 class="text-2xl font-bold text-gray-800">Create New Student</h1>
                 {{-- <p class="text-gray-600 mt-1">Add a new student to the system</p> --}}
             </div>
-            <a href="{{ route('admin.students') }}"
+            <a href="{{ route('rto.students') }}"
                 class="bg-gray-500 text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-gray-600 transition-colors">
                 Back to Students
             </a>
@@ -18,7 +18,7 @@
 
     <!-- Create Student Form -->
     <div class="bg-white rounded-lg shadow-sm p-6">
-        <form method="POST" action="{{ route('admin.students.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('rto.students.store') }}" class="space-y-6">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

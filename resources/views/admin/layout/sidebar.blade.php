@@ -12,10 +12,23 @@
                     </a>
                 @endcan
 
-                @can('find.placements')
+                {{-- @can('find.placements')
                     <a href="{{ route('admin.find-placements') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.find-placements') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Find Placements
+                    </a>
+                @endcan --}}
+
+                @can('find.industries')
+                    <a href="{{ route('admin.find-industries') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.find-industries') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Find Industries
+                    </a>
+                @endcan
+                @can('live.appointments')
+                    <a href="{{ route('admin.live-appointments') }}"
+                        class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.live-appointments') ? 'bg-brand rounded-lg text-white' : '' }}">
+                        Live Appointments
                     </a>
                 @endcan
 
@@ -82,12 +95,12 @@
                     </a>
                 @endcan
 
-                @can('students.assign_industry')
+                {{-- @can('students.assign_industry')
                     <a href="{{ route('admin.assign-students') }}"
                         class="flex items-center px-6 py-2 font-medium text-sm transition {{ request()->routeIs('admin.assign-students*') ? 'bg-brand rounded-lg text-white' : '' }}">
                         Assign Students
                     </a>
-                @endcan
+                @endcan --}}
 
                 @can('industries.view')
                     <a href="{{ route('admin.industries') }}"

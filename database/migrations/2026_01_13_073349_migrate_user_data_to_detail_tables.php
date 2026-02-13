@@ -57,6 +57,9 @@ return new class extends Migration
             if (!Schema::hasColumn('student_details', 'student_status')) {
                 $table->enum('student_status', ['active', 'inactive', 'blocked'])->default('active');
             }
+            if (!Schema::hasColumn('student_details', 'interview_status')) {
+                $table->string('interview_status')->nullable();
+            }
             if (!Schema::hasColumn('student_details', 'student_availability')) {
                 $table->json('student_availability')->nullable();
             }
@@ -129,6 +132,7 @@ return new class extends Migration
 
             $studentData = [
                 'student_status' => $user->student_status ?? 'active',
+                'interview_status' => $user->interview_status ?? null,
                 'student_availability' => $user->student_availability ?? null,
                 'assigned_coordinator_id' => $user->assigned_coordinator_id ?? null,
                 'placement_coordinator_id' => $user->placement_coordinator_id ?? null,
@@ -163,7 +167,7 @@ return new class extends Migration
             $columns = [
                 'student_status', 'student_availability', 'assigned_coordinator_id',
                 'placement_coordinator_id', 'sourcing_coordinator_id', 'medical_condition',
-                'transport', 'placement_data', 'gender'
+                'transport', 'placement_data', 'gender', 'interview_status'
             ];
 
             foreach ($columns as $column) {

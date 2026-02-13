@@ -29,9 +29,38 @@ class StudentNoteController extends Controller
         return response()->json([
             'success' => true,
             'note' => [
+                'id' => $note->id,
                 'content' => $note->content,
                 'author_role' => $note->author_role,
                 'author_name' => $note->author->name,
+                'author_id' => $note->author_id,
+                'created_at' => $note->created_at->format('M j, Y')
+            ]
+        ]);
+    }
+
+    public function update(Request $request, $studentId, $noteId)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000'
+        ]);
+
+        $note = StudentNote::where('student_id', $studentId)->findOrFail($noteId);
+
+        if ($note->author_id !== Auth::id()) {
+            return response()->json(['success' => false], 403);
+        }
+
+        $note->update(['content' => $request->content]);
+
+        return response()->json([
+            'success' => true,
+            'note' => [
+                'id' => $note->id,
+                'content' => $note->content,
+                'author_role' => $note->author_role,
+                'author_name' => $note->author->name,
+                'author_id' => $note->author_id,
                 'created_at' => $note->created_at->format('M j, Y')
             ]
         ]);
